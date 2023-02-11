@@ -121,6 +121,9 @@ int main(void)
   /* USER CODE BEGIN 2 */
   uint16_t encoderData_1 = 99;
   uint16_t encoderData_2 = 99;
+  uint16_t encoderData_3 = 99;
+  uint16_t encoder_max = 0;
+  uint16_t encoder_min = 4100;
   HAL_TIM_Base_Start(&htim1);
   /* USER CODE END 2 */
 
@@ -131,12 +134,17 @@ int main(void)
 
 	  encoderData_1 = getPositionSPI(&hspi1, GPIOC, GPIO_PIN_7, 12, &htim1);
 	  encoderData_2 = getPositionSPI(&hspi2, GPIOB, GPIO_PIN_6, 12, &htim1);
-//	  delay_us(10000);
-//	  print("encoder gives \r\n");
+	  encoderData_3 = getPositionSPI(&hspi3, GPIOA, GPIO_PIN_8, 12, &htim1);
+
 	  printf("encoder 1 gives %d\r\n", encoderData_1);
 	  printf("encoder 2 gives %d\r\n", encoderData_2);
-//	  delay_us(65535);
-	  HAL_Delay(100);
+	  printf("encoder 3 gives %d\r\n", encoderData_3);
+//	  if(encoderData_3 > encoder_max && encoderData_3 != 65535) encoder_max = encoderData_3;
+//	  if(encoderData_3 < encoder_min && encoderData_3 != 65535) encoder_min = encoderData_3;
+//	  printf("encoder_max is %d\r\n", encoder_max);
+//	  printf("encoder_min is %d\r\n", encoder_min);
+
+	  HAL_Delay(10);
 
 
 	  //TIMER TEST
