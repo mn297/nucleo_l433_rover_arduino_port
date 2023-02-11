@@ -73,14 +73,16 @@ void Error_Handler(void);
 #define SMPS_PG_GPIO_Port GPIOA
 #define SMPS_SW_Pin GPIO_PIN_7
 #define SMPS_SW_GPIO_Port GPIOA
-#define LD4_Pin GPIO_PIN_13
-#define LD4_GPIO_Port GPIOB
 #define SPI1_CS_Pin GPIO_PIN_7
 #define SPI1_CS_GPIO_Port GPIOC
+#define SPI3_CS_D9_Pin GPIO_PIN_9
+#define SPI3_CS_D9_GPIO_Port GPIOA
 #define TMS_Pin GPIO_PIN_13
 #define TMS_GPIO_Port GPIOA
 #define TCK_Pin GPIO_PIN_14
 #define TCK_GPIO_Port GPIOA
+#define SPI2_CS_D8_Pin GPIO_PIN_6
+#define SPI2_CS_D8_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 

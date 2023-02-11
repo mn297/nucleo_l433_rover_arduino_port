@@ -119,7 +119,8 @@ int main(void)
   MX_SPI3_Init();
   MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
-  uint16_t encoderData = 99;
+  uint16_t encoderData_1 = 99;
+  uint16_t encoderData_2 = 99;
   HAL_TIM_Base_Start(&htim1);
   /* USER CODE END 2 */
 
@@ -128,12 +129,14 @@ int main(void)
   while (1)
   {
 
-	  encoderData = getPositionSPI(&hspi1, GPIOA, GPIO_PIN_15, 12, &htim1);
+	  encoderData_1 = getPositionSPI(&hspi1, GPIOC, GPIO_PIN_7, 12, &htim1);
+	  encoderData_2 = getPositionSPI(&hspi2, GPIOB, GPIO_PIN_6, 12, &htim1);
 //	  delay_us(10000);
 //	  print("encoder gives \r\n");
-	  printf("encoder gives %d\r\n", encoderData);
+	  printf("encoder 1 gives %d\r\n", encoderData_1);
+	  printf("encoder 2 gives %d\r\n", encoderData_2);
 //	  delay_us(65535);
-	  HAL_Delay(50);
+	  HAL_Delay(100);
 
 
 	  //TIMER TEST
