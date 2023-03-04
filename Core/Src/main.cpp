@@ -25,7 +25,13 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "AMT22.h"
+#include "RoverArmMotor.h"
+//Standard includes
+#include <stdint.h>
+#include <string.h>
+#include <stdio.h>
+#include <stdarg.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -56,7 +62,28 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+void print(const char* s){
+//	#ifdef PRINT
+	HAL_StatusTypeDef code = HAL_UART_Transmit(&huart2, (uint8_t*) s, strlen(s), HAL_MAX_DELAY);
+//	#endif
+}
+int printf(const char* s, ...){
+	char buffer[256];
+//	#ifdef PRINT
+	va_list args;
+	va_start(args, s);
+	vsprintf(buffer, s, args);
+	perror(buffer);
+	print(buffer);
+	va_end(args);
+//	#endif
+	return strlen(buffer);
+}
+void delay_us (uint16_t us)
+{
+	__HAL_TIM_SET_COUNTER(&htim1,0);  // set the counter value a 0
+	while (__HAL_TIM_GET_COUNTER(&htim1) < us);  // wait for the counter to reach the us input in the parameter
+}
 /* USER CODE END 0 */
 
 /**
@@ -94,13 +121,75 @@ int main(void)
   MX_TIM1_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
+  uint16_t encoderData_1 = 99;
+  uint16_t encoderData_2 = 99;
+  uint16_t encoderData_3 = 99;
+  uint16_t encoder_max = 0;
+  uint16_t encoder_min = 4100;
+  HAL_TIM_Base_Start(&htim1);
 
+
+  Pin CYTRON_DIR_1(CYTRON_DIR_1_GPIO_Port, CYTRON_DIR_1_Pin);
+  Pin CYTRON_PWM_1(CYTRON_PWM_1_GPIO_Port, CYTRON_PWM_1_Pin);
+  int32_t  CH2_DC = 0;
+  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    //AMT22 test
+	  // encoderData_1 = getPositionSPI(&hspi1, GPIOC, GPIO_PIN_7, 12, &htim1);
+	  // encoderData_2 = getPositionSPI(&hspi2, GPIOB, GPIO_PIN_6, 12, &htim1);
+	  // encoderData_3 = getPositionSPI(&hspi3, GPIOA, GPIO_PIN_8, 12, &htim1);
+	  // printf("encoder 1 gives %d\r\n", encoderData_1);
+	  // printf("encoder 2 gives %d\r\n", encoderData_2);
+	  // printf("encoder 3 gives %d\r\n", encoderData_3);
+
+
+    //LEGACY CODE
+	  // if(encoderData_3 > encoder_max && encoderData_3 != 65535) encoder_max = encoderData_3;
+	  // if(encoderData_3 < encoder_min && encoderData_3 != 65535) encoder_min = encoderData_3;
+	  // printf("encoder_max is %d\r\n", encoder_max);
+	  // printf("encoder_min is %d\r\n", encoder_min);
+
+
+    //PWM test
+    // __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 1000);
+    while(CH2_DC < 65535)
+    {
+        // TIM2->CCR2 = CH2_DC;
+        __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, CH2_DC); //this is the same as above
+        CH2_DC += 70;
+        HAL_Delay(1);
+    }
+    while(CH2_DC > 0)
+    {
+        // TIM2->CCR2 = CH2_DC;
+        __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, CH2_DC); //this is the same as above
+        CH2_DC -= 70;
+        HAL_Delay(1);
+    }
+
+
+
+
+
+	  HAL_Delay(10);
+
+
+	  //TIMER TEST
+//	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_SET);
+//	  HAL_Delay(1000);
+	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_RESET);
+//	  HAL_Delay(1000);
+
+	  //TIMER US TEST
+//	  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_15);
+//	  delay_us(3);
+
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
