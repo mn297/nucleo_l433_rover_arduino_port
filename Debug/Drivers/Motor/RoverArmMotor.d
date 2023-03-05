@@ -32,7 +32,7 @@ Drivers/Motor/RoverArmMotor.o: ../Drivers/Motor/RoverArmMotor.cpp \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_tim_ex.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart_ex.h \
- ../Drivers/Motor/movingAvg.h
+ ../Drivers/Motor/movingAvg.h ../Drivers/STM32_AMT22_lib/AMT22.h
 ../Drivers/Motor/RoverArmMotor.h:
 ../Drivers/Motor/pid.h:
 ../Core/Inc/main.h:
@@ -69,3 +69,4 @@ Drivers/Motor/RoverArmMotor.o: ../Drivers/Motor/RoverArmMotor.cpp \
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart_ex.h:
 ../Drivers/Motor/movingAvg.h:
+../Drivers/STM32_AMT22_lib/AMT22.h:

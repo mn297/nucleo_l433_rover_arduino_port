@@ -27,7 +27,7 @@ class RoverArmMotor{
         #define BLUE_ROBOTICS 1
 
         // ADC values representing 359 and 0 degrees respectively
-        #define MAX_ADC_VALUE 1024 //3850 
+        #define MAX_ADC_VALUE 4095 //3850 
         #define MIN_ADC_VALUE 0     //200
 
         #define FWD 1
@@ -35,8 +35,8 @@ class RoverArmMotor{
 
         // RoverArmMotor(int pwm_pin, int encoder_pin, int esc_type, double minimum_angle, 
         //               double maximum_angle, int dir_pin, int brake_pin);
-        RoverArmMotor(Pin pwm_pin, Pin dir_pin, Pin encoder_pin, 
-        int esc_type, double minimum_angle, double maximum_angle, Pin brake_pin);
+        RoverArmMotor(SPI_HandleTypeDef* spi_handle, Pin pwm_pin, Pin dir_pin, Pin encoder_pin, 
+        int esc_type, double minimum_angle, double maximum_angle, Pin brake_pin = Pin());
 
         // Setters for various tunable parameters of our motors
         void setAggressiveCoefficients(double P, double I, double D);
@@ -73,6 +73,7 @@ class RoverArmMotor{
         double aggressiveKp, aggressiveKi, aggressiveKd, regularKp, regularKi, regularKd;
         //PINS
         Pin pwm, dir, encoder, brake;
+        SPI_HandleTypeDef* spi;
 
         int movingAverageWindowSize;
         double lowestAngle, highestAngle;

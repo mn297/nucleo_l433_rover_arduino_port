@@ -1,5 +1,6 @@
 // #include <Arduino.h>
 #include "RoverArmMotor.h"
+#include "AMT22.h"
 #include <cstdlib>
 
 
@@ -8,11 +9,12 @@
 // I'm very suspicious of the way I handled user defined pointers...
 
 // The motor will not move until begin() is called!
-RoverArmMotor::RoverArmMotor(Pin pwm_pin, Pin dir_pin, Pin encoder_pin, int esc_type, double minimum_angle, double maximum_angle, Pin brake_pin)
+RoverArmMotor::RoverArmMotor(SPI_HandleTypeDef* spi_handle, Pin pwm_pin, Pin dir_pin, Pin encoder_pin, int esc_type, double minimum_angle, double maximum_angle, Pin brake_pin)
                 :internalPIDInstance(&input, &output, &setpoint, regularKp, regularKi, regularKd, _PID_CD_DIRECT)
                 ,internalAveragerInstance(15){
 
     //constructor
+    spi = spi_handle;
     pwm = pwm_pin;
     dir = dir_pin;
     encoder = encoder_pin;
@@ -77,7 +79,7 @@ void RoverArmMotor::begin(double aggP, double aggI, double aggD, double regP, do
     //initialize the multiplier bool to false and the multiplier to 1. 
     wrist_waist = false; 
     //multiplier = 1;
-    gearRatio = 1;
+    gearRatio = 1;  //TODO check if this is correct
 
 }
 
@@ -87,9 +89,10 @@ double real_angle = 0;
 // Needs to be called in each loop
 void RoverArmMotor::tick(){
 
-    //TODO implement read encoder with new AMT22
     // Get current angle
     // adcResult = internalAveragerInstance.reading(analogRead(encoder));
+	uint16_t encoderData = getPositionSPI(spi, encoder.port, encoder.pin, 12, nullptr); //timer not used, so nullptr
+    adcResult = internalAveragerInstance.reading(encoderData);  // implicit cast to int
 
 
 

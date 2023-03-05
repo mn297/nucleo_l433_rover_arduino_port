@@ -13,6 +13,7 @@
 #define RES12           12
 #define RES14           14
 
+#define AMT22_DELAY     10
 
 void setCSLine (GPIO_TypeDef* encoderPort, uint16_t encoderPin, GPIO_PinState csLine)
 {
@@ -29,14 +30,14 @@ uint8_t spiWriteRead(SPI_HandleTypeDef *hspi, uint8_t sendByte, GPIO_TypeDef* en
 
   //There is a minimum time requirement after CS goes low before data can be clocked out of the encoder.
 //  delay(timer, 3);
-  delay_us_AMT22(3);
+  delay_us_AMT22(AMT22_DELAY);
 
   //send the command and receive response of the slave
   HAL_SPI_TransmitReceive(hspi, &sendByte, &data, 1, 10);
 
   //There is also a minimum time after clocking that CS should remain asserted before we release it
   //  delay(timer, 3);
-  delay_us_AMT22(3);
+  delay_us_AMT22(AMT22_DELAY);
 
   setCSLine(encoderPort, encoderPin, releaseLine); //if releaseLine is high set it high else it stays low
 
@@ -53,7 +54,7 @@ uint16_t getPositionSPI(SPI_HandleTypeDef *hspi, GPIO_TypeDef* encoderPort, uint
 
   //this is the time required between bytes as specified in the datasheet.
 //  delay(timer, 3);
-  delay_us_AMT22(3);
+  delay_us_AMT22(AMT22_DELAY);
 
   //OR the low byte with the currentPosition variable. release line after second byte
   currentPosition |= spiWriteRead(hspi, AMT22_NOP, encoderPort, encoderPin, 1, timer);
@@ -80,13 +81,13 @@ uint16_t getPositionSPI(SPI_HandleTypeDef *hspi, GPIO_TypeDef* encoderPort, uint
 
 void setZeroSPI(SPI_HandleTypeDef *hspi, GPIO_TypeDef* encoderPort, uint16_t encoderPin, TIM_HandleTypeDef *timer)
 {
-  spiWriteRead(&hspi, AMT22_NOP, encoderPort, encoderPin, 0, timer);
+  spiWriteRead(hspi, AMT22_NOP, encoderPort, encoderPin, 0, timer);
 
   //There is also a minimum time after clocking that CS should remain asserted before we release it
 //  delay(timer, 3);
   delay_us_AMT22(3);
 
-  spiWriteRead(&hspi, AMT22_ZERO, encoderPort, encoderPin, 1, timer);
+  spiWriteRead(hspi, AMT22_ZERO, encoderPort, encoderPin, 1, timer);
 
 
 //  delay(timer, 250);
@@ -95,13 +96,13 @@ void setZeroSPI(SPI_HandleTypeDef *hspi, GPIO_TypeDef* encoderPort, uint16_t enc
 
 void resetAMT22(SPI_HandleTypeDef *hspi, GPIO_TypeDef* encoderPort, uint16_t encoderPin, TIM_HandleTypeDef *timer)
 {
-  spiWriteRead(&hspi, AMT22_NOP, encoderPort, encoderPin, 0, timer);
+  spiWriteRead(hspi, AMT22_NOP, encoderPort, encoderPin, 0, timer);
 
   //There is also a minimum time after clocking that CS should remain asserted before we release it
 //  delay(timer, 3);
-  delay_us_AMT22(3);
+  delay_us_AMT22(AMT22_DELAY);
 
-  spiWriteRead(&hspi, AMT22_RESET, encoderPort, encoderPin, 1, timer);
+  spiWriteRead(hspi, AMT22_RESET, encoderPort, encoderPin, 1, timer);
 
 //  delay(timer, 250);
   delay_us_AMT22(250);

@@ -7,8 +7,13 @@
 #ifndef AMT22_H_
 #define AMT22_H_
 
+#if defined (__cplusplus) // If used by C++ code mn297
+extern "C" {
+#endif
+
 #include "stdint.h"
 #include "stm32l4xx_hal.h"
+#include "main.h"
 
 
 //#define 	STM32F4					// Comment when using H7
@@ -104,3 +109,6 @@ void delay(TIM_HandleTypeDef *timer, uint32_t delayTime);
 void delay_us_AMT22 (uint16_t us);
 
 #endif /* SRC_AMT22_H_ */
+#if defined (__cplusplus)
+}
+#endif
