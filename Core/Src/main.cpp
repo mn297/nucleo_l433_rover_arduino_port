@@ -130,9 +130,11 @@ int main(void)
 
 
   Pin CYTRON_DIR_1(CYTRON_DIR_1_GPIO_Port, CYTRON_DIR_1_Pin);
-  Pin CYTRON_PWM_1(CYTRON_PWM_1_GPIO_Port, CYTRON_PWM_1_Pin);
+  Pin CYTRON_PWM_1(CYTRON_PWM_1_GPIO_Port,♦ CYTRON_PWM_1_Pin);
   int32_t  CH2_DC = 0;
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
+  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 70);
+  HAL_Delay(10);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -156,20 +158,22 @@ int main(void)
 
 
     //PWM test
-    // __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 1000);
+//     __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 1000);
     while(CH2_DC < 65535)
     {
         // TIM2->CCR2 = CH2_DC;
+    	printf("current CH2_DC %d\r\n", CH2_DC);
         __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, CH2_DC); //this is the same as above
         CH2_DC += 70;
-        HAL_Delay(1);
+        HAL_Delay(10);
     }
     while(CH2_DC > 0)
     {
         // TIM2->CCR2 = CH2_DC;
+    	printf("current CH2_DC %d\r\n", CH2_DC);
         __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, CH2_DC); //this is the same as above
         CH2_DC -= 70;
-        HAL_Delay(1);
+        HAL_Delay(10);
     }
 
 
