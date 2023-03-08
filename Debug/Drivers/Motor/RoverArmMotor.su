@@ -2,16 +2,16 @@
 ../Drivers/Motor/RoverArmMotor.h:16:3:Pin::Pin()	16	static
 ../Drivers/Motor/RoverArmMotor.cpp:12:1:RoverArmMotor::RoverArmMotor(SPI_HandleTypeDef*, Pin, Pin, Pin, int, double, double, Pin)	56	static
 ../Drivers/Motor/RoverArmMotor.cpp:28:6:void RoverArmMotor::begin(double, double, double, double, double, double)	64	static
-../Drivers/Motor/RoverArmMotor.cpp:90:6:void RoverArmMotor::tick()	48	static
-../Drivers/Motor/RoverArmMotor.cpp:171:6:bool RoverArmMotor::setMultiplierBool(bool, double)	32	static
-../Drivers/Motor/RoverArmMotor.cpp:180:8:double RoverArmMotor::getSetpoint()	16	static
-../Drivers/Motor/RoverArmMotor.cpp:184:6:bool RoverArmMotor::newSetpoint(double)	32	static
-../Drivers/Motor/RoverArmMotor.cpp:194:5:int RoverArmMotor::getDirection()	16	static
-../Drivers/Motor/RoverArmMotor.cpp:203:6:void RoverArmMotor::setAngleLimits(double, double)	32	static
-../Drivers/Motor/RoverArmMotor.cpp:208:6:void RoverArmMotor::disengageBrake()	16	static
-../Drivers/Motor/RoverArmMotor.cpp:215:6:void RoverArmMotor::engageBrake()	16	static
-../Drivers/Motor/RoverArmMotor.cpp:222:8:double RoverArmMotor::getCurrentAngle()	16	static
-../Drivers/Motor/RoverArmMotor.cpp:226:8:double RoverArmMotor::getCurrentOutput()	16	static
-../Drivers/Motor/RoverArmMotor.cpp:230:8:double RoverArmMotor::mapFloat(float, float, float, float, float)	40	static
-../Drivers/Motor/RoverArmMotor.cpp:236:8:double RoverArmMotor::getRatio()	16	static
-../Drivers/Motor/RoverArmMotor.cpp:240:6:void RoverArmMotor::WatchdogISR()	16	static
+../Drivers/Motor/RoverArmMotor.cpp:91:6:void RoverArmMotor::tick()	48	static
+../Drivers/Motor/RoverArmMotor.cpp:172:6:bool RoverArmMotor::setMultiplierBool(bool, double)	32	static
+../Drivers/Motor/RoverArmMotor.cpp:181:8:double RoverArmMotor::getSetpoint()	16	static
+../Drivers/Motor/RoverArmMotor.cpp:185:6:bool RoverArmMotor::newSetpoint(double)	32	static
+../Drivers/Motor/RoverArmMotor.cpp:195:5:int RoverArmMotor::getDirection()	16	static
+../Drivers/Motor/RoverArmMotor.cpp:204:6:void RoverArmMotor::setAngleLimits(double, double)	32	static
+../Drivers/Motor/RoverArmMotor.cpp:209:6:void RoverArmMotor::disengageBrake()	16	static
+../Drivers/Motor/RoverArmMotor.cpp:216:6:void RoverArmMotor::engageBrake()	16	static
+../Drivers/Motor/RoverArmMotor.cpp:223:8:double RoverArmMotor::getCurrentAngle()	16	static
+../Drivers/Motor/RoverArmMotor.cpp:227:8:double RoverArmMotor::getCurrentOutput()	16	static
+../Drivers/Motor/RoverArmMotor.cpp:231:8:double RoverArmMotor::mapFloat(float, float, float, float, float)	40	static
+../Drivers/Motor/RoverArmMotor.cpp:237:8:double RoverArmMotor::getRatio()	16	static
+../Drivers/Motor/RoverArmMotor.cpp:241:6:void RoverArmMotor::WatchdogISR()	16	static

@@ -27,6 +27,8 @@ RoverArmMotor::RoverArmMotor(SPI_HandleTypeDef* spi_handle, Pin pwm_pin, Pin dir
 
 void RoverArmMotor::begin(double aggP, double aggI, double aggD, double regP, double regI, double regD){
 
+
+    /*------------------Initialize pins------------------*/ 
     // Initialize given pins
     // pinMode(encoder, INPUT); // not needed since we use HAL library
     // pinMode(pwm, OUTPUT);
@@ -54,17 +56,16 @@ void RoverArmMotor::begin(double aggP, double aggI, double aggD, double regP, do
     internalPIDInstance.SetMode(_PID_MODE_AUTOMATIC);
 
 
-    // TODO implement read encoder with new AMT22
+    /*------------------Get setpoint------------------*/
     // Get current location and set it as setpoint. Essential to prevent jerkiness
     // as the microcontroller initializes.
     // adcResult = internalAveragerInstance.reading(analogRead(encoder));
-
-
-
     currentAngle = mapFloat((float) adcResult, MIN_ADC_VALUE, MAX_ADC_VALUE, 0, 359.0f);
     setpoint = currentAngle;
 
-    // Set tuning params
+
+
+    /*------------------Set PID parameters------------------*/
     regularKp = regP;
     regularKi = regI;
     regularKd = regD;
@@ -89,7 +90,7 @@ double real_angle = 0;
 // Needs to be called in each loop
 void RoverArmMotor::tick(){
 
-    // Get current angle
+    /*------------------Get current angle------------------*/
     // adcResult = internalAveragerInstance.reading(analogRead(encoder));
 	uint16_t encoderData = getPositionSPI(spi, encoder.port, encoder.pin, 12, nullptr); //timer not used, so nullptr
     adcResult = internalAveragerInstance.reading(encoderData);  // implicit cast to int

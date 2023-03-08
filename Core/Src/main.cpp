@@ -129,18 +129,22 @@ int main(void)
   HAL_TIM_Base_Start(&htim1);
 
 
-  //CYTRON setup
-//  Pin CYTRON_DIR_1(CYTRON_DIR_1_GPIO_Port, CYTRON_DIR_1_Pin);
-//  Pin CYTRON_PWM_1(CYTRON_PWM_1_GPIO_Port, CYTRON_PWM_1_Pin);
-//  Pin AMT22_1(GPIOC, GPIO_PIN_7);
-//
-//  int32_t  CH2_DC = 0;
-//  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
-//  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
-//  HAL_Delay(10);
-//  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 70);
-//  RoverArmMotor Wrist_Roll(&hspi1, CYTRON_PWM_1, CYTRON_DIR_1, AMT22_1, CYTRON, 0, 359.0f);
-  
+  /*---CYTRON setup---*/
+  Pin CYTRON_DIR_1(CYTRON_DIR_1_GPIO_Port, CYTRON_DIR_1_Pin);
+  Pin CYTRON_PWM_1(CYTRON_PWM_1_GPIO_Port, CYTRON_PWM_1_Pin);
+  Pin AMT22_1(GPIOC, GPIO_PIN_7);
+
+  int32_t  CH2_DC = 0;
+  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
+  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
+  HAL_Delay(10);
+  RoverArmMotor Wrist_Roll(&hspi1, CYTRON_PWM_1, CYTRON_DIR_1, AMT22_1, CYTRON, 0, 359.0f);
+    
+  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 70);
+
+
+
+  /*---AMT22 setup---*/
   resetAMT22(&hspi1, GPIOC, GPIO_PIN_7, &htim1);
 
 
@@ -158,6 +162,20 @@ int main(void)
 	  printf("encoder 1 gives %d\r\n", encoderData_1);
 	  // printf("encoder 2 gives %d\r\n", encoderData_2);
 	  // printf("encoder 3 gives %d\r\n", encoderData_3);
+
+
+    /*---CYTRON test---*/
+    printf("0\r\n");
+    __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
+    HAL_Delay(1000);    
+    
+    printf("20\r\n");
+    __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 20);
+    HAL_Delay(1000);
+
+    printf("60\r\n");
+    __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 60);
+    HAL_Delay(1000);
 
 
     //LEGACY CODE
