@@ -147,6 +147,11 @@ int main(void)
   /*---AMT22 setup---*/
   resetAMT22(&hspi1, GPIOC, GPIO_PIN_7, &htim1);
 
+  /*---ESC setup---*/
+  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
+  __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 1500-1);
+
+
 
 
   /* USER CODE END 2 */
@@ -165,17 +170,30 @@ int main(void)
 
 
     /*---CYTRON test---*/
-    printf("0\r\n");
-    __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
-    HAL_Delay(1000);    
+    // printf("0\r\n");
+    // __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
+    // HAL_Delay(1000);    
     
-    printf("20\r\n");
-    __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 20);
-    HAL_Delay(1000);
+    // printf("20\r\n");
+    // __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 20);
+    // HAL_Delay(1000);
 
-    printf("60\r\n");
-    __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 60);
+    // printf("60\r\n");
+    // __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 60);
+    // HAL_Delay(1000);
+
+
+    /*---ESC test---*/
     HAL_Delay(1000);
+    __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 1500-1);
+    HAL_Delay(1000);
+    __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 1600-1);
+    HAL_Delay(1000);
+    __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 1500-1);
+    HAL_Delay(1000);
+    __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 1400-1);
+
+
 
 
     //LEGACY CODE
