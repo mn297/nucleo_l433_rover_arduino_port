@@ -148,9 +148,15 @@ int main(void)
   resetAMT22(&hspi1, GPIOC, GPIO_PIN_7, &htim1);
 
   /*---ESC setup---*/
+  int32_t  CH2_ESC = 1500-1;
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
+  HAL_Delay(500);
   __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 1500-1);
-
+  HAL_Delay(500);
+//  __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 1570-1);
+//  HAL_Delay(500);
+//  __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 1600-1);
+//  HAL_Delay(500);
 
 
 
@@ -161,15 +167,15 @@ int main(void)
   while (1)
   {
     //AMT22 test
-	  encoderData_1 = getPositionSPI(&hspi1, GPIOC, GPIO_PIN_7, 12, &htim1);
+	  // encoderData_1 = getPositionSPI(&hspi1, GPIOC, GPIO_PIN_7, 12, &htim1);
 	  // encoderData_2 = getPositionSPI(&hspi2, GPIOB, GPIO_PIN_6, 12, &htim1);
 	  // encoderData_3 = getPositionSPI(&hspi3, GPIOA, GPIO_PIN_8, 12, &htim1);
-	  printf("encoder 1 gives %d\r\n", encoderData_1);
+	  // printf("encoder 1 gives %d\r\n", encoderData_1);
 	  // printf("encoder 2 gives %d\r\n", encoderData_2);
 	  // printf("encoder 3 gives %d\r\n", encoderData_3);
 
 
-    /*---CYTRON test---*/
+    /*--------------------------------------CYTRON test--------------------------------------*/
     // printf("0\r\n");
     // __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
     // HAL_Delay(1000);    
@@ -183,16 +189,34 @@ int main(void)
     // HAL_Delay(1000);
 
 
-    /*---ESC test---*/
-    HAL_Delay(1000);
-    __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 1500-1);
-    HAL_Delay(1000);
-    __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 1600-1);
-    HAL_Delay(1000);
-    __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 1500-1);
-    HAL_Delay(1000);
-    __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 1400-1);
+    /*--------------------------------------ESC test--------------------------------------*/
+    // HAL_Delay(1000);
+    // __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 1500-1);
+    // HAL_Delay(1000);
+    // __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 1600-1);
+    // HAL_Delay(1000);
+    // __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 1500-1);
+    // HAL_Delay(1000);
+    // __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 1400-1);
 
+
+    /*--------------------------------------ESC sweep test--------------------------------------*/
+    while(CH2_ESC < 1600)
+    {
+        // TIM2->CCR2 = CH2_DC;
+      CH2_ESC += 1;
+    	printf("current CH2_DC %d\r\n", CH2_ESC);
+      __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, CH2_ESC); //this is the same as above
+      HAL_Delay(50);
+    }
+    while(CH2_ESC > 1540)
+    {
+        // TIM2->CCR2 = CH2_DC;
+      CH2_ESC -= 1;
+    	printf("current CH2_DC %d\r\n", CH2_ESC);
+      __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, CH2_ESC); //this is the same as above
+      HAL_Delay(50);
+    }
 
 
 
@@ -224,8 +248,6 @@ int main(void)
 
 
 
-
-	  HAL_Delay(10);
 
 
 	  //TIMER TEST
