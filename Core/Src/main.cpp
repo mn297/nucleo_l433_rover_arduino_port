@@ -51,6 +51,8 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+double aggKp=0.025, aggKi=0.019,  aggKd=0, elbaggKp=0.025, elbaggKi=0.019,  elbaggKd=0;
+double regKp=0.025, regKi=0.014, regKd=0, elbregKp=0.025, elbregKi=0.014,  elbregKd=0;
 
 /* USER CODE END PV */
 
@@ -129,18 +131,19 @@ int main(void)
   HAL_TIM_Base_Start(&htim1);
 
 
-  /*---CYTRON setup---*/
-  Pin CYTRON_DIR_1(CYTRON_DIR_1_GPIO_Port, CYTRON_DIR_1_Pin);
-  Pin CYTRON_PWM_1(CYTRON_PWM_1_GPIO_Port, CYTRON_PWM_1_Pin);
-  Pin AMT22_1(GPIOC, GPIO_PIN_7);
+    /*---CYTRON setup---*/
+    Pin CYTRON_DIR_1(CYTRON_DIR_1_GPIO_Port, CYTRON_DIR_1_Pin);
+    Pin CYTRON_PWM_1(CYTRON_PWM_1_GPIO_Port, CYTRON_PWM_1_Pin, &htim2, TIM_CHANNEL_2);
+    Pin AMT22_1(GPIOC, GPIO_PIN_7);
 
-  int32_t  CH2_DC = 0;
-  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
-  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
-  HAL_Delay(10);
-  RoverArmMotor Wrist_Roll(&hspi1, CYTRON_PWM_1, CYTRON_DIR_1, AMT22_1, CYTRON, 0, 359.0f);
-    
-  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 70);
+    int32_t  CH2_DC = 0;
+    HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
+    __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
+    HAL_Delay(10);
+    RoverArmMotor Wrist_Roll(&hspi1, CYTRON_PWM_1, CYTRON_DIR_1, AMT22_1, CYTRON, 0, 359.0f);
+    Wrist_Roll.begin(aggKp, aggKi, aggKd, regKp, regKi, regKd);
+    double current_angle = 0;
+    // __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 70);
 
 
 
@@ -158,7 +161,9 @@ int main(void)
 //  __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 1600-1);
 //  HAL_Delay(500);
 
-
+   current_angle = Wrist_Roll.get_current_angle();
+   printf("current angle is %f\r\n, current_angle");
+   Wrist_Roll.newSetpoint(current_angle + 100);
 
   /* USER CODE END 2 */
 
@@ -167,12 +172,12 @@ int main(void)
   while (1)
   {
     //AMT22 test
-	  // encoderData_1 = getPositionSPI(&hspi1, GPIOC, GPIO_PIN_7, 12, &htim1);
-	  // encoderData_2 = getPositionSPI(&hspi2, GPIOB, GPIO_PIN_6, 12, &htim1);
-	  // encoderData_3 = getPositionSPI(&hspi3, GPIOA, GPIO_PIN_8, 12, &htim1);
-	  // printf("encoder 1 gives %d\r\n", encoderData_1);
-	  // printf("encoder 2 gives %d\r\n", encoderData_2);
-	  // printf("encoder 3 gives %d\r\n", encoderData_3);
+    // encoderData_1 = getPositionSPI(&hspi1, GPIOC, GPIO_PIN_7, 12, &htim1);
+    // encoderData_2 = getPositionSPI(&hspi2, GPIOB, GPIO_PIN_6, 12, &htim1);
+    // encoderData_3 = getPositionSPI(&hspi3, GPIOA, GPIO_PIN_8, 12, &htim1);
+    // printf("encoder 1 gives %d\r\n", encoderData_1);
+    // printf("encoder 2 gives %d\r\n", encoderData_2);
+    // printf("encoder 3 gives %d\r\n", encoderData_3);
 
 
     /*--------------------------------------CYTRON test--------------------------------------*/
@@ -187,6 +192,17 @@ int main(void)
     // printf("60\r\n");
     // __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 60);
     // HAL_Delay(1000);
+    // current_angle = Wrist_Roll.get_current_angle();
+    // printf("current angle is %f\r\n, current_angle");
+    // HAL_Delay(50);
+    // Wrist_Roll.newSetpoint(current_angle + 10);
+    // current_angle = Wrist_Roll.get_current_angle();
+    // printf("current angle is %f\r\n, current_angle");
+    Wrist_Roll.tick();
+    HAL_Delay(1); // safety delay
+
+
+
 
 
     /*--------------------------------------ESC test--------------------------------------*/
@@ -201,22 +217,22 @@ int main(void)
 
 
     /*--------------------------------------ESC sweep test--------------------------------------*/
-    while(CH2_ESC < 1600)
-    {
-        // TIM2->CCR2 = CH2_DC;
-      CH2_ESC += 1;
-    	printf("current CH2_DC %d\r\n", CH2_ESC);
-      __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, CH2_ESC); //this is the same as above
-      HAL_Delay(50);
-    }
-    while(CH2_ESC > 1540)
-    {
-        // TIM2->CCR2 = CH2_DC;
-      CH2_ESC -= 1;
-    	printf("current CH2_DC %d\r\n", CH2_ESC);
-      __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, CH2_ESC); //this is the same as above
-      HAL_Delay(50);
-    }
+    // while(CH2_ESC < 1600)
+    // {
+    //     // TIM2->CCR2 = CH2_DC;
+    //   CH2_ESC += 1;
+    // 	printf("current CH2_DC %d\r\n", CH2_ESC);
+    //   __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, CH2_ESC); //this is the same as above
+    //   HAL_Delay(50);
+    // }
+    // while(CH2_ESC > 1540)
+    // {
+    //     // TIM2->CCR2 = CH2_DC;
+    //   CH2_ESC -= 1;
+    // 	printf("current CH2_DC %d\r\n", CH2_ESC);
+    //   __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, CH2_ESC); //this is the same as above
+    //   HAL_Delay(50);
+    // }
 
 
 

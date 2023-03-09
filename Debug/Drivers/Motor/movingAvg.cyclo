@@ -1,0 +1,5 @@
+movingAvg.cpp:9:6:void movingAvg::begin()	2
+movingAvg.cpp:15:5:int movingAvg::reading(int)	3
+movingAvg.cpp:33:5:int movingAvg::getAvg()	1
+movingAvg.cpp:40:5:int movingAvg::getAvg(int)	6
+movingAvg.cpp:62:6:void movingAvg::reset()	1

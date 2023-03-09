@@ -2,6 +2,7 @@
 #include "RoverArmMotor.h"
 #include "AMT22.h"
 #include <cstdlib>
+#include "tim.h"
 
 
 
@@ -38,7 +39,7 @@ void RoverArmMotor::begin(double aggP, double aggI, double aggD, double regP, do
 
         // Allow negative outputs, the sign will be interpreted as
         // the direction pin
-        internalPIDInstance.SetOutputLimits(-100, 100); // max ADC write is 255 PWM mn297
+        internalPIDInstance.SetOutputLimits(0, 99); // PWM duty cycle mn297
     }
     //TODO: Add support for other ESC types
     // else if(escType == BLUE_ROBOTICS){
@@ -60,6 +61,7 @@ void RoverArmMotor::begin(double aggP, double aggI, double aggD, double regP, do
     // Get current location and set it as setpoint. Essential to prevent jerkiness
     // as the microcontroller initializes.
     // adcResult = internalAveragerInstance.reading(analogRead(encoder));
+    //after setup, currentAngle is same as setpoint
     currentAngle = mapFloat((float) adcResult, MIN_ADC_VALUE, MAX_ADC_VALUE, 0, 359.0f);
     setpoint = currentAngle;
 
@@ -92,21 +94,17 @@ void RoverArmMotor::tick(){
 
     /*------------------Get current angle------------------*/
     // adcResult = internalAveragerInstance.reading(analogRead(encoder));
-	uint16_t encoderData = getPositionSPI(spi, encoder.port, encoder.pin, 12, nullptr); //timer not used, so nullptr
-    adcResult = internalAveragerInstance.reading(encoderData);  // implicit cast to int
-
-
-
-    // currentAngle = mapFloat((float) adcResult, MAX_ADC_VALUE, MIN_ADC_VALUE, 359.0f, 0.0f);
-    currentAngle = mapFloat((float) adcResult, MIN_ADC_VALUE, MAX_ADC_VALUE, 0, 359.0f); //mn297 potentiometer encoder
+    currentAngle = get_current_angle_avg(); //TODO avg or not?
 
       // Measurement deadband - ignore sub-degree noise
     if(abs(currentAngle - lastAngle) < 1.0){
         currentAngle = lastAngle;
     }
-
     input = currentAngle; // range [0,359]
 
+
+
+   //------------------Compute PID------------------//
     // Compute distance, retune PID if necessary. Less aggressive tuning params for small errors
     // Find the shortest from the current position to the set point
     double gap; //mn297 could be negative
@@ -129,12 +127,9 @@ void RoverArmMotor::tick(){
     }else{
         internalPIDInstance.SetTunings(aggressiveKp, aggressiveKi, aggressiveKd);
     }
-
-    // Compute the next value
     internalPIDInstance.Compute(); // return value stored in output
     // Serial.print("current output is ");
     // Serial.println(output, 4); 
-
 
     // Refuse to go to setpoint if it is outside of boundaries
     // if(setpoint <= lowestAngle || setpoint >= highestAngle){
@@ -144,17 +139,23 @@ void RoverArmMotor::tick(){
     // Make sure we aren't snapping our tendons - move back a little bit if we are
     // if(currentAngle >= (highestAngle - 2) && currentAngle <= (lowestAngle + 2)) output = 0.0;
 
-    // Interpret output data based on the ESC type defined in constructor
+
+    //------------------Write to motor------------------//
     if(escType == CYTRON){
 
         // Interpret sign of the error signal as the direction pin value
         // (gap > 0) ? digitalWrite(dir, HIGH) : digitalWrite(dir, LOW); // invert if needed mn297
-        if (gap > 0) HAL_GPIO_WritePin(dir.port, dir.pin, GPIO_PIN_SET); //mn297
-        else HAL_GPIO_WritePin(dir.port, dir.pin, GPIO_PIN_RESET); //mn297
-
+        if (gap > 0) {
+            HAL_GPIO_WritePin(dir.port, dir.pin, GPIO_PIN_SET); //mn297
+        }
+        else {
+            HAL_GPIO_WritePin(dir.port, dir.pin, GPIO_PIN_RESET); //mn297
+        }
         // Write to PWM pin
         //TODO port to HAL
         // analogWrite(pwm, abs(output)); //mn297 function execute quickly and jumps to next tick()
+        double test_output = abs(output);     //smoothing
+        __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, test_output);
 
     }
 
@@ -165,6 +166,8 @@ void RoverArmMotor::tick(){
     //     internalServoInstance.writeMicroseconds(output);
     // }
 
+
+    //------------------Update angle------------------//
     lastAngle = currentAngle;
     
 }
@@ -220,10 +223,19 @@ void RoverArmMotor::engageBrake(){
     }
 }
 
-double RoverArmMotor::getCurrentAngle(){
+double RoverArmMotor::get_current_angle_avg(){    //mn297
+    // return currentAngle / gearRatio;
+    uint16_t encoderData = getPositionSPI(spi, encoder.port, encoder.pin, 12, nullptr); //timer not used, so nullptr
+    adcResult = internalAveragerInstance.reading(encoderData);  // implicit cast to int
+    currentAngle = mapFloat((float) adcResult, MIN_ADC_VALUE, MAX_ADC_VALUE, 0, 359.0f); //mn297 potentiometer encoder
     return currentAngle / gearRatio;
 }
-
+double RoverArmMotor::get_current_angle(){    //mn297
+    // return currentAngle / gearRatio;
+    uint16_t encoderData = getPositionSPI(spi, encoder.port, encoder.pin, 12, nullptr); //timer not used, so nullptr
+    currentAngle = mapFloat((float) encoderData, MIN_ADC_VALUE, MAX_ADC_VALUE, 0, 359.0f); //mn297 potentiometer encoder
+    return currentAngle / gearRatio;
+}
 double RoverArmMotor::getCurrentOutput(){
     return output;
 }

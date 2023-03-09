@@ -6,15 +6,17 @@
 #include "main.h"
 
 
-
 // #define MOTOR_DC_DIR_1
 struct Pin {
-  GPIO_TypeDef* port;
-  uint16_t pin;
-  bool valid;
+    GPIO_TypeDef* port;
+    uint16_t pin;
+    bool valid;
+    TIM_HandleTypeDef* p_tim;
+    unsigned int channel;
 
-  Pin() : port(nullptr), pin(0), valid(false) {}
-  Pin(GPIO_TypeDef* p, uint16_t pn) : port(p), pin(pn), valid(true) {}
+    Pin() : port(nullptr), pin(0), valid(false), p_tim(nullptr), channel(0) {}
+    Pin(GPIO_TypeDef* p, uint16_t pn) : port(p), pin(pn), valid(true), p_tim(nullptr), channel(0) {} // no timer
+    Pin(GPIO_TypeDef* p, uint16_t pn, TIM_HandleTypeDef* t, unsigned int c) : port(p), pin(pn), valid(true), p_tim(t), channel(c) {}
 };
 
 
@@ -51,7 +53,10 @@ class RoverArmMotor{
         void disengageBrake();
         void engageBrake();
 
-        double getCurrentAngle();
+        double get_current_angle_avg();    //mn297
+        double get_current_angle();  //mn297
+        // double getCurrentAngle();
+        
         double getSetpoint();
         double getCurrentOutput();
         int getDirection();

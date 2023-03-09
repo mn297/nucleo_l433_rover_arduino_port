@@ -78,7 +78,7 @@ main-build: nucleo_l433_rover_arduino_port.elf secondary-outputs
 
 # Tool invocations
 nucleo_l433_rover_arduino_port.elf nucleo_l433_rover_arduino_port.map: $(OBJS) $(USER_OBJS) C:\Users\printer2\STM32CubeIDE\workspace_1.11.0\nucleo_l433_rover_arduino_port\STM32L433RCTXP_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-g++ -o "nucleo_l433_rover_arduino_port.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\printer2\STM32CubeIDE\workspace_1.11.0\nucleo_l433_rover_arduino_port\STM32L433RCTXP_FLASH.ld" -Wl,-Map="nucleo_l433_rover_arduino_port.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
+	arm-none-eabi-g++ -o "nucleo_l433_rover_arduino_port.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\printer2\STM32CubeIDE\workspace_1.11.0\nucleo_l433_rover_arduino_port\STM32L433RCTXP_FLASH.ld" -Wl,-Map="nucleo_l433_rover_arduino_port.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
