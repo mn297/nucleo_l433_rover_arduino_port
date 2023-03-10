@@ -23,6 +23,10 @@ RoverArmMotor::RoverArmMotor(SPI_HandleTypeDef* spi_handle, Pin pwm_pin, Pin dir
     escType = esc_type;
     lowestAngle = minimum_angle;
     highestAngle = maximum_angle;
+
+    //clean up variables
+    input = 0;
+    output = 0;
     
 }
 
@@ -39,7 +43,7 @@ void RoverArmMotor::begin(double aggP, double aggI, double aggD, double regP, do
 
         // Allow negative outputs, the sign will be interpreted as
         // the direction pin
-        internalPIDInstance.SetOutputLimits(0, 99); // PWM duty cycle mn297
+        internalPIDInstance.SetOutputLimits(5, 99); // PWM duty cycle mn297 TOOD: check this
     }
     //TODO: Add support for other ESC types
     // else if(escType == BLUE_ROBOTICS){
@@ -50,10 +54,11 @@ void RoverArmMotor::begin(double aggP, double aggI, double aggD, double regP, do
     //     internalServoInstance.attach(pwm, 1100, 1900, 1500); // mn297
     // }
     
-    // Initialize moving averager
+    /*------------------Initialize moving average------------------*/
     internalAveragerInstance.begin();
 
-    // Set to auto
+    /*------------------Initialize PID------------------*/
+    internalPIDInstance.Init();
     internalPIDInstance.SetMode(_PID_MODE_AUTOMATIC);
 
 
@@ -62,6 +67,7 @@ void RoverArmMotor::begin(double aggP, double aggI, double aggD, double regP, do
     // as the microcontroller initializes.
     // adcResult = internalAveragerInstance.reading(analogRead(encoder));
     //after setup, currentAngle is same as setpoint
+    adcResult = get_current_angle();    // fix setpoint not equal to current angle
     currentAngle = mapFloat((float) adcResult, MIN_ADC_VALUE, MAX_ADC_VALUE, 0, 359.0f);
     setpoint = currentAngle;
 
@@ -94,7 +100,7 @@ void RoverArmMotor::tick(){
 
     /*------------------Get current angle------------------*/
     // adcResult = internalAveragerInstance.reading(analogRead(encoder));
-    currentAngle = get_current_angle_avg(); //TODO avg or not?
+    currentAngle = get_current_angle(); //TODO avg or not?
 
       // Measurement deadband - ignore sub-degree noise
     if(abs(currentAngle - lastAngle) < 1.0){
@@ -155,7 +161,7 @@ void RoverArmMotor::tick(){
         //TODO port to HAL
         // analogWrite(pwm, abs(output)); //mn297 function execute quickly and jumps to next tick()
         double test_output = abs(output);     //smoothing
-        __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, test_output);
+        __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, (int) test_output);
 
     }
 

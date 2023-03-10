@@ -19,6 +19,7 @@
 */
 
 #include "pid.h"
+#include <cstdlib>	//mn297 for abs()
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 /* ~~~~~~~~~~~~~~~~ Constructor ~~~~~~~~~~~~~~~~ */
@@ -43,7 +44,12 @@ PID::PID(double *Input, double *Output, double *Setpoint, double Kp, double Ki, 
 	
 }
 
-PID::PID(double *Input, double *Output, double *Setpoint, double Kp, double Ki, double Kd, PIDCD_TypeDef ControllerDirection) : PID::PID(Input, Output, Setpoint, Kp, Ki, Kd, _PID_P_ON_E, ControllerDirection){ }
+PID::PID(double *Input, double *Output, double *Setpoint, double Kp, double Ki, double Kd, PIDCD_TypeDef ControllerDirection) : PID::PID(Input, Output, Setpoint, Kp, Ki, Kd, _PID_P_ON_E, ControllerDirection)
+{ }
+
+
+
+
 
 /* ~~~~~~~~~~~~~~~~~ Initialize ~~~~~~~~~~~~~~~~ */
 void PID::Init(void)
@@ -60,7 +66,7 @@ void PID::Init(void)
 	{
 		_outputSum = _outMin;
 	}
-	else { }
+	else { }	
 	
 }
 
@@ -114,8 +120,8 @@ uint8_t PID::Compute(void)
 	{
 		/* ..... Compute all the working error variables ..... */
 		input   = *_myInput;
-		error   = *_mySetpoint - input;
-		dInput  = (input - _lastInput);
+		error   = abs(*_mySetpoint - input);	//mn297 fix
+		dInput  = abs(input - _lastInput);		//mn297 fix TODO: check if this is correct
 		
 		_outputSum += (_ki * error);
 		
@@ -146,7 +152,7 @@ uint8_t PID::Compute(void)
 		}
 		
 		/* ..... Compute Rest of PID Output ..... */
-		output += _outputSum - _kd * dInput;
+		output += _outputSum - _kd * dInput;		//TODO check if this is correct mn297
 		
 		if (output > _outMax)
 		{

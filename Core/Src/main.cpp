@@ -51,8 +51,10 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-double aggKp=0.025, aggKi=0.019,  aggKd=0, elbaggKp=0.025, elbaggKi=0.019,  elbaggKd=0;
-double regKp=0.025, regKi=0.014, regKd=0, elbregKp=0.025, elbregKi=0.014,  elbregKd=0;
+// double aggKp=0.025, aggKi=0.019,  aggKd=0.0, elbaggKp=0.025, elbaggKi=0.019,  elbaggKd=0;
+// double regKp=0.025, regKi=0.014, regKd=0, elbregKp=0.025, elbregKi=0.014,  elbregKd=0;
+double aggKp=0.6, aggKi=0.01,  aggKd=0.01, elbaggKp=0.025, elbaggKi=0,  elbaggKd=0;
+double regKp=0.6, regKi=0.01, regKd=0.01, elbregKp=0.025, elbregKi=0,  elbregKd=0;
 
 /* USER CODE END PV */
 
@@ -131,19 +133,7 @@ int main(void)
   HAL_TIM_Base_Start(&htim1);
 
 
-    /*---CYTRON setup---*/
-    Pin CYTRON_DIR_1(CYTRON_DIR_1_GPIO_Port, CYTRON_DIR_1_Pin);
-    Pin CYTRON_PWM_1(CYTRON_PWM_1_GPIO_Port, CYTRON_PWM_1_Pin, &htim2, TIM_CHANNEL_2);
-    Pin AMT22_1(GPIOC, GPIO_PIN_7);
 
-    int32_t  CH2_DC = 0;
-    HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
-    __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
-    HAL_Delay(10);
-    RoverArmMotor Wrist_Roll(&hspi1, CYTRON_PWM_1, CYTRON_DIR_1, AMT22_1, CYTRON, 0, 359.0f);
-    Wrist_Roll.begin(aggKp, aggKi, aggKd, regKp, regKi, regKd);
-    double current_angle = 0;
-    // __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 70);
 
 
 
@@ -161,9 +151,25 @@ int main(void)
 //  __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 1600-1);
 //  HAL_Delay(500);
 
-   current_angle = Wrist_Roll.get_current_angle();
-   printf("current angle is %f\r\n, current_angle");
-   Wrist_Roll.newSetpoint(current_angle + 100);
+
+
+    /*---CYTRON setup---*/
+    Pin CYTRON_DIR_1(CYTRON_DIR_1_GPIO_Port, CYTRON_DIR_1_Pin);
+    Pin CYTRON_PWM_1(CYTRON_PWM_1_GPIO_Port, CYTRON_PWM_1_Pin, &htim2, TIM_CHANNEL_2);
+    Pin AMT22_1(GPIOC, GPIO_PIN_7);
+
+    int32_t  CH2_DC = 0;
+    HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
+    __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
+    HAL_Delay(10);
+    RoverArmMotor Wrist_Roll(&hspi1, CYTRON_PWM_1, CYTRON_DIR_1, AMT22_1, CYTRON, 0, 359.0f);
+    Wrist_Roll.begin(aggKp, aggKi, aggKd, regKp, regKi, regKd);
+    double current_angle = 0;
+    double setpoint = 0;
+    // __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 70);
+    current_angle = Wrist_Roll.get_current_angle();
+    printf("current angle is %f\r\n, current_angle");
+    Wrist_Roll.newSetpoint(current_angle + 150);
 
   /* USER CODE END 2 */
 
@@ -196,8 +202,9 @@ int main(void)
     // printf("current angle is %f\r\n, current_angle");
     // HAL_Delay(50);
     // Wrist_Roll.newSetpoint(current_angle + 10);
-    // current_angle = Wrist_Roll.get_current_angle();
-    // printf("current angle is %f\r\n, current_angle");
+    current_angle = Wrist_Roll.get_current_angle();
+    setpoint = Wrist_Roll.getSetpoint();
+    printf("current angle: %f, setpoint: %f\r\n", current_angle, setpoint);
     Wrist_Roll.tick();
     HAL_Delay(1); // safety delay
 
