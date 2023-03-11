@@ -91,12 +91,16 @@ void delay_us (uint16_t us)
 
 /*---------------------ARM VARIABLES---------------------*/
 double current_angle = 0;
+double current_angle_sw = 0;
 double setpoint = 0;
+int turn = 0;
 int brakeSet = 0;
 Pin CYTRON_DIR_1(CYTRON_DIR_1_GPIO_Port, CYTRON_DIR_1_Pin);
 Pin CYTRON_PWM_1(CYTRON_PWM_1_GPIO_Port, CYTRON_PWM_1_Pin, &htim2, TIM_CHANNEL_2);
 Pin AMT22_1(GPIOC, GPIO_PIN_7);
 RoverArmMotor Wrist_Roll(&hspi1, CYTRON_PWM_1, CYTRON_DIR_1, AMT22_1, CYTRON, 0, 359.0f);
+int button_counter = 0;
+
 
 /* USER CODE END 0 */
 
@@ -148,7 +152,7 @@ int main(void)
 
 
   /*---AMT22 setup---*/
-  resetAMT22(&hspi1, GPIOC, GPIO_PIN_7, &htim1);
+  // resetAMT22(&hspi1, GPIOC, GPIO_PIN_7, &htim1);
 
   /*---ESC setup---*/
   int32_t  CH2_ESC = 1500-1;
@@ -156,38 +160,43 @@ int main(void)
   HAL_Delay(500);
   __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 1500-1);
   HAL_Delay(500);
-//  __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 1570-1);
-//  HAL_Delay(500);
-//  __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 1600-1);
-//  HAL_Delay(500);
 
 
 
-    /*---CYTRON setup---*/
-    int32_t  CH2_DC = 0;
-    HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
-    __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
-    HAL_Delay(10);
-    Wrist_Roll.begin(aggKp, aggKi, aggKd, regKp, regKi, regKd);
-    Wrist_Roll.setAngleLimits(2, 120.0f); //for angle limits test
-    Wrist_Roll.reset_encoder();
-    Wrist_Roll.set_zero_angle();
-    // __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 70);
-    // current_angle = Wrist_Roll.get_current_angle();
-    // printf("current angle is %f\r\n, current_angle");
-    // Wrist_Roll.newSetpoint(current_angle + 150);
 
-    __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 30);
-    while(!brakeSet){
-      printf("waiting for brake set, current %f\r\n", Wrist_Roll.get_current_angle());
-    }
+  /*---CYTRON setup---*/
+  int32_t  CH2_DC = 0;
+  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
+  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
+  HAL_Delay(10);
+  Wrist_Roll.begin(aggKp, aggKi, aggKd, regKp, regKi, regKd);
+  Wrist_Roll.setAngleLimits(2, 120.0f); //for angle limits test
+  Wrist_Roll.reset_encoder();
+  // turn = Wrist_Roll.get_turns_encoder();
+  // printf("current angle: %f, setpoint: %f, turn %d, button %d\r\n", current_angle, setpoint, turn, button_counter);
+  // __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 70);
+  // current_angle = Wrist_Roll.get_current_angle();
+  // printf("current angle is %f\r\n, current_angle");
+  // Wrist_Roll.newSetpoint(current_angle + 150);
+
+  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 30);
+  while(!brakeSet){
+    // printf("waiting for brake set, current %f\r\n", Wrist_Roll.get_current_angle());
+    current_angle = Wrist_Roll.get_current_angle();
+    current_angle_sw = Wrist_Roll.get_current_angle_sw();
+    setpoint = Wrist_Roll.getSetpoint();
+    printf("BRAKE, current angle: %f, setpoint: %f, current_angle_sw: %f\r\n", current_angle, setpoint, current_angle_sw);
+    // printf("waiting for brake set\r\n");
+  }
+  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    //AMT22 test
+    /*--------------------------------------AMT22 test--------------------------------------*/
     // encoderData_1 = getPositionSPI(&hspi1, GPIOC, GPIO_PIN_7, 12, &htim1);
     // encoderData_2 = getPositionSPI(&hspi2, GPIOB, GPIO_PIN_6, 12, &htim1);
     // encoderData_3 = getPositionSPI(&hspi3, GPIOA, GPIO_PIN_8, 12, &htim1);
@@ -211,38 +220,44 @@ int main(void)
     // current_angle = Wrist_Roll.get_current_angle();
     // printf("current angle is %f\r\n, current_angle");
     // HAL_Delay(50);
-    // Wrist_Roll.newSetpoint(current_angle + 10);
-
-    current_angle = Wrist_Roll.get_current_angle();
-    setpoint = Wrist_Roll.getSetpoint();
-    printf("current angle: %f, setpoint: %f\r\n", current_angle, setpoint);
+    // Wrist_Roll.newSetpoint(current_angle + 10);    
     // Wrist_Roll.tick();
     // HAL_Delay(1); // safety delay
 
-    /*--------------------------------------CYTRON angle limit test--------------------------------------*/
+    /*--------------------------------------CYTRON print--------------------------------------*/
+    // current_angle = Wrist_Roll.get_current_angle();
+    // current_angle_sw = Wrist_Roll.get_current_angle_sw();
+    // setpoint = Wrist_Roll.getSetpoint();
+    // printf("current angle: %f, setpoint: %f, current_angle_sw: %f\r\n", current_angle, setpoint, current_angle_sw);
 
-    // Wrist_Roll.newSetpoint(Wrist_Roll.lowestAngle);
-    // while(true) {
-    //   current_angle = Wrist_Roll.get_current_angle();
-    //   if (!(current_angle <= Wrist_Roll.lowestAngle + 1.0)) {
-    //     printf("DOWN current angle: %f, setpoint: %f\r\n", current_angle, Wrist_Roll.setpoint);
-    //     Wrist_Roll.tick();
-    //   }
-    //   else {
-    //     break;
-    //   }
-    // }
-    // Wrist_Roll.newSetpoint(Wrist_Roll.highestAngle);
-    // while(true) {
-    //   current_angle = Wrist_Roll.get_current_angle();
-    //   if (!(current_angle >= Wrist_Roll.highestAngle - 1.0)) {
-    //     printf("UP current angle: %f, setpoint: %f\r\n", current_angle, Wrist_Roll.setpoint);
-    //     Wrist_Roll.tick();
-    //   }
-    //   else {
-    //     break;
-    //   }
-    // }
+
+    /*--------------------------------------CYTRON angle limit test--------------------------------------*/
+    // high first because we just set zero 
+    Wrist_Roll.newSetpoint(Wrist_Roll.highestAngle);
+    while(true) {
+      current_angle = Wrist_Roll.get_current_angle();
+      current_angle_sw = Wrist_Roll.get_current_angle_sw();
+      if (!(current_angle_sw >= Wrist_Roll.highestAngle - 1.0)) {
+        printf("UP current angle: %f, setpoint: %f, sw: %f\r\n", current_angle, Wrist_Roll.setpoint, current_angle_sw);
+        Wrist_Roll.tick();
+      }
+      else {
+        break;
+      }
+    }
+    Wrist_Roll.newSetpoint(Wrist_Roll.lowestAngle);
+    while(true) {
+      current_angle = Wrist_Roll.get_current_angle();
+      current_angle_sw = Wrist_Roll.get_current_angle_sw();
+      if (!(current_angle_sw <= Wrist_Roll.lowestAngle + 1.0)) {
+        printf("DOWN current angle: %f, setpoint: %f, sw: %f\r\n", current_angle, Wrist_Roll.setpoint, current_angle_sw);
+        Wrist_Roll.tick();
+      }
+      else {
+        break;
+      }
+    }
+
 
     
 
@@ -304,10 +319,6 @@ int main(void)
     //     CH2_DC -= 70;
     //     HAL_Delay(10);
     // }
-
-
-
-
 
 
 	  //TIMER TEST
@@ -381,19 +392,18 @@ void SystemClock_Config(void)
 // External Interrupt ISR Handler CallBackFun
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
+  if(!brakeSet) {
     if(GPIO_Pin == B1_Pin) // INT Source is pin A9
     {
-      // HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_11); // Toggle LED
-      // printf("INTERRUPT\r\n");
-      // current_angle = Wrist_Roll.get_current_angle();
-      // printf("current angle is %f\r\n, current_angle");
-      // Wrist_Roll.newSetpoint(current_angle + 150);
-
-      __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
-      Wrist_Roll.set_zero_angle();
+      __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);  // set encoder stationary
+      HAL_Delay(100);  
+      button_counter++;
+      Wrist_Roll.set_zero_angle_sw();
       brakeSet = 1;
+      HAL_Delay(100);
       return;
     }
+  }
 }
 
 /* USER CODE END 4 */

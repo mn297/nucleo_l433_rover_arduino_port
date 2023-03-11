@@ -46,6 +46,8 @@ class RoverArmMotor{
         void setRetuningGapLimit(int gap);
         void setAngleLimits(double lowest_angle, double highest_angle);
         void set_zero_angle();  //mn297
+        void set_zero_angle_sw();  //mn297 software zero angle
+        uint32_t get_turns_encoder();    //mn297
         void reset_encoder();  //mn297
         bool setMultiplierBool(bool mult, double ratio); 
         bool newSetpoint(double angle);
@@ -57,7 +59,7 @@ class RoverArmMotor{
 
         double get_current_angle_avg();    //mn297
         double get_current_angle();  //mn297
-        // double getCurrentAngle();
+        double get_current_angle_sw();  //mn297
         
         double getSetpoint();
         double getCurrentOutput();
@@ -94,6 +96,11 @@ class RoverArmMotor{
         double setpoint;
         int actuationState;
         double gearRatio;
+
+        int sw_angle;  //mn297
+        double zero_angle_sw;  //mn297
+
+
 
         enum ActuationStates
         {

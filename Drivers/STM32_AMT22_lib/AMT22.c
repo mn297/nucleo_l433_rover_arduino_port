@@ -9,6 +9,7 @@
 #define AMT22_NOP       0x00
 #define AMT22_RESET     0x60
 #define AMT22_ZERO      0x70
+#define AMT22_TURNS     0xA0
 
 #define RES12           12
 #define RES14           14
@@ -79,6 +80,47 @@ uint16_t getPositionSPI(SPI_HandleTypeDef *hspi, GPIO_TypeDef* encoderPort, uint
   return currentPosition;
 }
 
+uint32_t get_turns_AMT22(SPI_HandleTypeDef *hspi, GPIO_TypeDef* encoderPort, uint16_t encoderPin, uint8_t resolution, TIM_HandleTypeDef *timer)
+{
+  uint32_t currentTurns = 0;          //32-bit response from encoder
+  uint16_t currentPosition;       //16-bit response from encoder
+  uint8_t binaryArray[16];        //after receiving the position we will populate this array and use it for calculating the checksum
+
+  //get first byte which is the high byte, shift it 8 bits. don't release line for the first byte
+  currentPosition = spiWriteRead(hspi, AMT22_NOP, encoderPort, encoderPin, 0, timer) << 8;
+
+  //this is the time required between bytes as specified in the datasheet.
+//  delay(timer, 3);
+  delay_us_AMT22(AMT22_DELAY);
+
+  //OR the low byte with the currentPosition variable. release line after second byte
+  currentPosition |= spiWriteRead(hspi, AMT22_TURNS, encoderPort, encoderPin, 0, timer);
+  delay_us_AMT22(AMT22_DELAY);
+  currentTurns = spiWriteRead(hspi, AMT22_NOP, encoderPort, encoderPin, 0, timer)  << 8;
+  delay_us_AMT22(AMT22_DELAY);
+  currentTurns |= spiWriteRead(hspi, AMT22_NOP, encoderPort, encoderPin, 1, timer);
+
+  //run through the 16 bits of position and put each bit into a slot in the array so we can do the checksum calculation
+  for(int i = 0; i < 16; i++) binaryArray[i] = (0x01) & (currentPosition >> (i));
+
+  //using the equation on the datasheet we can calculate the checksums and then make sure they match what the encoder sent
+ if ((binaryArray[15] == !(binaryArray[13] ^ binaryArray[11] ^ binaryArray[9] ^ binaryArray[7] ^ binaryArray[5] ^ binaryArray[3] ^ binaryArray[1]))
+         && (binaryArray[14] == !(binaryArray[12] ^ binaryArray[10] ^ binaryArray[8] ^ binaryArray[6] ^ binaryArray[4] ^ binaryArray[2] ^ binaryArray[0])))
+   {
+     //we got back a good position, so just mask away the checkbits
+     currentPosition &= 0x3FFF;
+   }
+ else
+ {
+   currentPosition = 0xFFFF; //bad position
+ }
+  // currentPosition &= 0x3FFF;
+  //If the resolution is 12-bits, and wasn't 0xFFFF, then shift position, otherwise do nothing
+  if ((resolution == RES12) && (currentPosition != 0xFFFF)) currentPosition = currentPosition >> 2;
+  currentTurns |= currentPosition << 16;
+  return currentTurns;
+}
+
 void setZeroSPI(SPI_HandleTypeDef *hspi, GPIO_TypeDef* encoderPort, uint16_t encoderPin, TIM_HandleTypeDef *timer)
 {
   spiWriteRead(hspi, AMT22_NOP, encoderPort, encoderPin, 0, timer);
@@ -91,7 +133,9 @@ void setZeroSPI(SPI_HandleTypeDef *hspi, GPIO_TypeDef* encoderPort, uint16_t enc
 
 
 //  delay(timer, 250);
-  delay_us_AMT22(250);
+  // delay_us_AMT22(250);
+  //power on delay is 200ms
+  HAL_Delay(250);
 }
 
 void resetAMT22(SPI_HandleTypeDef *hspi, GPIO_TypeDef* encoderPort, uint16_t encoderPin, TIM_HandleTypeDef *timer)
@@ -105,7 +149,9 @@ void resetAMT22(SPI_HandleTypeDef *hspi, GPIO_TypeDef* encoderPort, uint16_t enc
   spiWriteRead(hspi, AMT22_RESET, encoderPort, encoderPin, 1, timer);
 
 //  delay(timer, 250);
-  delay_us_AMT22(250);
+  // delay_us_AMT22(250);
+  //power on delay is 200ms
+  HAL_Delay(250);
 }
 
 void delay(TIM_HandleTypeDef *timer, uint32_t delayTime){

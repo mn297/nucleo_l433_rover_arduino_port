@@ -27,6 +27,9 @@ RoverArmMotor::RoverArmMotor(SPI_HandleTypeDef* spi_handle, Pin pwm_pin, Pin dir
     //clean up variables
     input = 0;
     output = 0;
+    lastAngle = 0;
+    sw_angle = 1;  //use software angle
+    zero_angle_sw = 0;  //mn297
     
 }
 
@@ -67,8 +70,7 @@ void RoverArmMotor::begin(double aggP, double aggI, double aggD, double regP, do
     // as the microcontroller initializes.
     // adcResult = internalAveragerInstance.reading(analogRead(encoder));
     //after setup, currentAngle is same as setpoint
-    adcResult = get_current_angle();    // fix setpoint not equal to current angle
-    currentAngle = mapFloat((float) adcResult, MIN_ADC_VALUE, MAX_ADC_VALUE, 0, 359.0f);
+    currentAngle = get_current_angle();    // fix setpoint not equal to current angle
     setpoint = currentAngle;
 
 
@@ -96,11 +98,15 @@ int positive_rezeros = 0;
 double real_angle = 0;
 
 // Needs to be called in each loop
-void RoverArmMotor::tick(){
+void RoverArmMotor::tick(){ // worry about currentAngle and setpoint
 
     /*------------------Get current angle------------------*/
     // adcResult = internalAveragerInstance.reading(analogRead(encoder));
-    currentAngle = get_current_angle(); //TODO avg or not?
+    if (sw_angle) {
+        currentAngle = get_current_angle_sw(); 
+    }   else {
+        currentAngle = get_current_angle(); 
+    }
 
       // Measurement deadband - ignore sub-degree noise
     if(abs(currentAngle - lastAngle) < 1.0){
@@ -223,6 +229,14 @@ void RoverArmMotor::set_zero_angle(){
 void RoverArmMotor::reset_encoder(){
     resetAMT22(spi, encoder.port, encoder.pin, nullptr); //timer not used, so nullptr
 }
+void RoverArmMotor::set_zero_angle_sw(){
+    zero_angle_sw = this->get_current_angle();
+}  //mn297 software zero angle
+uint32_t RoverArmMotor::get_turns_encoder(){    //mn297
+    uint32_t turns = get_turns_AMT22(spi, encoder.port, encoder.pin, 12, nullptr);
+    return turns;
+}
+
 
 void RoverArmMotor::disengageBrake(){
     if(brake.valid != 0){
@@ -251,6 +265,16 @@ double RoverArmMotor::get_current_angle(){    //mn297
     currentAngle = mapFloat((float) encoderData, MIN_ADC_VALUE, MAX_ADC_VALUE, 0, 359.0f); //mn297 potentiometer encoder
     return currentAngle / gearRatio;
 }
+double RoverArmMotor::get_current_angle_sw(){    //TODO mn297
+    // return currentAngle / gearRatio;
+    uint16_t encoderData = getPositionSPI(spi, encoder.port, encoder.pin, 12, nullptr); //timer not used, so nullptr
+    currentAngle = mapFloat((float) encoderData, MIN_ADC_VALUE, MAX_ADC_VALUE, 0, 359.0f); //mn297 potentiometer encoder
+    
+    double diff = currentAngle - zero_angle_sw;
+    if(diff < 0) diff += 360;
+    return diff / gearRatio;
+}
+
 double RoverArmMotor::getCurrentOutput(){
     return output;
 }

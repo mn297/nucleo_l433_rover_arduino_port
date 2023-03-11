@@ -73,6 +73,21 @@ uint8_t spiWriteRead(SPI_HandleTypeDef *hspi, uint8_t sendByte, GPIO_TypeDef* en
  */
 uint16_t getPositionSPI(SPI_HandleTypeDef *hspi, GPIO_TypeDef* encoderPort, uint16_t encoderPin, uint8_t resolution, TIM_HandleTypeDef *timer);
 
+/*  TODO 
+ * @brief 	Gets the absolute position from the AMT22 encoder using the SPI bus. The AMT22 position includes 2 checkbits to use
+ * 				  for position verification. Both 12-bit and 14-bit encoders transfer position via two bytes, giving 16-bits regardless of resolution.
+ * 				  For 12-bit encoders the position is left-shifted two bits, leaving the right two bits as zeros. This gives the impression that the encoder
+ * 				  is actually sending 14-bits, when it is actually sending 12-bit values, where every number is multiplied by 4.
+ * 				  Error values are returned as 0xFFFF.
+ * @param	  hspi pointer to a SPI_HandleTypeDef structure that contains the configuration information for SPI module.
+ * @param   encoderPort to select the GPIO peripheral for STM32.
+ * @param   encoderPin specifies the port bit to be written.
+ * @param	  resolution to properly format position responses.
+ * @param   timer is used to make microsecond delays during data exchange.
+ * @retval	currentPosition of the encoder. In case of error returned value is 0xFFFF.
+ *
+ */
+uint32_t get_turns_AMT22(SPI_HandleTypeDef *hspi, GPIO_TypeDef* encoderPort, uint16_t encoderPin, uint8_t resolution, TIM_HandleTypeDef *timer);
 
 /*
  * @brief 	Sets value of the given encoder to ZERO.
