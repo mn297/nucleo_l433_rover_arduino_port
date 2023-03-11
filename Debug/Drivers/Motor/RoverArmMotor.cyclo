@@ -9,11 +9,12 @@ RoverArmMotor.cpp:196:6:bool RoverArmMotor::newSetpoint(double)	3
 RoverArmMotor.cpp:206:5:int RoverArmMotor::getDirection()	2
 RoverArmMotor.cpp:215:6:void RoverArmMotor::setAngleLimits(double, double)	1
 RoverArmMotor.cpp:220:6:void RoverArmMotor::set_zero_angle()	1
-RoverArmMotor.cpp:224:6:void RoverArmMotor::disengageBrake()	2
-RoverArmMotor.cpp:231:6:void RoverArmMotor::engageBrake()	2
-RoverArmMotor.cpp:238:8:double RoverArmMotor::get_current_angle_avg()	1
-RoverArmMotor.cpp:245:8:double RoverArmMotor::get_current_angle()	1
-RoverArmMotor.cpp:251:8:double RoverArmMotor::getCurrentOutput()	1
-RoverArmMotor.cpp:255:8:double RoverArmMotor::mapFloat(float, float, float, float, float)	1
-RoverArmMotor.cpp:261:8:double RoverArmMotor::getRatio()	1
-RoverArmMotor.cpp:265:6:void RoverArmMotor::WatchdogISR()	1
+RoverArmMotor.cpp:223:6:void RoverArmMotor::reset_encoder()	1
+RoverArmMotor.cpp:227:6:void RoverArmMotor::disengageBrake()	2
+RoverArmMotor.cpp:234:6:void RoverArmMotor::engageBrake()	2
+RoverArmMotor.cpp:241:8:double RoverArmMotor::get_current_angle_avg()	1
+RoverArmMotor.cpp:248:8:double RoverArmMotor::get_current_angle()	1
+RoverArmMotor.cpp:254:8:double RoverArmMotor::getCurrentOutput()	1
+RoverArmMotor.cpp:258:8:double RoverArmMotor::mapFloat(float, float, float, float, float)	1
+RoverArmMotor.cpp:264:8:double RoverArmMotor::getRatio()	1
+RoverArmMotor.cpp:268:6:void RoverArmMotor::WatchdogISR()	1

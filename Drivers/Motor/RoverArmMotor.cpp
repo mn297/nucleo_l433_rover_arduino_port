@@ -220,6 +220,9 @@ void RoverArmMotor::setAngleLimits(double lowest, double highest){
 void RoverArmMotor::set_zero_angle(){
     setZeroSPI(spi, encoder.port, encoder.pin, nullptr); //timer not used, so nullptr
 }
+void RoverArmMotor::reset_encoder(){
+    resetAMT22(spi, encoder.port, encoder.pin, nullptr); //timer not used, so nullptr
+}
 
 void RoverArmMotor::disengageBrake(){
     if(brake.valid != 0){

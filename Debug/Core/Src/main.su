@@ -4,9 +4,9 @@
 ../Core/Src/main.cpp:69:6:void print(const char*)	24	static
 ../Core/Src/main.cpp:74:5:)	272	static
 ../Core/Src/main.cpp:86:6:void delay_us(uint16_t)	16	static
-../Core/Src/main.cpp:107:5:int main()	48	static
-../Core/Src/main.cpp:334:6:void SystemClock_Config()	96	static
-../Core/Src/main.cpp:381:6:void HAL_GPIO_EXTI_Callback(uint16_t)	16	static
-../Core/Src/main.cpp:403:6:void Error_Handler()	4	static,ignoring_inline_asm
-../Core/Src/main.cpp:412:1:void __static_initialization_and_destruction_0(int, int)	104	static
-../Core/Src/main.cpp:412:1:cpp)	8	static
+../Core/Src/main.cpp:107:5:int main()	40	static
+../Core/Src/main.cpp:335:6:void SystemClock_Config()	96	static
+../Core/Src/main.cpp:382:6:void HAL_GPIO_EXTI_Callback(uint16_t)	16	static
+../Core/Src/main.cpp:405:6:void Error_Handler()	4	static,ignoring_inline_asm
+../Core/Src/main.cpp:414:1:void __static_initialization_and_destruction_0(int, int)	104	static
+../Core/Src/main.cpp:414:1:cpp)	8	static

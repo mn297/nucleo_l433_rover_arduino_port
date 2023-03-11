@@ -46,6 +46,7 @@ class RoverArmMotor{
         void setRetuningGapLimit(int gap);
         void setAngleLimits(double lowest_angle, double highest_angle);
         void set_zero_angle();  //mn297
+        void reset_encoder();  //mn297
         bool setMultiplierBool(bool mult, double ratio); 
         bool newSetpoint(double angle);
 

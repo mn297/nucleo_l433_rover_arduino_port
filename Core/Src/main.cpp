@@ -170,7 +170,8 @@ int main(void)
     HAL_Delay(10);
     Wrist_Roll.begin(aggKp, aggKi, aggKd, regKp, regKi, regKd);
     Wrist_Roll.setAngleLimits(2, 120.0f); //for angle limits test
-
+    Wrist_Roll.reset_encoder();
+    Wrist_Roll.set_zero_angle();
     // __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 70);
     // current_angle = Wrist_Roll.get_current_angle();
     // printf("current angle is %f\r\n, current_angle");
@@ -212,36 +213,36 @@ int main(void)
     // HAL_Delay(50);
     // Wrist_Roll.newSetpoint(current_angle + 10);
 
-    // current_angle = Wrist_Roll.get_current_angle();
-    // setpoint = Wrist_Roll.getSetpoint();
-    // printf("current angle: %f, setpoint: %f\r\n", current_angle, setpoint);
+    current_angle = Wrist_Roll.get_current_angle();
+    setpoint = Wrist_Roll.getSetpoint();
+    printf("current angle: %f, setpoint: %f\r\n", current_angle, setpoint);
     // Wrist_Roll.tick();
     // HAL_Delay(1); // safety delay
 
     /*--------------------------------------CYTRON angle limit test--------------------------------------*/
 
-    Wrist_Roll.newSetpoint(Wrist_Roll.lowestAngle);
-    while(true) {
-      current_angle = Wrist_Roll.get_current_angle();
-      if (!(current_angle <= Wrist_Roll.lowestAngle + 1.0)) {
-        printf("DOWN current angle: %f, setpoint: %f\r\n", current_angle, Wrist_Roll.setpoint);
-        Wrist_Roll.tick();
-      }
-      else {
-        break;
-      }
-    }
-    Wrist_Roll.newSetpoint(Wrist_Roll.highestAngle);
-    while(true) {
-      current_angle = Wrist_Roll.get_current_angle();
-      if (!(current_angle >= Wrist_Roll.highestAngle - 1.0)) {
-        printf("UP current angle: %f, setpoint: %f\r\n", current_angle, Wrist_Roll.setpoint);
-        Wrist_Roll.tick();
-      }
-      else {
-        break;
-      }
-    }
+    // Wrist_Roll.newSetpoint(Wrist_Roll.lowestAngle);
+    // while(true) {
+    //   current_angle = Wrist_Roll.get_current_angle();
+    //   if (!(current_angle <= Wrist_Roll.lowestAngle + 1.0)) {
+    //     printf("DOWN current angle: %f, setpoint: %f\r\n", current_angle, Wrist_Roll.setpoint);
+    //     Wrist_Roll.tick();
+    //   }
+    //   else {
+    //     break;
+    //   }
+    // }
+    // Wrist_Roll.newSetpoint(Wrist_Roll.highestAngle);
+    // while(true) {
+    //   current_angle = Wrist_Roll.get_current_angle();
+    //   if (!(current_angle >= Wrist_Roll.highestAngle - 1.0)) {
+    //     printf("UP current angle: %f, setpoint: %f\r\n", current_angle, Wrist_Roll.setpoint);
+    //     Wrist_Roll.tick();
+    //   }
+    //   else {
+    //     break;
+    //   }
+    // }
 
     
 
@@ -388,6 +389,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
       // printf("current angle is %f\r\n, current_angle");
       // Wrist_Roll.newSetpoint(current_angle + 150);
 
+      __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
       Wrist_Roll.set_zero_angle();
       brakeSet = 1;
       return;
