@@ -27,9 +27,9 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  11 .ARM.attributes 00000030  00000000  00000000  0002020c  2**0
                   CONTENTS, READONLY
- 12 .debug_info   00018a04  00000000  00000000  0002023c  2**0
+ 12 .debug_info   00018a06  00000000  00000000  0002023c  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 13 .debug_abbrev 00003584  00000000  00000000  00038c40  2**0
+ 13 .debug_abbrev 00003584  00000000  00000000  00038c42  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  14 .debug_aranges 000013a0  00000000  00000000  0003c1c8  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
@@ -37,13 +37,13 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  16 .debug_macro  000279f8  00000000  00000000  0003e7b0  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   00017693  00000000  00000000  000661a8  2**0
+ 17 .debug_line   00017692  00000000  00000000  000661a8  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    000ddf65  00000000  00000000  0007d83b  2**0
+ 18 .debug_str    000ddf65  00000000  00000000  0007d83a  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000050  00000000  00000000  0015b7a0  2**0
+ 19 .comment      00000050  00000000  00000000  0015b79f  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  000064a4  00000000  00000000  0015b7f0  2**2
+ 20 .debug_frame  000064a8  00000000  00000000  0015b7f0  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -1622,7 +1622,7 @@ int main(void)
 
   /* Configure the system clock */
   SystemClock_Config();
- 800115a:	f000 f973 	bl	8001444 <_Z18SystemClock_Configv>
+ 800115a:	f000 f977 	bl	800144c <_Z18SystemClock_Configv>
   /* USER CODE BEGIN SysInit */
 
   /* USER CODE END SysInit */
@@ -1659,7 +1659,7 @@ int main(void)
  800118a:	f241 0304 	movw	r3, #4100	; 0x1004
  800118e:	81fb      	strh	r3, [r7, #14]
   HAL_TIM_Base_Start(&htim1);
- 8001190:	489b      	ldr	r0, [pc, #620]	; (8001400 <main+0x2b0>)
+ 8001190:	489d      	ldr	r0, [pc, #628]	; (8001408 <main+0x2b8>)
  8001192:	f004 f88f 	bl	80052b4 <HAL_TIM_Base_Start>
 
   /*---AMT22 setup---*/
@@ -1671,13 +1671,13 @@ int main(void)
  800119a:	60bb      	str	r3, [r7, #8]
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
  800119c:	2104      	movs	r1, #4
- 800119e:	4898      	ldr	r0, [pc, #608]	; (8001400 <main+0x2b0>)
+ 800119e:	489a      	ldr	r0, [pc, #616]	; (8001408 <main+0x2b8>)
  80011a0:	f004 f936 	bl	8005410 <HAL_TIM_PWM_Start>
   HAL_Delay(500);
  80011a4:	f44f 70fa 	mov.w	r0, #500	; 0x1f4
  80011a8:	f001 ff5a 	bl	8003060 <HAL_Delay>
   __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 1500-1);
- 80011ac:	4b94      	ldr	r3, [pc, #592]	; (8001400 <main+0x2b0>)
+ 80011ac:	4b96      	ldr	r3, [pc, #600]	; (8001408 <main+0x2b8>)
  80011ae:	681b      	ldr	r3, [r3, #0]
  80011b0:	f240 52db 	movw	r2, #1499	; 0x5db
  80011b4:	639a      	str	r2, [r3, #56]	; 0x38
@@ -1694,429 +1694,429 @@ int main(void)
  80011c0:	607b      	str	r3, [r7, #4]
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
  80011c2:	2104      	movs	r1, #4
- 80011c4:	488f      	ldr	r0, [pc, #572]	; (8001404 <main+0x2b4>)
+ 80011c4:	4891      	ldr	r0, [pc, #580]	; (800140c <main+0x2bc>)
  80011c6:	f004 f923 	bl	8005410 <HAL_TIM_PWM_Start>
   __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
- 80011ca:	4b8e      	ldr	r3, [pc, #568]	; (8001404 <main+0x2b4>)
+ 80011ca:	4b90      	ldr	r3, [pc, #576]	; (800140c <main+0x2bc>)
  80011cc:	681b      	ldr	r3, [r3, #0]
  80011ce:	2200      	movs	r2, #0
  80011d0:	639a      	str	r2, [r3, #56]	; 0x38
   HAL_Delay(10);
  80011d2:	200a      	movs	r0, #10
  80011d4:	f001 ff44 	bl	8003060 <HAL_Delay>
+  Wrist_Roll.wrist_waist = 1;
+ 80011d8:	4b8d      	ldr	r3, [pc, #564]	; (8001410 <main+0x2c0>)
+ 80011da:	2201      	movs	r2, #1
+ 80011dc:	f883 2128 	strb.w	r2, [r3, #296]	; 0x128
   Wrist_Roll.begin(aggKp, aggKi, aggKd, regKp, regKi, regKd);
- 80011d8:	4b8b      	ldr	r3, [pc, #556]	; (8001408 <main+0x2b8>)
- 80011da:	ed93 7b00 	vldr	d7, [r3]
- 80011de:	4b8b      	ldr	r3, [pc, #556]	; (800140c <main+0x2bc>)
- 80011e0:	ed93 6b00 	vldr	d6, [r3]
- 80011e4:	4b8a      	ldr	r3, [pc, #552]	; (8001410 <main+0x2c0>)
- 80011e6:	ed93 2b00 	vldr	d2, [r3]
- 80011ea:	4b8a      	ldr	r3, [pc, #552]	; (8001414 <main+0x2c4>)
- 80011ec:	ed93 3b00 	vldr	d3, [r3]
- 80011f0:	4b89      	ldr	r3, [pc, #548]	; (8001418 <main+0x2c8>)
- 80011f2:	ed93 4b00 	vldr	d4, [r3]
- 80011f6:	4b89      	ldr	r3, [pc, #548]	; (800141c <main+0x2cc>)
- 80011f8:	ed93 5b00 	vldr	d5, [r3]
- 80011fc:	eeb0 1a46 	vmov.f32	s2, s12
- 8001200:	eef0 1a66 	vmov.f32	s3, s13
- 8001204:	eeb0 0a47 	vmov.f32	s0, s14
- 8001208:	eef0 0a67 	vmov.f32	s1, s15
- 800120c:	4884      	ldr	r0, [pc, #528]	; (8001420 <main+0x2d0>)
- 800120e:	f000 fff3 	bl	80021f8 <_ZN13RoverArmMotor5beginEdddddd>
+ 80011e0:	4b8c      	ldr	r3, [pc, #560]	; (8001414 <main+0x2c4>)
+ 80011e2:	ed93 7b00 	vldr	d7, [r3]
+ 80011e6:	4b8c      	ldr	r3, [pc, #560]	; (8001418 <main+0x2c8>)
+ 80011e8:	ed93 6b00 	vldr	d6, [r3]
+ 80011ec:	4b8b      	ldr	r3, [pc, #556]	; (800141c <main+0x2cc>)
+ 80011ee:	ed93 2b00 	vldr	d2, [r3]
+ 80011f2:	4b8b      	ldr	r3, [pc, #556]	; (8001420 <main+0x2d0>)
+ 80011f4:	ed93 3b00 	vldr	d3, [r3]
+ 80011f8:	4b8a      	ldr	r3, [pc, #552]	; (8001424 <main+0x2d4>)
+ 80011fa:	ed93 4b00 	vldr	d4, [r3]
+ 80011fe:	4b8a      	ldr	r3, [pc, #552]	; (8001428 <main+0x2d8>)
+ 8001200:	ed93 5b00 	vldr	d5, [r3]
+ 8001204:	eeb0 1a46 	vmov.f32	s2, s12
+ 8001208:	eef0 1a66 	vmov.f32	s3, s13
+ 800120c:	eeb0 0a47 	vmov.f32	s0, s14
+ 8001210:	eef0 0a67 	vmov.f32	s1, s15
+ 8001214:	487e      	ldr	r0, [pc, #504]	; (8001410 <main+0x2c0>)
+ 8001216:	f000 ffef 	bl	80021f8 <_ZN13RoverArmMotor5beginEdddddd>
   Wrist_Roll.setAngleLimits(2, 120.0f); //for angle limits test
- 8001212:	ed9f 1b77 	vldr	d1, [pc, #476]	; 80013f0 <main+0x2a0>
- 8001216:	ed9f 0b78 	vldr	d0, [pc, #480]	; 80013f8 <main+0x2a8>
- 800121a:	4881      	ldr	r0, [pc, #516]	; (8001420 <main+0x2d0>)
- 800121c:	f001 fa02 	bl	8002624 <_ZN13RoverArmMotor14setAngleLimitsEdd>
+ 800121a:	ed9f 1b77 	vldr	d1, [pc, #476]	; 80013f8 <main+0x2a8>
+ 800121e:	ed9f 0b78 	vldr	d0, [pc, #480]	; 8001400 <main+0x2b0>
+ 8001222:	487b      	ldr	r0, [pc, #492]	; (8001410 <main+0x2c0>)
+ 8001224:	f001 f9fe 	bl	8002624 <_ZN13RoverArmMotor14setAngleLimitsEdd>
   Wrist_Roll.reset_encoder();
- 8001220:	487f      	ldr	r0, [pc, #508]	; (8001420 <main+0x2d0>)
- 8001222:	f001 fa23 	bl	800266c <_ZN13RoverArmMotor13reset_encoderEv>
+ 8001228:	4879      	ldr	r0, [pc, #484]	; (8001410 <main+0x2c0>)
+ 800122a:	f001 fa1f 	bl	800266c <_ZN13RoverArmMotor13reset_encoderEv>
   // __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 70);
   // current_angle = Wrist_Roll.get_current_angle();
   // printf("current angle is %f\r\n, current_angle");
   // Wrist_Roll.newSetpoint(current_angle + 150);
 
   __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 30);
- 8001226:	4b77      	ldr	r3, [pc, #476]	; (8001404 <main+0x2b4>)
- 8001228:	681b      	ldr	r3, [r3, #0]
- 800122a:	221e      	movs	r2, #30
- 800122c:	639a      	str	r2, [r3, #56]	; 0x38
-  while(!brakeSet){
- 800122e:	4b7d      	ldr	r3, [pc, #500]	; (8001424 <main+0x2d4>)
+ 800122e:	4b77      	ldr	r3, [pc, #476]	; (800140c <main+0x2bc>)
  8001230:	681b      	ldr	r3, [r3, #0]
- 8001232:	2b00      	cmp	r3, #0
- 8001234:	d130      	bne.n	8001298 <main+0x148>
+ 8001232:	221e      	movs	r2, #30
+ 8001234:	639a      	str	r2, [r3, #56]	; 0x38
+  while(!brakeSet){
+ 8001236:	4b7d      	ldr	r3, [pc, #500]	; (800142c <main+0x2dc>)
+ 8001238:	681b      	ldr	r3, [r3, #0]
+ 800123a:	2b00      	cmp	r3, #0
+ 800123c:	d130      	bne.n	80012a0 <main+0x150>
     // printf("waiting for brake set, current %f\r\n", Wrist_Roll.get_current_angle());
     current_angle = Wrist_Roll.get_current_angle();
- 8001236:	487a      	ldr	r0, [pc, #488]	; (8001420 <main+0x2d0>)
- 8001238:	f001 fa56 	bl	80026e8 <_ZN13RoverArmMotor17get_current_angleEv>
- 800123c:	eeb0 7a40 	vmov.f32	s14, s0
- 8001240:	eef0 7a60 	vmov.f32	s15, s1
- 8001244:	4b78      	ldr	r3, [pc, #480]	; (8001428 <main+0x2d8>)
- 8001246:	ed83 7b00 	vstr	d7, [r3]
+ 800123e:	4874      	ldr	r0, [pc, #464]	; (8001410 <main+0x2c0>)
+ 8001240:	f001 fa52 	bl	80026e8 <_ZN13RoverArmMotor17get_current_angleEv>
+ 8001244:	eeb0 7a40 	vmov.f32	s14, s0
+ 8001248:	eef0 7a60 	vmov.f32	s15, s1
+ 800124c:	4b78      	ldr	r3, [pc, #480]	; (8001430 <main+0x2e0>)
+ 800124e:	ed83 7b00 	vstr	d7, [r3]
     current_angle_sw = Wrist_Roll.get_current_angle_sw();
- 800124a:	4875      	ldr	r0, [pc, #468]	; (8001420 <main+0x2d0>)
- 800124c:	f001 fa92 	bl	8002774 <_ZN13RoverArmMotor20get_current_angle_swEv>
- 8001250:	eeb0 7a40 	vmov.f32	s14, s0
- 8001254:	eef0 7a60 	vmov.f32	s15, s1
- 8001258:	4b74      	ldr	r3, [pc, #464]	; (800142c <main+0x2dc>)
- 800125a:	ed83 7b00 	vstr	d7, [r3]
+ 8001252:	486f      	ldr	r0, [pc, #444]	; (8001410 <main+0x2c0>)
+ 8001254:	f001 fa8e 	bl	8002774 <_ZN13RoverArmMotor20get_current_angle_swEv>
+ 8001258:	eeb0 7a40 	vmov.f32	s14, s0
+ 800125c:	eef0 7a60 	vmov.f32	s15, s1
+ 8001260:	4b74      	ldr	r3, [pc, #464]	; (8001434 <main+0x2e4>)
+ 8001262:	ed83 7b00 	vstr	d7, [r3]
     setpoint = Wrist_Roll.getSetpoint();
- 800125e:	4870      	ldr	r0, [pc, #448]	; (8001420 <main+0x2d0>)
- 8001260:	f001 f998 	bl	8002594 <_ZN13RoverArmMotor11getSetpointEv>
- 8001264:	eeb0 7a40 	vmov.f32	s14, s0
- 8001268:	eef0 7a60 	vmov.f32	s15, s1
- 800126c:	4b70      	ldr	r3, [pc, #448]	; (8001430 <main+0x2e0>)
- 800126e:	ed83 7b00 	vstr	d7, [r3]
+ 8001266:	486a      	ldr	r0, [pc, #424]	; (8001410 <main+0x2c0>)
+ 8001268:	f001 f994 	bl	8002594 <_ZN13RoverArmMotor11getSetpointEv>
+ 800126c:	eeb0 7a40 	vmov.f32	s14, s0
+ 8001270:	eef0 7a60 	vmov.f32	s15, s1
+ 8001274:	4b70      	ldr	r3, [pc, #448]	; (8001438 <main+0x2e8>)
+ 8001276:	ed83 7b00 	vstr	d7, [r3]
     printf("BRAKE, current angle: %f, setpoint: %f, current_angle_sw: %f\r\n", current_angle, setpoint, current_angle_sw);
- 8001272:	4b6d      	ldr	r3, [pc, #436]	; (8001428 <main+0x2d8>)
- 8001274:	e9d3 4500 	ldrd	r4, r5, [r3]
- 8001278:	4b6d      	ldr	r3, [pc, #436]	; (8001430 <main+0x2e0>)
- 800127a:	e9d3 2300 	ldrd	r2, r3, [r3]
- 800127e:	496b      	ldr	r1, [pc, #428]	; (800142c <main+0x2dc>)
- 8001280:	e9d1 0100 	ldrd	r0, r1, [r1]
- 8001284:	e9cd 0102 	strd	r0, r1, [sp, #8]
- 8001288:	e9cd 2300 	strd	r2, r3, [sp]
- 800128c:	4622      	mov	r2, r4
- 800128e:	462b      	mov	r3, r5
- 8001290:	4868      	ldr	r0, [pc, #416]	; (8001434 <main+0x2e4>)
- 8001292:	f7ff ff2f 	bl	80010f4 <printf>
+ 800127a:	4b6d      	ldr	r3, [pc, #436]	; (8001430 <main+0x2e0>)
+ 800127c:	e9d3 4500 	ldrd	r4, r5, [r3]
+ 8001280:	4b6d      	ldr	r3, [pc, #436]	; (8001438 <main+0x2e8>)
+ 8001282:	e9d3 2300 	ldrd	r2, r3, [r3]
+ 8001286:	496b      	ldr	r1, [pc, #428]	; (8001434 <main+0x2e4>)
+ 8001288:	e9d1 0100 	ldrd	r0, r1, [r1]
+ 800128c:	e9cd 0102 	strd	r0, r1, [sp, #8]
+ 8001290:	e9cd 2300 	strd	r2, r3, [sp]
+ 8001294:	4622      	mov	r2, r4
+ 8001296:	462b      	mov	r3, r5
+ 8001298:	4868      	ldr	r0, [pc, #416]	; (800143c <main+0x2ec>)
+ 800129a:	f7ff ff2b 	bl	80010f4 <printf>
   while(!brakeSet){
- 8001296:	e7ca      	b.n	800122e <main+0xde>
+ 800129e:	e7ca      	b.n	8001236 <main+0xe6>
     // printf("waiting for brake set\r\n");
   }
   __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
- 8001298:	4b5a      	ldr	r3, [pc, #360]	; (8001404 <main+0x2b4>)
- 800129a:	681b      	ldr	r3, [r3, #0]
- 800129c:	2200      	movs	r2, #0
- 800129e:	639a      	str	r2, [r3, #56]	; 0x38
+ 80012a0:	4b5a      	ldr	r3, [pc, #360]	; (800140c <main+0x2bc>)
+ 80012a2:	681b      	ldr	r3, [r3, #0]
+ 80012a4:	2200      	movs	r2, #0
+ 80012a6:	639a      	str	r2, [r3, #56]	; 0x38
     // printf("current angle: %f, setpoint: %f, current_angle_sw: %f\r\n", current_angle, setpoint, current_angle_sw);
 
 
     /*--------------------------------------CYTRON angle limit test--------------------------------------*/
     // high first because we just set zero 
     Wrist_Roll.newSetpoint(Wrist_Roll.highestAngle);
- 80012a0:	4b5f      	ldr	r3, [pc, #380]	; (8001420 <main+0x2d0>)
- 80012a2:	ed93 7b42 	vldr	d7, [r3, #264]	; 0x108
- 80012a6:	eeb0 0a47 	vmov.f32	s0, s14
- 80012aa:	eef0 0a67 	vmov.f32	s1, s15
- 80012ae:	485c      	ldr	r0, [pc, #368]	; (8001420 <main+0x2d0>)
- 80012b0:	f001 f987 	bl	80025c2 <_ZN13RoverArmMotor11newSetpointEd>
+ 80012a8:	4b59      	ldr	r3, [pc, #356]	; (8001410 <main+0x2c0>)
+ 80012aa:	ed93 7b42 	vldr	d7, [r3, #264]	; 0x108
+ 80012ae:	eeb0 0a47 	vmov.f32	s0, s14
+ 80012b2:	eef0 0a67 	vmov.f32	s1, s15
+ 80012b6:	4856      	ldr	r0, [pc, #344]	; (8001410 <main+0x2c0>)
+ 80012b8:	f001 f983 	bl	80025c2 <_ZN13RoverArmMotor11newSetpointEd>
     while(true) {
       current_angle = Wrist_Roll.get_current_angle();
- 80012b4:	485a      	ldr	r0, [pc, #360]	; (8001420 <main+0x2d0>)
- 80012b6:	f001 fa17 	bl	80026e8 <_ZN13RoverArmMotor17get_current_angleEv>
- 80012ba:	eeb0 7a40 	vmov.f32	s14, s0
- 80012be:	eef0 7a60 	vmov.f32	s15, s1
- 80012c2:	4b59      	ldr	r3, [pc, #356]	; (8001428 <main+0x2d8>)
- 80012c4:	ed83 7b00 	vstr	d7, [r3]
+ 80012bc:	4854      	ldr	r0, [pc, #336]	; (8001410 <main+0x2c0>)
+ 80012be:	f001 fa13 	bl	80026e8 <_ZN13RoverArmMotor17get_current_angleEv>
+ 80012c2:	eeb0 7a40 	vmov.f32	s14, s0
+ 80012c6:	eef0 7a60 	vmov.f32	s15, s1
+ 80012ca:	4b59      	ldr	r3, [pc, #356]	; (8001430 <main+0x2e0>)
+ 80012cc:	ed83 7b00 	vstr	d7, [r3]
       current_angle_sw = Wrist_Roll.get_current_angle_sw();
- 80012c8:	4855      	ldr	r0, [pc, #340]	; (8001420 <main+0x2d0>)
- 80012ca:	f001 fa53 	bl	8002774 <_ZN13RoverArmMotor20get_current_angle_swEv>
- 80012ce:	eeb0 7a40 	vmov.f32	s14, s0
- 80012d2:	eef0 7a60 	vmov.f32	s15, s1
- 80012d6:	4b55      	ldr	r3, [pc, #340]	; (800142c <main+0x2dc>)
- 80012d8:	ed83 7b00 	vstr	d7, [r3]
+ 80012d0:	484f      	ldr	r0, [pc, #316]	; (8001410 <main+0x2c0>)
+ 80012d2:	f001 fa4f 	bl	8002774 <_ZN13RoverArmMotor20get_current_angle_swEv>
+ 80012d6:	eeb0 7a40 	vmov.f32	s14, s0
+ 80012da:	eef0 7a60 	vmov.f32	s15, s1
+ 80012de:	4b55      	ldr	r3, [pc, #340]	; (8001434 <main+0x2e4>)
+ 80012e0:	ed83 7b00 	vstr	d7, [r3]
       if (!(current_angle_sw >= Wrist_Roll.highestAngle - 1.0)) {
- 80012dc:	4b50      	ldr	r3, [pc, #320]	; (8001420 <main+0x2d0>)
- 80012de:	e9d3 0142 	ldrd	r0, r1, [r3, #264]	; 0x108
- 80012e2:	f04f 0200 	mov.w	r2, #0
- 80012e6:	4b54      	ldr	r3, [pc, #336]	; (8001438 <main+0x2e8>)
- 80012e8:	f7fe ffce 	bl	8000288 <__aeabi_dsub>
- 80012ec:	4602      	mov	r2, r0
- 80012ee:	460b      	mov	r3, r1
- 80012f0:	4610      	mov	r0, r2
- 80012f2:	4619      	mov	r1, r3
- 80012f4:	4b4d      	ldr	r3, [pc, #308]	; (800142c <main+0x2dc>)
- 80012f6:	e9d3 2300 	ldrd	r2, r3, [r3]
- 80012fa:	2401      	movs	r4, #1
- 80012fc:	f7ff fbf8 	bl	8000af0 <__aeabi_dcmple>
- 8001300:	4603      	mov	r3, r0
- 8001302:	2b00      	cmp	r3, #0
- 8001304:	d101      	bne.n	800130a <main+0x1ba>
- 8001306:	2300      	movs	r3, #0
- 8001308:	461c      	mov	r4, r3
- 800130a:	b2e3      	uxtb	r3, r4
- 800130c:	f083 0301 	eor.w	r3, r3, #1
- 8001310:	b2db      	uxtb	r3, r3
- 8001312:	2b00      	cmp	r3, #0
- 8001314:	d015      	beq.n	8001342 <main+0x1f2>
+ 80012e4:	4b4a      	ldr	r3, [pc, #296]	; (8001410 <main+0x2c0>)
+ 80012e6:	e9d3 0142 	ldrd	r0, r1, [r3, #264]	; 0x108
+ 80012ea:	f04f 0200 	mov.w	r2, #0
+ 80012ee:	4b54      	ldr	r3, [pc, #336]	; (8001440 <main+0x2f0>)
+ 80012f0:	f7fe ffca 	bl	8000288 <__aeabi_dsub>
+ 80012f4:	4602      	mov	r2, r0
+ 80012f6:	460b      	mov	r3, r1
+ 80012f8:	4610      	mov	r0, r2
+ 80012fa:	4619      	mov	r1, r3
+ 80012fc:	4b4d      	ldr	r3, [pc, #308]	; (8001434 <main+0x2e4>)
+ 80012fe:	e9d3 2300 	ldrd	r2, r3, [r3]
+ 8001302:	2401      	movs	r4, #1
+ 8001304:	f7ff fbf4 	bl	8000af0 <__aeabi_dcmple>
+ 8001308:	4603      	mov	r3, r0
+ 800130a:	2b00      	cmp	r3, #0
+ 800130c:	d101      	bne.n	8001312 <main+0x1c2>
+ 800130e:	2300      	movs	r3, #0
+ 8001310:	461c      	mov	r4, r3
+ 8001312:	b2e3      	uxtb	r3, r4
+ 8001314:	f083 0301 	eor.w	r3, r3, #1
+ 8001318:	b2db      	uxtb	r3, r3
+ 800131a:	2b00      	cmp	r3, #0
+ 800131c:	d015      	beq.n	800134a <main+0x1fa>
         printf("UP current angle: %f, setpoint: %f, sw: %f\r\n", current_angle, Wrist_Roll.setpoint, current_angle_sw);
- 8001316:	4b44      	ldr	r3, [pc, #272]	; (8001428 <main+0x2d8>)
- 8001318:	e9d3 4500 	ldrd	r4, r5, [r3]
- 800131c:	4b40      	ldr	r3, [pc, #256]	; (8001420 <main+0x2d0>)
- 800131e:	e9d3 2350 	ldrd	r2, r3, [r3, #320]	; 0x140
- 8001322:	4942      	ldr	r1, [pc, #264]	; (800142c <main+0x2dc>)
- 8001324:	e9d1 0100 	ldrd	r0, r1, [r1]
- 8001328:	e9cd 0102 	strd	r0, r1, [sp, #8]
- 800132c:	e9cd 2300 	strd	r2, r3, [sp]
- 8001330:	4622      	mov	r2, r4
- 8001332:	462b      	mov	r3, r5
- 8001334:	4841      	ldr	r0, [pc, #260]	; (800143c <main+0x2ec>)
- 8001336:	f7ff fedd 	bl	80010f4 <printf>
+ 800131e:	4b44      	ldr	r3, [pc, #272]	; (8001430 <main+0x2e0>)
+ 8001320:	e9d3 4500 	ldrd	r4, r5, [r3]
+ 8001324:	4b3a      	ldr	r3, [pc, #232]	; (8001410 <main+0x2c0>)
+ 8001326:	e9d3 2350 	ldrd	r2, r3, [r3, #320]	; 0x140
+ 800132a:	4942      	ldr	r1, [pc, #264]	; (8001434 <main+0x2e4>)
+ 800132c:	e9d1 0100 	ldrd	r0, r1, [r1]
+ 8001330:	e9cd 0102 	strd	r0, r1, [sp, #8]
+ 8001334:	e9cd 2300 	strd	r2, r3, [sp]
+ 8001338:	4622      	mov	r2, r4
+ 800133a:	462b      	mov	r3, r5
+ 800133c:	4841      	ldr	r0, [pc, #260]	; (8001444 <main+0x2f4>)
+ 800133e:	f7ff fed9 	bl	80010f4 <printf>
         Wrist_Roll.tick();
- 800133a:	4839      	ldr	r0, [pc, #228]	; (8001420 <main+0x2d0>)
- 800133c:	f000 ffee 	bl	800231c <_ZN13RoverArmMotor4tickEv>
+ 8001342:	4833      	ldr	r0, [pc, #204]	; (8001410 <main+0x2c0>)
+ 8001344:	f000 ffea 	bl	800231c <_ZN13RoverArmMotor4tickEv>
       current_angle = Wrist_Roll.get_current_angle();
- 8001340:	e7b8      	b.n	80012b4 <main+0x164>
+ 8001348:	e7b8      	b.n	80012bc <main+0x16c>
       }
       else {
         break;
- 8001342:	bf00      	nop
+ 800134a:	bf00      	nop
       }
     }
     Wrist_Roll.newSetpoint(Wrist_Roll.lowestAngle);
- 8001344:	4b36      	ldr	r3, [pc, #216]	; (8001420 <main+0x2d0>)
- 8001346:	ed93 7b40 	vldr	d7, [r3, #256]	; 0x100
- 800134a:	eeb0 0a47 	vmov.f32	s0, s14
- 800134e:	eef0 0a67 	vmov.f32	s1, s15
- 8001352:	4833      	ldr	r0, [pc, #204]	; (8001420 <main+0x2d0>)
- 8001354:	f001 f935 	bl	80025c2 <_ZN13RoverArmMotor11newSetpointEd>
+ 800134c:	4b30      	ldr	r3, [pc, #192]	; (8001410 <main+0x2c0>)
+ 800134e:	ed93 7b40 	vldr	d7, [r3, #256]	; 0x100
+ 8001352:	eeb0 0a47 	vmov.f32	s0, s14
+ 8001356:	eef0 0a67 	vmov.f32	s1, s15
+ 800135a:	482d      	ldr	r0, [pc, #180]	; (8001410 <main+0x2c0>)
+ 800135c:	f001 f931 	bl	80025c2 <_ZN13RoverArmMotor11newSetpointEd>
     while(true) {
       current_angle = Wrist_Roll.get_current_angle();
- 8001358:	4831      	ldr	r0, [pc, #196]	; (8001420 <main+0x2d0>)
- 800135a:	f001 f9c5 	bl	80026e8 <_ZN13RoverArmMotor17get_current_angleEv>
- 800135e:	eeb0 7a40 	vmov.f32	s14, s0
- 8001362:	eef0 7a60 	vmov.f32	s15, s1
- 8001366:	4b30      	ldr	r3, [pc, #192]	; (8001428 <main+0x2d8>)
- 8001368:	ed83 7b00 	vstr	d7, [r3]
+ 8001360:	482b      	ldr	r0, [pc, #172]	; (8001410 <main+0x2c0>)
+ 8001362:	f001 f9c1 	bl	80026e8 <_ZN13RoverArmMotor17get_current_angleEv>
+ 8001366:	eeb0 7a40 	vmov.f32	s14, s0
+ 800136a:	eef0 7a60 	vmov.f32	s15, s1
+ 800136e:	4b30      	ldr	r3, [pc, #192]	; (8001430 <main+0x2e0>)
+ 8001370:	ed83 7b00 	vstr	d7, [r3]
       current_angle_sw = Wrist_Roll.get_current_angle_sw();
- 800136c:	482c      	ldr	r0, [pc, #176]	; (8001420 <main+0x2d0>)
- 800136e:	f001 fa01 	bl	8002774 <_ZN13RoverArmMotor20get_current_angle_swEv>
- 8001372:	eeb0 7a40 	vmov.f32	s14, s0
- 8001376:	eef0 7a60 	vmov.f32	s15, s1
- 800137a:	4b2c      	ldr	r3, [pc, #176]	; (800142c <main+0x2dc>)
- 800137c:	ed83 7b00 	vstr	d7, [r3]
+ 8001374:	4826      	ldr	r0, [pc, #152]	; (8001410 <main+0x2c0>)
+ 8001376:	f001 f9fd 	bl	8002774 <_ZN13RoverArmMotor20get_current_angle_swEv>
+ 800137a:	eeb0 7a40 	vmov.f32	s14, s0
+ 800137e:	eef0 7a60 	vmov.f32	s15, s1
+ 8001382:	4b2c      	ldr	r3, [pc, #176]	; (8001434 <main+0x2e4>)
+ 8001384:	ed83 7b00 	vstr	d7, [r3]
       if (!(current_angle_sw <= Wrist_Roll.lowestAngle + 1.0)) {
- 8001380:	4b27      	ldr	r3, [pc, #156]	; (8001420 <main+0x2d0>)
- 8001382:	e9d3 0140 	ldrd	r0, r1, [r3, #256]	; 0x100
- 8001386:	f04f 0200 	mov.w	r2, #0
- 800138a:	4b2b      	ldr	r3, [pc, #172]	; (8001438 <main+0x2e8>)
- 800138c:	f7fe ff7e 	bl	800028c <__adddf3>
- 8001390:	4602      	mov	r2, r0
- 8001392:	460b      	mov	r3, r1
- 8001394:	4610      	mov	r0, r2
- 8001396:	4619      	mov	r1, r3
- 8001398:	4b24      	ldr	r3, [pc, #144]	; (800142c <main+0x2dc>)
- 800139a:	e9d3 2300 	ldrd	r2, r3, [r3]
- 800139e:	2401      	movs	r4, #1
- 80013a0:	f7ff fbb0 	bl	8000b04 <__aeabi_dcmpge>
- 80013a4:	4603      	mov	r3, r0
- 80013a6:	2b00      	cmp	r3, #0
- 80013a8:	d101      	bne.n	80013ae <main+0x25e>
- 80013aa:	2300      	movs	r3, #0
- 80013ac:	461c      	mov	r4, r3
- 80013ae:	b2e3      	uxtb	r3, r4
- 80013b0:	f083 0301 	eor.w	r3, r3, #1
- 80013b4:	b2db      	uxtb	r3, r3
- 80013b6:	2b00      	cmp	r3, #0
- 80013b8:	d015      	beq.n	80013e6 <main+0x296>
+ 8001388:	4b21      	ldr	r3, [pc, #132]	; (8001410 <main+0x2c0>)
+ 800138a:	e9d3 0140 	ldrd	r0, r1, [r3, #256]	; 0x100
+ 800138e:	f04f 0200 	mov.w	r2, #0
+ 8001392:	4b2b      	ldr	r3, [pc, #172]	; (8001440 <main+0x2f0>)
+ 8001394:	f7fe ff7a 	bl	800028c <__adddf3>
+ 8001398:	4602      	mov	r2, r0
+ 800139a:	460b      	mov	r3, r1
+ 800139c:	4610      	mov	r0, r2
+ 800139e:	4619      	mov	r1, r3
+ 80013a0:	4b24      	ldr	r3, [pc, #144]	; (8001434 <main+0x2e4>)
+ 80013a2:	e9d3 2300 	ldrd	r2, r3, [r3]
+ 80013a6:	2401      	movs	r4, #1
+ 80013a8:	f7ff fbac 	bl	8000b04 <__aeabi_dcmpge>
+ 80013ac:	4603      	mov	r3, r0
+ 80013ae:	2b00      	cmp	r3, #0
+ 80013b0:	d101      	bne.n	80013b6 <main+0x266>
+ 80013b2:	2300      	movs	r3, #0
+ 80013b4:	461c      	mov	r4, r3
+ 80013b6:	b2e3      	uxtb	r3, r4
+ 80013b8:	f083 0301 	eor.w	r3, r3, #1
+ 80013bc:	b2db      	uxtb	r3, r3
+ 80013be:	2b00      	cmp	r3, #0
+ 80013c0:	d015      	beq.n	80013ee <main+0x29e>
         printf("DOWN current angle: %f, setpoint: %f, sw: %f\r\n", current_angle, Wrist_Roll.setpoint, current_angle_sw);
- 80013ba:	4b1b      	ldr	r3, [pc, #108]	; (8001428 <main+0x2d8>)
- 80013bc:	e9d3 4500 	ldrd	r4, r5, [r3]
- 80013c0:	4b17      	ldr	r3, [pc, #92]	; (8001420 <main+0x2d0>)
- 80013c2:	e9d3 2350 	ldrd	r2, r3, [r3, #320]	; 0x140
- 80013c6:	4919      	ldr	r1, [pc, #100]	; (800142c <main+0x2dc>)
- 80013c8:	e9d1 0100 	ldrd	r0, r1, [r1]
- 80013cc:	e9cd 0102 	strd	r0, r1, [sp, #8]
- 80013d0:	e9cd 2300 	strd	r2, r3, [sp]
- 80013d4:	4622      	mov	r2, r4
- 80013d6:	462b      	mov	r3, r5
- 80013d8:	4819      	ldr	r0, [pc, #100]	; (8001440 <main+0x2f0>)
- 80013da:	f7ff fe8b 	bl	80010f4 <printf>
+ 80013c2:	4b1b      	ldr	r3, [pc, #108]	; (8001430 <main+0x2e0>)
+ 80013c4:	e9d3 4500 	ldrd	r4, r5, [r3]
+ 80013c8:	4b11      	ldr	r3, [pc, #68]	; (8001410 <main+0x2c0>)
+ 80013ca:	e9d3 2350 	ldrd	r2, r3, [r3, #320]	; 0x140
+ 80013ce:	4919      	ldr	r1, [pc, #100]	; (8001434 <main+0x2e4>)
+ 80013d0:	e9d1 0100 	ldrd	r0, r1, [r1]
+ 80013d4:	e9cd 0102 	strd	r0, r1, [sp, #8]
+ 80013d8:	e9cd 2300 	strd	r2, r3, [sp]
+ 80013dc:	4622      	mov	r2, r4
+ 80013de:	462b      	mov	r3, r5
+ 80013e0:	4819      	ldr	r0, [pc, #100]	; (8001448 <main+0x2f8>)
+ 80013e2:	f7ff fe87 	bl	80010f4 <printf>
         Wrist_Roll.tick();
- 80013de:	4810      	ldr	r0, [pc, #64]	; (8001420 <main+0x2d0>)
- 80013e0:	f000 ff9c 	bl	800231c <_ZN13RoverArmMotor4tickEv>
+ 80013e6:	480a      	ldr	r0, [pc, #40]	; (8001410 <main+0x2c0>)
+ 80013e8:	f000 ff98 	bl	800231c <_ZN13RoverArmMotor4tickEv>
       current_angle = Wrist_Roll.get_current_angle();
- 80013e4:	e7b8      	b.n	8001358 <main+0x208>
+ 80013ec:	e7b8      	b.n	8001360 <main+0x210>
       }
       else {
         break;
- 80013e6:	bf00      	nop
+ 80013ee:	bf00      	nop
     Wrist_Roll.newSetpoint(Wrist_Roll.highestAngle);
- 80013e8:	e75a      	b.n	80012a0 <main+0x150>
- 80013ea:	bf00      	nop
- 80013ec:	f3af 8000 	nop.w
- 80013f0:	00000000 	.word	0x00000000
- 80013f4:	405e0000 	.word	0x405e0000
+ 80013f0:	e75a      	b.n	80012a8 <main+0x158>
+ 80013f2:	bf00      	nop
+ 80013f4:	f3af 8000 	nop.w
  80013f8:	00000000 	.word	0x00000000
- 80013fc:	40000000 	.word	0x40000000
- 8001400:	2000051c 	.word	0x2000051c
- 8001404:	20000568 	.word	0x20000568
- 8001408:	20000000 	.word	0x20000000
- 800140c:	20000008 	.word	0x20000008
- 8001410:	20000010 	.word	0x20000010
- 8001414:	20000018 	.word	0x20000018
- 8001418:	20000020 	.word	0x20000020
- 800141c:	20000028 	.word	0x20000028
- 8001420:	20000280 	.word	0x20000280
- 8001424:	20000248 	.word	0x20000248
- 8001428:	20000230 	.word	0x20000230
- 800142c:	20000238 	.word	0x20000238
- 8001430:	20000240 	.word	0x20000240
- 8001434:	0800a290 	.word	0x0800a290
- 8001438:	3ff00000 	.word	0x3ff00000
- 800143c:	0800a2d0 	.word	0x0800a2d0
- 8001440:	0800a300 	.word	0x0800a300
+ 80013fc:	405e0000 	.word	0x405e0000
+ 8001400:	00000000 	.word	0x00000000
+ 8001404:	40000000 	.word	0x40000000
+ 8001408:	2000051c 	.word	0x2000051c
+ 800140c:	20000568 	.word	0x20000568
+ 8001410:	20000280 	.word	0x20000280
+ 8001414:	20000000 	.word	0x20000000
+ 8001418:	20000008 	.word	0x20000008
+ 800141c:	20000010 	.word	0x20000010
+ 8001420:	20000018 	.word	0x20000018
+ 8001424:	20000020 	.word	0x20000020
+ 8001428:	20000028 	.word	0x20000028
+ 800142c:	20000248 	.word	0x20000248
+ 8001430:	20000230 	.word	0x20000230
+ 8001434:	20000238 	.word	0x20000238
+ 8001438:	20000240 	.word	0x20000240
+ 800143c:	0800a290 	.word	0x0800a290
+ 8001440:	3ff00000 	.word	0x3ff00000
+ 8001444:	0800a2d0 	.word	0x0800a2d0
+ 8001448:	0800a300 	.word	0x0800a300
 
-08001444 <_Z18SystemClock_Configv>:
+0800144c <_Z18SystemClock_Configv>:
 /**
   * @brief System Clock Configuration
   * @retval None
   */
 void SystemClock_Config(void)
 {
- 8001444:	b580      	push	{r7, lr}
- 8001446:	b096      	sub	sp, #88	; 0x58
- 8001448:	af00      	add	r7, sp, #0
+ 800144c:	b580      	push	{r7, lr}
+ 800144e:	b096      	sub	sp, #88	; 0x58
+ 8001450:	af00      	add	r7, sp, #0
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
- 800144a:	f107 0314 	add.w	r3, r7, #20
- 800144e:	2244      	movs	r2, #68	; 0x44
- 8001450:	2100      	movs	r1, #0
- 8001452:	4618      	mov	r0, r3
- 8001454:	f005 fd6a 	bl	8006f2c <memset>
+ 8001452:	f107 0314 	add.w	r3, r7, #20
+ 8001456:	2244      	movs	r2, #68	; 0x44
+ 8001458:	2100      	movs	r1, #0
+ 800145a:	4618      	mov	r0, r3
+ 800145c:	f005 fd66 	bl	8006f2c <memset>
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
- 8001458:	463b      	mov	r3, r7
- 800145a:	2200      	movs	r2, #0
- 800145c:	601a      	str	r2, [r3, #0]
- 800145e:	605a      	str	r2, [r3, #4]
- 8001460:	609a      	str	r2, [r3, #8]
- 8001462:	60da      	str	r2, [r3, #12]
- 8001464:	611a      	str	r2, [r3, #16]
+ 8001460:	463b      	mov	r3, r7
+ 8001462:	2200      	movs	r2, #0
+ 8001464:	601a      	str	r2, [r3, #0]
+ 8001466:	605a      	str	r2, [r3, #4]
+ 8001468:	609a      	str	r2, [r3, #8]
+ 800146a:	60da      	str	r2, [r3, #12]
+ 800146c:	611a      	str	r2, [r3, #16]
 
   /** Configure the main internal regulator output voltage
   */
   if (HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE1) != HAL_OK)
- 8001466:	f44f 7000 	mov.w	r0, #512	; 0x200
- 800146a:	f002 f8e7 	bl	800363c <HAL_PWREx_ControlVoltageScaling>
- 800146e:	4603      	mov	r3, r0
- 8001470:	2b00      	cmp	r3, #0
- 8001472:	bf14      	ite	ne
- 8001474:	2301      	movne	r3, #1
- 8001476:	2300      	moveq	r3, #0
- 8001478:	b2db      	uxtb	r3, r3
- 800147a:	2b00      	cmp	r3, #0
- 800147c:	d001      	beq.n	8001482 <_Z18SystemClock_Configv+0x3e>
+ 800146e:	f44f 7000 	mov.w	r0, #512	; 0x200
+ 8001472:	f002 f8e3 	bl	800363c <HAL_PWREx_ControlVoltageScaling>
+ 8001476:	4603      	mov	r3, r0
+ 8001478:	2b00      	cmp	r3, #0
+ 800147a:	bf14      	ite	ne
+ 800147c:	2301      	movne	r3, #1
+ 800147e:	2300      	moveq	r3, #0
+ 8001480:	b2db      	uxtb	r3, r3
+ 8001482:	2b00      	cmp	r3, #0
+ 8001484:	d001      	beq.n	800148a <_Z18SystemClock_Configv+0x3e>
   {
     Error_Handler();
- 800147e:	f000 f86f 	bl	8001560 <Error_Handler>
+ 8001486:	f000 f86b 	bl	8001560 <Error_Handler>
   }
 
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
- 8001482:	2302      	movs	r3, #2
- 8001484:	617b      	str	r3, [r7, #20]
+ 800148a:	2302      	movs	r3, #2
+ 800148c:	617b      	str	r3, [r7, #20]
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
- 8001486:	f44f 7380 	mov.w	r3, #256	; 0x100
- 800148a:	623b      	str	r3, [r7, #32]
+ 800148e:	f44f 7380 	mov.w	r3, #256	; 0x100
+ 8001492:	623b      	str	r3, [r7, #32]
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
- 800148c:	2310      	movs	r3, #16
- 800148e:	627b      	str	r3, [r7, #36]	; 0x24
+ 8001494:	2310      	movs	r3, #16
+ 8001496:	627b      	str	r3, [r7, #36]	; 0x24
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
- 8001490:	2302      	movs	r3, #2
- 8001492:	63fb      	str	r3, [r7, #60]	; 0x3c
+ 8001498:	2302      	movs	r3, #2
+ 800149a:	63fb      	str	r3, [r7, #60]	; 0x3c
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
- 8001494:	2302      	movs	r3, #2
- 8001496:	643b      	str	r3, [r7, #64]	; 0x40
+ 800149c:	2302      	movs	r3, #2
+ 800149e:	643b      	str	r3, [r7, #64]	; 0x40
   RCC_OscInitStruct.PLL.PLLM = 1;
- 8001498:	2301      	movs	r3, #1
- 800149a:	647b      	str	r3, [r7, #68]	; 0x44
+ 80014a0:	2301      	movs	r3, #1
+ 80014a2:	647b      	str	r3, [r7, #68]	; 0x44
   RCC_OscInitStruct.PLL.PLLN = 10;
- 800149c:	230a      	movs	r3, #10
- 800149e:	64bb      	str	r3, [r7, #72]	; 0x48
+ 80014a4:	230a      	movs	r3, #10
+ 80014a6:	64bb      	str	r3, [r7, #72]	; 0x48
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV7;
- 80014a0:	2307      	movs	r3, #7
- 80014a2:	64fb      	str	r3, [r7, #76]	; 0x4c
+ 80014a8:	2307      	movs	r3, #7
+ 80014aa:	64fb      	str	r3, [r7, #76]	; 0x4c
   RCC_OscInitStruct.PLL.PLLQ = RCC_PLLQ_DIV2;
- 80014a4:	2302      	movs	r3, #2
- 80014a6:	653b      	str	r3, [r7, #80]	; 0x50
+ 80014ac:	2302      	movs	r3, #2
+ 80014ae:	653b      	str	r3, [r7, #80]	; 0x50
   RCC_OscInitStruct.PLL.PLLR = RCC_PLLR_DIV2;
- 80014a8:	2302      	movs	r3, #2
- 80014aa:	657b      	str	r3, [r7, #84]	; 0x54
+ 80014b0:	2302      	movs	r3, #2
+ 80014b2:	657b      	str	r3, [r7, #84]	; 0x54
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
- 80014ac:	f107 0314 	add.w	r3, r7, #20
- 80014b0:	4618      	mov	r0, r3
- 80014b2:	f002 f919 	bl	80036e8 <HAL_RCC_OscConfig>
- 80014b6:	4603      	mov	r3, r0
- 80014b8:	2b00      	cmp	r3, #0
- 80014ba:	bf14      	ite	ne
- 80014bc:	2301      	movne	r3, #1
- 80014be:	2300      	moveq	r3, #0
- 80014c0:	b2db      	uxtb	r3, r3
- 80014c2:	2b00      	cmp	r3, #0
- 80014c4:	d001      	beq.n	80014ca <_Z18SystemClock_Configv+0x86>
+ 80014b4:	f107 0314 	add.w	r3, r7, #20
+ 80014b8:	4618      	mov	r0, r3
+ 80014ba:	f002 f915 	bl	80036e8 <HAL_RCC_OscConfig>
+ 80014be:	4603      	mov	r3, r0
+ 80014c0:	2b00      	cmp	r3, #0
+ 80014c2:	bf14      	ite	ne
+ 80014c4:	2301      	movne	r3, #1
+ 80014c6:	2300      	moveq	r3, #0
+ 80014c8:	b2db      	uxtb	r3, r3
+ 80014ca:	2b00      	cmp	r3, #0
+ 80014cc:	d001      	beq.n	80014d2 <_Z18SystemClock_Configv+0x86>
   {
     Error_Handler();
- 80014c6:	f000 f84b 	bl	8001560 <Error_Handler>
+ 80014ce:	f000 f847 	bl	8001560 <Error_Handler>
   }
 
   /** Initializes the CPU, AHB and APB buses clocks
   */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
- 80014ca:	230f      	movs	r3, #15
- 80014cc:	603b      	str	r3, [r7, #0]
+ 80014d2:	230f      	movs	r3, #15
+ 80014d4:	603b      	str	r3, [r7, #0]
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
- 80014ce:	2303      	movs	r3, #3
- 80014d0:	607b      	str	r3, [r7, #4]
+ 80014d6:	2303      	movs	r3, #3
+ 80014d8:	607b      	str	r3, [r7, #4]
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
- 80014d2:	2300      	movs	r3, #0
- 80014d4:	60bb      	str	r3, [r7, #8]
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
- 80014d6:	2300      	movs	r3, #0
- 80014d8:	60fb      	str	r3, [r7, #12]
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
  80014da:	2300      	movs	r3, #0
- 80014dc:	613b      	str	r3, [r7, #16]
+ 80014dc:	60bb      	str	r3, [r7, #8]
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
+ 80014de:	2300      	movs	r3, #0
+ 80014e0:	60fb      	str	r3, [r7, #12]
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+ 80014e2:	2300      	movs	r3, #0
+ 80014e4:	613b      	str	r3, [r7, #16]
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_4) != HAL_OK)
- 80014de:	463b      	mov	r3, r7
- 80014e0:	2104      	movs	r1, #4
- 80014e2:	4618      	mov	r0, r3
- 80014e4:	f002 fd14 	bl	8003f10 <HAL_RCC_ClockConfig>
- 80014e8:	4603      	mov	r3, r0
- 80014ea:	2b00      	cmp	r3, #0
- 80014ec:	bf14      	ite	ne
- 80014ee:	2301      	movne	r3, #1
- 80014f0:	2300      	moveq	r3, #0
- 80014f2:	b2db      	uxtb	r3, r3
- 80014f4:	2b00      	cmp	r3, #0
- 80014f6:	d001      	beq.n	80014fc <_Z18SystemClock_Configv+0xb8>
+ 80014e6:	463b      	mov	r3, r7
+ 80014e8:	2104      	movs	r1, #4
+ 80014ea:	4618      	mov	r0, r3
+ 80014ec:	f002 fd10 	bl	8003f10 <HAL_RCC_ClockConfig>
+ 80014f0:	4603      	mov	r3, r0
+ 80014f2:	2b00      	cmp	r3, #0
+ 80014f4:	bf14      	ite	ne
+ 80014f6:	2301      	movne	r3, #1
+ 80014f8:	2300      	moveq	r3, #0
+ 80014fa:	b2db      	uxtb	r3, r3
+ 80014fc:	2b00      	cmp	r3, #0
+ 80014fe:	d001      	beq.n	8001504 <_Z18SystemClock_Configv+0xb8>
   {
     Error_Handler();
- 80014f8:	f000 f832 	bl	8001560 <Error_Handler>
+ 8001500:	f000 f82e 	bl	8001560 <Error_Handler>
   }
 }
- 80014fc:	bf00      	nop
- 80014fe:	3758      	adds	r7, #88	; 0x58
- 8001500:	46bd      	mov	sp, r7
- 8001502:	bd80      	pop	{r7, pc}
+ 8001504:	bf00      	nop
+ 8001506:	3758      	adds	r7, #88	; 0x58
+ 8001508:	46bd      	mov	sp, r7
+ 800150a:	bd80      	pop	{r7, pc}
 
-08001504 <HAL_GPIO_EXTI_Callback>:
+0800150c <HAL_GPIO_EXTI_Callback>:
 
 /* USER CODE BEGIN 4 */
 // External Interrupt ISR Handler CallBackFun
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
- 8001504:	b580      	push	{r7, lr}
- 8001506:	b082      	sub	sp, #8
- 8001508:	af00      	add	r7, sp, #0
- 800150a:	4603      	mov	r3, r0
- 800150c:	80fb      	strh	r3, [r7, #6]
-  if(!brakeSet) {
- 800150e:	4b10      	ldr	r3, [pc, #64]	; (8001550 <HAL_GPIO_EXTI_Callback+0x4c>)
- 8001510:	681b      	ldr	r3, [r3, #0]
- 8001512:	2b00      	cmp	r3, #0
- 8001514:	d119      	bne.n	800154a <HAL_GPIO_EXTI_Callback+0x46>
+ 800150c:	b580      	push	{r7, lr}
+ 800150e:	b082      	sub	sp, #8
+ 8001510:	af00      	add	r7, sp, #0
+ 8001512:	4603      	mov	r3, r0
+ 8001514:	80fb      	strh	r3, [r7, #6]
+  // if(!brakeSet) {
     if(GPIO_Pin == B1_Pin) // INT Source is pin A9
  8001516:	88fb      	ldrh	r3, [r7, #6]
  8001518:	f5b3 5f00 	cmp.w	r3, #8192	; 0x2000
- 800151c:	d115      	bne.n	800154a <HAL_GPIO_EXTI_Callback+0x46>
+ 800151c:	d115      	bne.n	800154a <HAL_GPIO_EXTI_Callback+0x3e>
     {
       __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);  // set encoder stationary
- 800151e:	4b0d      	ldr	r3, [pc, #52]	; (8001554 <HAL_GPIO_EXTI_Callback+0x50>)
+ 800151e:	4b0c      	ldr	r3, [pc, #48]	; (8001550 <HAL_GPIO_EXTI_Callback+0x44>)
  8001520:	681b      	ldr	r3, [r3, #0]
  8001522:	2200      	movs	r2, #0
  8001524:	639a      	str	r2, [r3, #56]	; 0x38
@@ -2124,16 +2124,16 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
  8001526:	2064      	movs	r0, #100	; 0x64
  8001528:	f001 fd9a 	bl	8003060 <HAL_Delay>
       button_counter++;
- 800152c:	4b0a      	ldr	r3, [pc, #40]	; (8001558 <HAL_GPIO_EXTI_Callback+0x54>)
+ 800152c:	4b09      	ldr	r3, [pc, #36]	; (8001554 <HAL_GPIO_EXTI_Callback+0x48>)
  800152e:	681b      	ldr	r3, [r3, #0]
  8001530:	3301      	adds	r3, #1
- 8001532:	4a09      	ldr	r2, [pc, #36]	; (8001558 <HAL_GPIO_EXTI_Callback+0x54>)
+ 8001532:	4a08      	ldr	r2, [pc, #32]	; (8001554 <HAL_GPIO_EXTI_Callback+0x48>)
  8001534:	6013      	str	r3, [r2, #0]
       Wrist_Roll.set_zero_angle_sw();
- 8001536:	4809      	ldr	r0, [pc, #36]	; (800155c <HAL_GPIO_EXTI_Callback+0x58>)
+ 8001536:	4808      	ldr	r0, [pc, #32]	; (8001558 <HAL_GPIO_EXTI_Callback+0x4c>)
  8001538:	f001 f8ac 	bl	8002694 <_ZN13RoverArmMotor17set_zero_angle_swEv>
       brakeSet = 1;
- 800153c:	4b04      	ldr	r3, [pc, #16]	; (8001550 <HAL_GPIO_EXTI_Callback+0x4c>)
+ 800153c:	4b07      	ldr	r3, [pc, #28]	; (800155c <HAL_GPIO_EXTI_Callback+0x50>)
  800153e:	2201      	movs	r2, #1
  8001540:	601a      	str	r2, [r3, #0]
       HAL_Delay(100);
@@ -2142,15 +2142,15 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
       return;
  8001548:	bf00      	nop
     }
-  }
+  // }
 }
  800154a:	3708      	adds	r7, #8
  800154c:	46bd      	mov	sp, r7
  800154e:	bd80      	pop	{r7, pc}
- 8001550:	20000248 	.word	0x20000248
- 8001554:	20000568 	.word	0x20000568
- 8001558:	200003e8 	.word	0x200003e8
- 800155c:	20000280 	.word	0x20000280
+ 8001550:	20000568 	.word	0x20000568
+ 8001554:	200003e8 	.word	0x200003e8
+ 8001558:	20000280 	.word	0x20000280
+ 800155c:	20000248 	.word	0x20000248
 
 08001560 <Error_Handler>:
 /**
@@ -4514,8 +4514,8 @@ double real_angle = 0;
 
 // Needs to be called in each loop
 void RoverArmMotor::tick(){ // worry about currentAngle and setpoint
- 800231c:	b590      	push	{r4, r7, lr}
- 800231e:	b087      	sub	sp, #28
+ 800231c:	b5b0      	push	{r4, r5, r7, lr}
+ 800231e:	b086      	sub	sp, #24
  8002320:	af00      	add	r7, sp, #0
  8002322:	6078      	str	r0, [r7, #4]
 
@@ -4589,7 +4589,12 @@ void RoverArmMotor::tick(){ // worry about currentAngle and setpoint
  80023ac:	f893 3128 	ldrb.w	r3, [r3, #296]	; 0x128
  80023b0:	2b00      	cmp	r3, #0
  80023b2:	d052      	beq.n	800245a <_ZN13RoverArmMotor4tickEv+0x13e>
-        (abs(setpoint-input) < abs((setpoint + 360.0f)-input)) ? //mn297 uesless cause always true
+        // if(abs(setpoint-input) < abs((setpoint + 360.0f)-input)) { 
+        //     gap = setpoint - input; 
+        // } else {
+        //     gap = (setpoint + 360.0f) - input; 
+        // }
+        if(abs(setpoint-input) > abs((setpoint + 360.0f)-input)) { 
  80023b4:	687b      	ldr	r3, [r7, #4]
  80023b6:	e9d3 0150 	ldrd	r0, r1, [r3, #320]	; 0x140
  80023ba:	687b      	ldr	r3, [r7, #4]
@@ -4625,26 +4630,28 @@ void RoverArmMotor::tick(){ // worry about currentAngle and setpoint
  800240c:	bfb8      	it	lt
  800240e:	425b      	neglt	r3, r3
  8002410:	429c      	cmp	r4, r3
- 8002412:	da0c      	bge.n	800242e <_ZN13RoverArmMotor4tickEv+0x112>
-        gap = setpoint - input : gap = (setpoint + 360.0f) - input; 
+ 8002412:	dd15      	ble.n	8002440 <_ZN13RoverArmMotor4tickEv+0x124>
+            gap = input - (setpoint + 360.0f); 
  8002414:	687b      	ldr	r3, [r7, #4]
- 8002416:	e9d3 0150 	ldrd	r0, r1, [r3, #320]	; 0x140
+ 8002416:	e9d3 454c 	ldrd	r4, r5, [r3, #304]	; 0x130
  800241a:	687b      	ldr	r3, [r7, #4]
- 800241c:	e9d3 234c 	ldrd	r2, r3, [r3, #304]	; 0x130
- 8002420:	f7fd ff32 	bl	8000288 <__aeabi_dsub>
- 8002424:	4602      	mov	r2, r0
- 8002426:	460b      	mov	r3, r1
- 8002428:	e9c7 2304 	strd	r2, r3, [r7, #16]
- 800242c:	e021      	b.n	8002472 <_ZN13RoverArmMotor4tickEv+0x156>
- 800242e:	687b      	ldr	r3, [r7, #4]
- 8002430:	e9d3 0150 	ldrd	r0, r1, [r3, #320]	; 0x140
- 8002434:	f04f 0200 	mov.w	r2, #0
- 8002438:	4b54      	ldr	r3, [pc, #336]	; (800258c <_ZN13RoverArmMotor4tickEv+0x270>)
- 800243a:	f7fd ff27 	bl	800028c <__adddf3>
- 800243e:	4602      	mov	r2, r0
- 8002440:	460b      	mov	r3, r1
- 8002442:	4610      	mov	r0, r2
- 8002444:	4619      	mov	r1, r3
+ 800241c:	e9d3 0150 	ldrd	r0, r1, [r3, #320]	; 0x140
+ 8002420:	f04f 0200 	mov.w	r2, #0
+ 8002424:	4b59      	ldr	r3, [pc, #356]	; (800258c <_ZN13RoverArmMotor4tickEv+0x270>)
+ 8002426:	f7fd ff31 	bl	800028c <__adddf3>
+ 800242a:	4602      	mov	r2, r0
+ 800242c:	460b      	mov	r3, r1
+ 800242e:	4620      	mov	r0, r4
+ 8002430:	4629      	mov	r1, r5
+ 8002432:	f7fd ff29 	bl	8000288 <__aeabi_dsub>
+ 8002436:	4602      	mov	r2, r0
+ 8002438:	460b      	mov	r3, r1
+ 800243a:	e9c7 2304 	strd	r2, r3, [r7, #16]
+ 800243e:	e018      	b.n	8002472 <_ZN13RoverArmMotor4tickEv+0x156>
+        } else {
+            gap = setpoint - input; 
+ 8002440:	687b      	ldr	r3, [r7, #4]
+ 8002442:	e9d3 0150 	ldrd	r0, r1, [r3, #320]	; 0x140
  8002446:	687b      	ldr	r3, [r7, #4]
  8002448:	e9d3 234c 	ldrd	r2, r3, [r3, #304]	; 0x130
  800244c:	f7fd ff1c 	bl	8000288 <__aeabi_dsub>
@@ -4652,7 +4659,10 @@ void RoverArmMotor::tick(){ // worry about currentAngle and setpoint
  8002452:	460b      	mov	r3, r1
  8002454:	e9c7 2304 	strd	r2, r3, [r7, #16]
  8002458:	e00b      	b.n	8002472 <_ZN13RoverArmMotor4tickEv+0x156>
-    }else{
+        }
+        
+    }
+    else{
         gap = setpoint - input;
  800245a:	687b      	ldr	r3, [r7, #4]
  800245c:	e9d3 0150 	ldrd	r0, r1, [r3, #320]	; 0x140
@@ -4794,9 +4804,9 @@ void RoverArmMotor::tick(){ // worry about currentAngle and setpoint
     
 }
  800257e:	bf00      	nop
- 8002580:	371c      	adds	r7, #28
+ 8002580:	3718      	adds	r7, #24
  8002582:	46bd      	mov	sp, r7
- 8002584:	bd90      	pop	{r4, r7, pc}
+ 8002584:	bdb0      	pop	{r4, r5, r7, pc}
  8002586:	bf00      	nop
  8002588:	3ff00000 	.word	0x3ff00000
  800258c:	40768000 	.word	0x40768000
@@ -7273,7 +7283,7 @@ void HAL_GPIO_EXTI_IRQHandler(uint16_t GPIO_Pin)
     HAL_GPIO_EXTI_Callback(GPIO_Pin);
  800360c:	88fb      	ldrh	r3, [r7, #6]
  800360e:	4618      	mov	r0, r3
- 8003610:	f7fd ff78 	bl	8001504 <HAL_GPIO_EXTI_Callback>
+ 8003610:	f7fd ff7c 	bl	800150c <HAL_GPIO_EXTI_Callback>
   }
 }
  8003614:	bf00      	nop

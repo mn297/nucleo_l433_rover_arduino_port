@@ -122,9 +122,22 @@ void RoverArmMotor::tick(){ // worry about currentAngle and setpoint
     double gap; //mn297 could be negative
 
     if(wrist_waist){
-        (abs(setpoint-input) < abs((setpoint + 360.0f)-input)) ? //mn297 uesless cause always true
-        gap = setpoint - input : gap = (setpoint + 360.0f) - input; 
-    }else{
+        // (abs(setpoint-input) < abs((setpoint + 360.0f)-input)) ? 
+        // gap = setpoint - input : gap = (setpoint + 360.0f) - input; 
+
+        // if(abs(setpoint-input) < abs((setpoint + 360.0f)-input)) { 
+        //     gap = setpoint - input; 
+        // } else {
+        //     gap = (setpoint + 360.0f) - input; 
+        // }
+        if(abs(setpoint-input) > abs((setpoint + 360.0f)-input)) { 
+            gap = input - (setpoint + 360.0f); 
+        } else {
+            gap = setpoint - input; 
+        }
+        
+    }
+    else{
         gap = setpoint - input;
     }
 

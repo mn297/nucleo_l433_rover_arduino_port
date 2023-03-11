@@ -169,6 +169,7 @@ int main(void)
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
   __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
   HAL_Delay(10);
+  Wrist_Roll.wrist_waist = 1;
   Wrist_Roll.begin(aggKp, aggKi, aggKd, regKp, regKi, regKd);
   Wrist_Roll.setAngleLimits(2, 120.0f); //for angle limits test
   Wrist_Roll.reset_encoder();
@@ -392,7 +393,7 @@ void SystemClock_Config(void)
 // External Interrupt ISR Handler CallBackFun
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-  if(!brakeSet) {
+  // if(!brakeSet) {
     if(GPIO_Pin == B1_Pin) // INT Source is pin A9
     {
       __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);  // set encoder stationary
@@ -403,7 +404,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
       HAL_Delay(100);
       return;
     }
-  }
+  // }
 }
 
 /* USER CODE END 4 */
