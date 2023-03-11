@@ -4,6 +4,9 @@ RoverArmMotor.h:19:5:Pin::Pin(GPIO_TypeDef*, uint16_t, TIM_HandleTypeDef*, unsig
 main.cpp:69:6:void print(const char*)	1
 main.cpp:74:5:)	1
 main.cpp:86:6:void delay_us(uint16_t)	2
-main.cpp:97:5:int main()	1
-main.cpp:298:6:void SystemClock_Config()	4
-main.cpp:351:6:void Error_Handler()	1
+main.cpp:107:5:int main()	6
+main.cpp:334:6:void SystemClock_Config()	4
+main.cpp:381:6:void HAL_GPIO_EXTI_Callback(uint16_t)	2
+main.cpp:403:6:void Error_Handler()	1
+main.cpp:412:1:void __static_initialization_and_destruction_0(int, int)	3
+main.cpp:412:1:cpp)	1

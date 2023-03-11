@@ -88,6 +88,16 @@ void delay_us (uint16_t us)
 	__HAL_TIM_SET_COUNTER(&htim1,0);  // set the counter value a 0
 	while (__HAL_TIM_GET_COUNTER(&htim1) < us);  // wait for the counter to reach the us input in the parameter
 }
+
+/*---------------------ARM VARIABLES---------------------*/
+double current_angle = 0;
+double setpoint = 0;
+int brakeSet = 0;
+Pin CYTRON_DIR_1(CYTRON_DIR_1_GPIO_Port, CYTRON_DIR_1_Pin);
+Pin CYTRON_PWM_1(CYTRON_PWM_1_GPIO_Port, CYTRON_PWM_1_Pin, &htim2, TIM_CHANNEL_2);
+Pin AMT22_1(GPIOC, GPIO_PIN_7);
+RoverArmMotor Wrist_Roll(&hspi1, CYTRON_PWM_1, CYTRON_DIR_1, AMT22_1, CYTRON, 0, 359.0f);
+
 /* USER CODE END 0 */
 
 /**
@@ -154,23 +164,22 @@ int main(void)
 
 
     /*---CYTRON setup---*/
-    Pin CYTRON_DIR_1(CYTRON_DIR_1_GPIO_Port, CYTRON_DIR_1_Pin);
-    Pin CYTRON_PWM_1(CYTRON_PWM_1_GPIO_Port, CYTRON_PWM_1_Pin, &htim2, TIM_CHANNEL_2);
-    Pin AMT22_1(GPIOC, GPIO_PIN_7);
-
     int32_t  CH2_DC = 0;
     HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
     __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
     HAL_Delay(10);
-    RoverArmMotor Wrist_Roll(&hspi1, CYTRON_PWM_1, CYTRON_DIR_1, AMT22_1, CYTRON, 0, 359.0f);
     Wrist_Roll.begin(aggKp, aggKi, aggKd, regKp, regKi, regKd);
-    double current_angle = 0;
-    double setpoint = 0;
-    // __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 70);
-    current_angle = Wrist_Roll.get_current_angle();
-    printf("current angle is %f\r\n, current_angle");
-    Wrist_Roll.newSetpoint(current_angle + 150);
+    Wrist_Roll.setAngleLimits(2, 120.0f); //for angle limits test
 
+    // __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 70);
+    // current_angle = Wrist_Roll.get_current_angle();
+    // printf("current angle is %f\r\n, current_angle");
+    // Wrist_Roll.newSetpoint(current_angle + 150);
+
+    __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 30);
+    while(!brakeSet){
+      printf("waiting for brake set, current %f\r\n", Wrist_Roll.get_current_angle());
+    }
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -202,12 +211,39 @@ int main(void)
     // printf("current angle is %f\r\n, current_angle");
     // HAL_Delay(50);
     // Wrist_Roll.newSetpoint(current_angle + 10);
-    current_angle = Wrist_Roll.get_current_angle();
-    setpoint = Wrist_Roll.getSetpoint();
-    printf("current angle: %f, setpoint: %f\r\n", current_angle, setpoint);
-    Wrist_Roll.tick();
-    HAL_Delay(1); // safety delay
 
+    // current_angle = Wrist_Roll.get_current_angle();
+    // setpoint = Wrist_Roll.getSetpoint();
+    // printf("current angle: %f, setpoint: %f\r\n", current_angle, setpoint);
+    // Wrist_Roll.tick();
+    // HAL_Delay(1); // safety delay
+
+    /*--------------------------------------CYTRON angle limit test--------------------------------------*/
+
+    Wrist_Roll.newSetpoint(Wrist_Roll.lowestAngle);
+    while(true) {
+      current_angle = Wrist_Roll.get_current_angle();
+      if (!(current_angle <= Wrist_Roll.lowestAngle + 1.0)) {
+        printf("DOWN current angle: %f, setpoint: %f\r\n", current_angle, Wrist_Roll.setpoint);
+        Wrist_Roll.tick();
+      }
+      else {
+        break;
+      }
+    }
+    Wrist_Roll.newSetpoint(Wrist_Roll.highestAngle);
+    while(true) {
+      current_angle = Wrist_Roll.get_current_angle();
+      if (!(current_angle >= Wrist_Roll.highestAngle - 1.0)) {
+        printf("UP current angle: %f, setpoint: %f\r\n", current_angle, Wrist_Roll.setpoint);
+        Wrist_Roll.tick();
+      }
+      else {
+        break;
+      }
+    }
+
+    
 
 
 
@@ -341,6 +377,22 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+// External Interrupt ISR Handler CallBackFun
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+    if(GPIO_Pin == B1_Pin) // INT Source is pin A9
+    {
+      // HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_11); // Toggle LED
+      // printf("INTERRUPT\r\n");
+      // current_angle = Wrist_Roll.get_current_angle();
+      // printf("current angle is %f\r\n, current_angle");
+      // Wrist_Roll.newSetpoint(current_angle + 150);
+
+      Wrist_Roll.set_zero_angle();
+      brakeSet = 1;
+      return;
+    }
+}
 
 /* USER CODE END 4 */
 

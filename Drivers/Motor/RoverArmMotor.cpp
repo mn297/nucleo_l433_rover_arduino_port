@@ -122,10 +122,12 @@ void RoverArmMotor::tick(){
         gap = setpoint - input;
     }
 
+
+    //TODO check if this is correct, mn297
     // If we are outside of angle bounds, make a setpoint intervention to bring the shaft to the midpoint
-    if(input <= lowestAngle || input >= highestAngle){
-        setpoint = gearRatio * (lowestAngle + highestAngle) / 2 ;
-    }
+    // if(input <= lowestAngle || input >= highestAngle){
+    //     setpoint = gearRatio * (lowestAngle + highestAngle) / 2 ;
+    // }
 
     // Tone down P and I as the motor hones onto position
     if (abs(gap) < 10){
@@ -193,7 +195,7 @@ double RoverArmMotor::getSetpoint(){
 
 bool RoverArmMotor::newSetpoint(double angl){
     double setpoint_test = angl * gearRatio;
-    if(setpoint_test > lowestAngle && setpoint_test < highestAngle){
+    if(setpoint_test >= lowestAngle && setpoint_test <= highestAngle){
         setpoint = setpoint_test;
         return true;
     }else{
@@ -213,6 +215,10 @@ int RoverArmMotor::getDirection(){
 void RoverArmMotor::setAngleLimits(double lowest, double highest){
     lowestAngle = lowest * gearRatio;
     highestAngle = highest * gearRatio;
+}
+
+void RoverArmMotor::set_zero_angle(){
+    setZeroSPI(spi, encoder.port, encoder.pin, nullptr); //timer not used, so nullptr
 }
 
 void RoverArmMotor::disengageBrake(){
