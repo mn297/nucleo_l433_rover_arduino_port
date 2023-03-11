@@ -101,7 +101,13 @@ Pin AMT22_1(GPIOC, GPIO_PIN_7);
 RoverArmMotor Wrist_Roll(&hspi1, CYTRON_PWM_1, CYTRON_DIR_1, AMT22_1, CYTRON, 0, 359.0f);
 int button_counter = 0;
 
-
+void print_CYTRON(char* msg){
+  current_angle = Wrist_Roll.get_current_angle();
+  current_angle_sw = Wrist_Roll.get_current_angle_sw();
+  printf("%s angle_raw %.2f, angle_sw %.2f, setpoint %.2f, zero_sw %.2f, _outputSum %.2f, output %.2f\r\n", 
+    msg, current_angle, current_angle_sw, Wrist_Roll.setpoint, Wrist_Roll.zero_angle_sw,
+    Wrist_Roll.internalPIDInstance._outputSum, *Wrist_Roll.internalPIDInstance._myOutput);
+}
 /* USER CODE END 0 */
 
 /**
@@ -182,11 +188,7 @@ int main(void)
 
   __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 30);
   while(!brakeSet){
-    // printf("waiting for brake set, current %f\r\n", Wrist_Roll.get_current_angle());
-    current_angle = Wrist_Roll.get_current_angle();
-    current_angle_sw = Wrist_Roll.get_current_angle_sw();
-    setpoint = Wrist_Roll.getSetpoint();
-    printf("BRAKE, current angle: %f, setpoint: %f, current_angle_sw: %f\r\n", current_angle, setpoint, current_angle_sw);
+    print_CYTRON("BRAKE");
     // printf("waiting for brake set\r\n");
   }
   __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
@@ -236,10 +238,8 @@ int main(void)
     // high first because we just set zero 
     Wrist_Roll.newSetpoint(Wrist_Roll.highestAngle);
     while(true) {
-      current_angle = Wrist_Roll.get_current_angle();
-      current_angle_sw = Wrist_Roll.get_current_angle_sw();
       if (!(current_angle_sw >= Wrist_Roll.highestAngle - 1.0)) {
-        printf("UP current angle: %f, setpoint: %f, sw: %f\r\n", current_angle, Wrist_Roll.setpoint, current_angle_sw);
+        print_CYTRON("UP");
         Wrist_Roll.tick();
       }
       else {
@@ -248,10 +248,8 @@ int main(void)
     }
     Wrist_Roll.newSetpoint(Wrist_Roll.lowestAngle);
     while(true) {
-      current_angle = Wrist_Roll.get_current_angle();
-      current_angle_sw = Wrist_Roll.get_current_angle_sw();
       if (!(current_angle_sw <= Wrist_Roll.lowestAngle + 1.0)) {
-        printf("DOWN current angle: %f, setpoint: %f, sw: %f\r\n", current_angle, Wrist_Roll.setpoint, current_angle_sw);
+        print_CYTRON("DOWN");
         Wrist_Roll.tick();
       }
       else {

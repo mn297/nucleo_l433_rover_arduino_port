@@ -194,7 +194,7 @@ typedef enum
 class PID
 {
 	
-	private:
+	public:	//mn297 private
 	
 	PIDPON_TypeDef  _pOnE;
 	PIDMode_TypeDef _inAuto;

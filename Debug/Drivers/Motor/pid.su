@@ -5,14 +5,14 @@
 ../Drivers/Motor/pid.cpp:73:6:void PID::Init(double*, double*, double*, double, double, double, PIDPON_TypeDef, PIDCD_TypeDef)	48	static
 ../Drivers/Motor/pid.cpp:92:6:void PID::Init(double*, double*, double*, double, double, double, PIDCD_TypeDef)	56	static
 ../Drivers/Motor/pid.cpp:98:9:uint8_t PID::Compute()	64	static
-../Drivers/Motor/pid.cpp:184:17:void PID::SetMode(PIDMode_TypeDef)	24	static
-../Drivers/Motor/pid.cpp:198:17:PIDMode_TypeDef PID::GetMode()	16	static
-../Drivers/Motor/pid.cpp:204:6:void PID::SetOutputLimits(double, double)	32	static
-../Drivers/Motor/pid.cpp:246:6:void PID::SetTunings(double, double, double)	40	static
-../Drivers/Motor/pid.cpp:250:6:void PID::SetTunings(double, double, double, PIDPON_TypeDef)	48	static
-../Drivers/Motor/pid.cpp:289:15:void PID::SetControllerDirection(PIDCD_TypeDef)	16	static
-../Drivers/Motor/pid.cpp:304:15:PIDCD_TypeDef PID::GetDirection()	16	static
-../Drivers/Motor/pid.cpp:310:6:void PID::SetSampleTime(int32_t)	32	static
-../Drivers/Motor/pid.cpp:330:8:double PID::GetKp()	16	static
-../Drivers/Motor/pid.cpp:334:8:double PID::GetKi()	16	static
-../Drivers/Motor/pid.cpp:338:8:double PID::GetKd()	16	static
+../Drivers/Motor/pid.cpp:185:17:void PID::SetMode(PIDMode_TypeDef)	24	static
+../Drivers/Motor/pid.cpp:199:17:PIDMode_TypeDef PID::GetMode()	16	static
+../Drivers/Motor/pid.cpp:205:6:void PID::SetOutputLimits(double, double)	32	static
+../Drivers/Motor/pid.cpp:247:6:void PID::SetTunings(double, double, double)	40	static
+../Drivers/Motor/pid.cpp:251:6:void PID::SetTunings(double, double, double, PIDPON_TypeDef)	48	static
+../Drivers/Motor/pid.cpp:290:15:void PID::SetControllerDirection(PIDCD_TypeDef)	16	static
+../Drivers/Motor/pid.cpp:305:15:PIDCD_TypeDef PID::GetDirection()	16	static
+../Drivers/Motor/pid.cpp:311:6:void PID::SetSampleTime(int32_t)	32	static
+../Drivers/Motor/pid.cpp:331:8:double PID::GetKp()	16	static
+../Drivers/Motor/pid.cpp:335:8:double PID::GetKi()	16	static
+../Drivers/Motor/pid.cpp:339:8:double PID::GetKd()	16	static

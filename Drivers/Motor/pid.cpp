@@ -105,7 +105,8 @@ uint8_t PID::Compute(void)
 	double error;
 	double dInput;
 	double output;
-	
+	_outputSum = _outMin;	//mn297 hotfix TODO check if this is correct
+
 	/* ~~~~~~~~~~ Check PID mode ~~~~~~~~~~ */
 	if (!_inAuto)
 	{
