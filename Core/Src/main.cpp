@@ -22,6 +22,7 @@
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
+#include "dma.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -108,6 +109,14 @@ void print_CYTRON(char* msg){
     msg, current_angle, current_angle_sw, Wrist_Roll.setpoint, Wrist_Roll.zero_angle_sw,
     Wrist_Roll.internalPIDInstance._outputSum, *Wrist_Roll.internalPIDInstance._myOutput);
 }
+
+
+
+/*---------------------UART---------------------*/
+const int RX_BUFFER_SIZE = 100;
+uint8_t rx_data[5]; // 1 byte
+uint8_t rx_buffer[RX_BUFFER_SIZE];
+uint32_t rx_index = 0;
 /* USER CODE END 0 */
 
 /**
@@ -138,9 +147,10 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_USART2_UART_Init();
   MX_SPI1_Init();
-  MX_SPI2_Init();
+//  MX_SPI2_Init();
   MX_SPI3_Init();
   MX_TIM1_Init();
   MX_TIM2_Init();
@@ -193,6 +203,8 @@ int main(void)
   }
   __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
 
+
+  HAL_UART_Receive_IT(&huart2, rx_data, 1);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -236,29 +248,31 @@ int main(void)
 
     /*--------------------------------------CYTRON angle limit test--------------------------------------*/
     // high first because we just set zero 
-    Wrist_Roll.newSetpoint(Wrist_Roll.highestAngle);
-    while(true) {
-      if (!(current_angle_sw >= Wrist_Roll.highestAngle - 1.0)) {
-        print_CYTRON("UP");
-        Wrist_Roll.tick();
-      }
-      else {
-        break;
-      }
-    }
-    Wrist_Roll.newSetpoint(Wrist_Roll.lowestAngle);
-    while(true) {
-      if (!(current_angle_sw <= Wrist_Roll.lowestAngle + 1.0)) {
-        print_CYTRON("DOWN");
-        Wrist_Roll.tick();
-      }
-      else {
-        break;
-      }
-    }
+    // Wrist_Roll.newSetpoint(Wrist_Roll.highestAngle);
+    // while(true) {
+    //   if (!(current_angle_sw >= Wrist_Roll.highestAngle - 1.0)) {
+    //     print_CYTRON("UP");
+    //     Wrist_Roll.tick();
+    //   }
+    //   else {
+    //     break;
+    //   }
+    // }
+    // Wrist_Roll.newSetpoint(Wrist_Roll.lowestAngle);
+    // while(true) {
+    //   if (!(current_angle_sw <= Wrist_Roll.lowestAngle + 1.0)) {
+    //     print_CYTRON("DOWN");
+    //     Wrist_Roll.tick();
+    //   }
+    //   else {
+    //     break;
+    //   }
+    // }
 
-
-    
+    /*--------------------------------------UART test loop--------------------------------------*/
+    // HAL_UART_Receive(&huart2, rx_buffer, 4, 2000);
+    // HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_13);
+    // HAL_Delay(100);
 
 
 
@@ -404,7 +418,29 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
     }
   // }
 }
-
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+  // if(huart->Instance == USART2)
+  // {
+    if(rx_index < RX_BUFFER_SIZE - 1) // check if buffer is not full
+    {
+      rx_buffer[rx_index++] = (uint8_t)rx_data[0]; // add received byte to buffer
+      if(rx_data[0] == '\n' || rx_data[0] == '\r') // check for Enter key
+      {
+        rx_buffer[rx_index] = '\0'; // add null terminator to make it a string
+        rx_index = 0; // reset buffer index
+        // do something with the received data
+      }
+    }
+    else if (rx_index == RX_BUFFER_SIZE - 1) // buffer is full
+    {
+      rx_buffer[rx_index] = '\0'; // add null terminator to make it a string
+      rx_index = 0; // reset buffer index
+      // do something with the received data
+    }
+  // }
+  HAL_UART_Receive_IT(&huart2, rx_data, 1); // start listening for next byte
+}
 /* USER CODE END 4 */
 
 /**
