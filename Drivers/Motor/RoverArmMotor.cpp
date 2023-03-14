@@ -151,8 +151,9 @@ void RoverArmMotor::tick(){ // worry about currentAngle and setpoint
     // Tone down P and I as the motor hones onto position
     if (abs(gap) < 10){
         internalPIDInstance.SetTunings(regularKp, regularKi, regularKd);
-    }else{
-        internalPIDInstance.SetTunings(aggressiveKp, aggressiveKi, aggressiveKd);
+    }else{  // TODO agressive tuning params
+        internalPIDInstance.SetTunings(regularKp, regularKi, regularKd);
+        // internalPIDInstance.SetTunings(aggressiveKp, aggressiveKi, aggressiveKd);
     }
     internalPIDInstance.Compute(); // return value stored in output
     // Serial.print("current output is ");
@@ -197,6 +198,15 @@ void RoverArmMotor::tick(){ // worry about currentAngle and setpoint
     //------------------Update angle------------------//
     lastAngle = currentAngle;
     
+}
+void RoverArmMotor::set_PID_params(double aggP, double aggI, double aggD, double regP, double regI, double regD) {
+    regularKp = regP;
+    regularKi = regI;
+    regularKd = regD;
+    aggressiveKp = aggP;
+    aggressiveKi = aggI;
+    aggressiveKd = aggD;
+    internalPIDInstance.SetTunings(regularKp, regularKi, regularKd);
 }
 
 bool RoverArmMotor::setMultiplierBool(bool mult, double ratio){

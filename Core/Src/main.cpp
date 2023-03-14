@@ -113,10 +113,13 @@ void print_CYTRON(char* msg){
 
 
 /*---------------------UART---------------------*/
-const int RX_BUFFER_SIZE = 100;
+const int RX_BUFFER_SIZE = 30;
 uint8_t rx_data[5]; // 1 byte
-uint8_t rx_buffer[RX_BUFFER_SIZE];
+char rx_buffer[RX_BUFFER_SIZE];
 uint32_t rx_index = 0;
+double Kp, Ki, Kd;
+
+
 /* USER CODE END 0 */
 
 /**
@@ -203,8 +206,10 @@ int main(void)
   }
   __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
 
-
+  /*---UART setup---*/
   HAL_UART_Receive_IT(&huart2, rx_data, 1);
+
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -271,9 +276,13 @@ int main(void)
 
     /*--------------------------------------UART test loop--------------------------------------*/
     // HAL_UART_Receive(&huart2, rx_buffer, 4, 2000);
-    // HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_13);
-    // HAL_Delay(100);
-
+     HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_13);
+     HAL_Delay(200);
+//    double kP, kI, kD;
+//    char buffer[50];
+//    sprintf(buffer, "0.1 0.2 0.3"); // Example string with three float values separated by spaces
+//    sscanf(buffer, "%lf %lf %lf", &kP, &kI, &kD); // Parse the float values
+//    printf("kP: %lf, kI: %lf, kD: %lf\r\n", kP, kI, kD); // Print the float values
 
 
 
@@ -430,6 +439,9 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
         rx_buffer[rx_index] = '\0'; // add null terminator to make it a string
         rx_index = 0; // reset buffer index
         // do something with the received data
+        sscanf(rx_buffer, "%lf %lf %lf", &Kp, &Ki, &Kd);
+        Wrist_Roll.set_PID_params(Kp, Ki, Kd, Kp, Ki, Kd);
+        printf("set to Kp: %lf, Ki: %lf, Kd: %lf\r\n", Kp, Ki, Kd);
       }
     }
     else if (rx_index == RX_BUFFER_SIZE - 1) // buffer is full
@@ -437,6 +449,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
       rx_buffer[rx_index] = '\0'; // add null terminator to make it a string
       rx_index = 0; // reset buffer index
       // do something with the received data
+      sscanf(rx_buffer, "%lf %lf %lf\n", &Kp, &Ki, &Kd);
+      printf("Kp: %lf, Ki: %lf, Kd: %lf\r\n", Kp, Ki, Kd);
     }
   // }
   HAL_UART_Receive_IT(&huart2, rx_data, 1); // start listening for next byte

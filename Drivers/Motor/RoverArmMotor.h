@@ -41,6 +41,8 @@ class RoverArmMotor{
         int esc_type, double minimum_angle, double maximum_angle, Pin brake_pin = Pin());
 
         // Setters for various tunable parameters of our motors
+        void set_PID_params(double aggP, double aggI, double aggD, double regP, double regI, double regD); //mn297
+
         void setAggressiveCoefficients(double P, double I, double D);
         void setRegularCoefficients(double P, double I, double D);
         void setRetuningGapLimit(int gap);
