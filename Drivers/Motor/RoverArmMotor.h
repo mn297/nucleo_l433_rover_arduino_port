@@ -84,7 +84,7 @@ class RoverArmMotor{
         double aggressiveKp, aggressiveKi, aggressiveKd, regularKp, regularKi, regularKd;
         //PINS
         Pin pwm, dir, encoder, brake;
-        SPI_HandleTypeDef* spi;
+        SPI_HandleTypeDef* spi; // encoder spi handle
 
         int movingAverageWindowSize;
         double lowestAngle, highestAngle;

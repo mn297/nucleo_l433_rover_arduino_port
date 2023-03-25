@@ -10,6 +10,18 @@
 // I'm very suspicious of the way I handled user defined pointers...
 
 // The motor will not move until begin() is called!
+/**
+ * @brief  Constructor for RoverArmMotor class
+ * @param  spi_handle: encoder SPI handle
+ * @param  pwm_pin: pin for the PWM
+ * @param  dir_pin: only used for Cytron ESC
+ * @param  encoder_pin: pin for the encoder
+ * @param  esc_type: CYTRON or BLUE_ROBOTICS
+ * @param  minimum_angle: minimum angle of the motor
+ * @param  maximum_angle: maximum angle of the motor
+ * @param  brake_pin: pin for the brake or limit switch
+ * @retval None
+ */
 RoverArmMotor::RoverArmMotor(SPI_HandleTypeDef* spi_handle, Pin pwm_pin, Pin dir_pin, Pin encoder_pin, int esc_type, double minimum_angle, double maximum_angle, Pin brake_pin)
                 :internalPIDInstance(&input, &output, &setpoint, regularKp, regularKi, regularKd, _PID_CD_DIRECT)
                 ,internalAveragerInstance(15){
@@ -36,26 +48,18 @@ RoverArmMotor::RoverArmMotor(SPI_HandleTypeDef* spi_handle, Pin pwm_pin, Pin dir
 void RoverArmMotor::begin(double aggP, double aggI, double aggD, double regP, double regI, double regD){
 
 
-    /*------------------Initialize pins------------------*/ 
-    // Initialize given pins
-    // pinMode(encoder, INPUT); // not needed since we use HAL library
-    // pinMode(pwm, OUTPUT);
+    /*------------------Initialize timers------------------*/ 
+    HAL_TIM_PWM_Start(pwm.p_tim, pwm.tim_channel);
+    __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, 0); // stop motor
 
+
+    /*------------------set PID parameters------------------*/
     if(escType == CYTRON){
-        // pinMode(dir, OUTPUT); // not needed since we use HAL library
-
-        // Allow negative outputs, the sign will be interpreted as
-        // the direction pin
         internalPIDInstance.SetOutputLimits(5, 99); // PWM duty cycle mn297 TOOD: check this
     }
-    //TODO: Add support for other ESC types
-    // else if(escType == BLUE_ROBOTICS){
-    //      // BlueRobotics ESC uses a servo-like control scheme where
-    //     // 1100us is full speed reverse and 1900us is full speed forward
-    //     internalPIDInstance.SetOutputLimits(1100, 1900); // 50Hz servo? mn297
-    //     // internalServoInstance.attach(pwm);
-    //     internalServoInstance.attach(pwm, 1100, 1900, 1500); // mn297
-    // }
+    else if(escType == BLUE_ROBOTICS){
+        internalPIDInstance.SetOutputLimits(0, 400); // 1500 +- 400 for BlueRobotics ESC
+    }
     
     /*------------------Initialize moving average------------------*/
     internalAveragerInstance.begin();
@@ -188,11 +192,13 @@ void RoverArmMotor::tick(){ // worry about currentAngle and setpoint
     }
 
     //TODO: Add support for other ESC types    
-    // else if(escType == BLUE_ROBOTICS){
-    //     // This one is more straightforward since we already defined the output range
-    //     // from 1100us to 1900us
-    //     internalServoInstance.writeMicroseconds(output);
-    // }
+    else if(escType == BLUE_ROBOTICS){
+        // This one is more straightforward since we already defined the output range
+        // from 1100us to 1900us
+        // internalServoInstance.writeMicroseconds(output);
+        __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, 1500-1+output);
+
+    }
 
 
     //------------------Update angle------------------//
