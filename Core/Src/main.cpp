@@ -100,13 +100,13 @@ int brakeSet = 0;
 Pin CYTRON_DIR_1(CYTRON_DIR_1_GPIO_Port, CYTRON_DIR_1_Pin);
 Pin CYTRON_PWM_1(CYTRON_PWM_1_GPIO_Port, CYTRON_PWM_1_Pin, &htim2, TIM_CHANNEL_2);
 Pin AMT22_1(GPIOC, GPIO_PIN_7);
-RoverArmMotor Wrist_Roll(&hspi1, CYTRON_PWM_1, CYTRON_DIR_1, AMT22_1, CYTRON, 0, 359.0f);
+RoverArmMotor Wrist_Roll(&hspi1, CYTRON_PWM_1, CYTRON_DIR_1, AMT22_1, CYTRON, 0, 359.99f);
 int button_counter = 0;
 
 /*---------------------SERVO DECLARATIONS---------------------*/
 Pin SERVO_PWM_1(SERVO_PWM_1_GPIO_Port, SERVO_PWM_1_Pin, &htim1, TIM_CHANNEL_2);
 //Pin AMT22_1(GPIOC, GPIO_PIN_7);
-RoverArmMotor Waist(&hspi1, CYTRON_PWM_1, CYTRON_DIR_1, AMT22_1, CYTRON, 0, 359.0f);
+RoverArmMotor Waist(&hspi1, CYTRON_PWM_1, CYTRON_DIR_1, AMT22_1, CYTRON, 0, 359.99f);
 
 
 
@@ -125,7 +125,8 @@ const int RX_BUFFER_SIZE = 30;
 uint8_t rx_data[5]; // 1 byte
 char rx_buffer[RX_BUFFER_SIZE];
 uint32_t rx_index = 0;
-double Kp, Ki, Kd;
+char command_buffer[20];
+double param1, param2, param3;
 
 
 /* USER CODE END 0 */
@@ -233,13 +234,12 @@ int main(void)
     // printf("encoder 3 gives %d\r\n", encoderData_3);
     // // int16_t* turn_count = (int16_t*)malloc(2*sizeof(int16_t));
 
-    int16_t turn_count[2];
-    getTurnCounterSPI(turn_count, &hspi1, GPIOC, GPIO_PIN_7, 12, &htim1);
-    printf("count is %d and %d\r\n", turn_count[0], turn_count[1]);
-    std::bitset<16> y(turn_count[1]);
-    printf("%s\r\n", y.to_string().c_str());
-    // std::cout << y << '\n';
-    HAL_Delay(100);
+    // int16_t turn_count[2];
+    // getTurnCounterSPI(turn_count, &hspi1, GPIOC, GPIO_PIN_7, 12, &htim1);
+    // printf("count is %d and %d\r\n", turn_count[0], turn_count[1]);
+    // std::bitset<16> y(turn_count[1]);
+    // printf("%s\r\n", y.to_string().c_str());
+    // HAL_Delay(100);
 
     /*--------------------------------------CYTRON test--------------------------------------*/
     // printf("0\r\n");
@@ -279,6 +279,9 @@ int main(void)
     //     print_CYTRON("DOWN");
     //     Wrist_Roll.tick();
     // }
+    /*--------------------------------------CYTRON setpoint test--------------------------------------*/
+    print_CYTRON("SETPOINT");
+    Wrist_Roll.tick();
 
     /*--------------------------------------UART test loop--------------------------------------*/
     // HAL_UART_Receive(&huart2, rx_buffer, 4, 2000);
@@ -288,8 +291,8 @@ int main(void)
   //  sscanf(buffer, "%lf %lf %lf", &kP, &kI, &kD); // Parse the float values
   //  printf("kP: %lf, kI: %lf, kD: %lf\r\n", kP, kI, kD); // Print the float values
   
-    //  HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_13);
-    //  HAL_Delay(200);
+     HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_13);
+     HAL_Delay(200);
 
 
     /*--------------------------------------ESC test--------------------------------------*/
@@ -445,18 +448,31 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
         rx_buffer[rx_index] = '\0'; // add null terminator to make it a string
         rx_index = 0; // reset buffer index
         // do something with the received data
-        sscanf(rx_buffer, "%lf %lf %lf", &Kp, &Ki, &Kd);
-        Wrist_Roll.set_PID_params(Kp, Ki, Kd, Kp, Ki, Kd);
-        printf("set to Kp: %lf, Ki: %lf, Kd: %lf\r\n", Kp, Ki, Kd);
+        sscanf(rx_buffer, "%s %lf %lf %lf", command_buffer, &param1, &param2, &param3);
+        //check if commmand_buffer is "pid"
+        if(strcmp(command_buffer, "pid") == 0)
+        {
+          Wrist_Roll.set_PID_params(param1, param2, param3, param1, param2, param3);
+          printf("set to Kp: %lf, Ki: %lf, Kd: %lf\r\n", param1, param2, param3);
+        }
+        else if (strcmp(command_buffer, "sp") == 0) 
+        {
+          Wrist_Roll.newSetpoint(param1);
+          printf("new Setpoint at %lf\r\n", param1);
+        } 
       }
+      else {
+          printf("invalid command %s\r\n", command_buffer);
+        }
+        
     }
     else if (rx_index == RX_BUFFER_SIZE - 1) // buffer is full
     {
       rx_buffer[rx_index] = '\0'; // add null terminator to make it a string
       rx_index = 0; // reset buffer index
       // do something with the received data
-      sscanf(rx_buffer, "%lf %lf %lf\n", &Kp, &Ki, &Kd);
-      printf("Kp: %lf, Ki: %lf, Kd: %lf\r\n", Kp, Ki, Kd);
+      sscanf(rx_buffer, "%s %lf %lf %lf", command_buffer, &param1, &param2, &param3);
+      printf("set to Kp: %lf, Ki: %lf, Kd: %lf\r\n", param1, param2, param3);
     }
   // }
   HAL_UART_Receive_IT(&huart2, rx_data, 1); // start listening for next byte
