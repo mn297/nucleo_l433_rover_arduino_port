@@ -56,7 +56,7 @@
 // double aggKp=0.025, aggKi=0.019,  aggKd=0.0, elbaggKp=0.025, elbaggKi=0.019,  elbaggKd=0;
 // double regKp=0.025, regKi=0.014, regKd=0, elbregKp=0.025, elbregKi=0.014,  elbregKd=0;
 double aggKp=0.6, aggKi=0.1,  aggKd=0.1, elbaggKp=0.025, elbaggKi=0,  elbaggKd=0;
-double regKp=0.6, regKi=0.1, regKd=0.1, elbregKp=0.025, elbregKi=0,  elbregKd=0;
+double regKp=0.6, regKi=0.01, regKd=0.1, elbregKp=0.025, elbregKi=0,  elbregKd=0;
 
 /* USER CODE END PV */
 
@@ -199,7 +199,7 @@ int main(void)
   HAL_Delay(10);
   Wrist_Roll.wrist_waist = 1;
   Wrist_Roll.begin(aggKp, aggKi, aggKd, regKp, regKi, regKd);
-  Wrist_Roll.setAngleLimits(2, 120.0f); //for angle limits test
+  Wrist_Roll.setAngleLimits(0.5, 200.0f); //TODO check good angle limits
   // Wrist_Roll.reset_encoder(); // useless since absoulte encoder
   // turn = Wrist_Roll.get_turns_encoder();
   // printf("current angle: %f, setpoint: %f, turn %d, button %d\r\n", current_angle, setpoint, turn, button_counter);
@@ -274,25 +274,29 @@ int main(void)
     //     print_CYTRON("UP");
     //     Wrist_Roll.tick();
     // }
+    // Wrist_Roll.stop();
+
     // Wrist_Roll.newSetpoint(Wrist_Roll.lowestAngle);
     // while(!(current_angle_sw <= Wrist_Roll.lowestAngle + 1.0)) {
     //     print_CYTRON("DOWN");
     //     Wrist_Roll.tick();
     // }
+    // Wrist_Roll.stop();
+
     /*--------------------------------------CYTRON setpoint test--------------------------------------*/
     print_CYTRON("SETPOINT");
     Wrist_Roll.tick();
 
     /*--------------------------------------UART test loop--------------------------------------*/
     // HAL_UART_Receive(&huart2, rx_buffer, 4, 2000);
-  //  double kP, kI, kD;
-  //  char buffer[50];
-  //  sprintf(buffer, "0.1 0.2 0.3"); // Example string with three float values separated by spaces
-  //  sscanf(buffer, "%lf %lf %lf", &kP, &kI, &kD); // Parse the float values
-  //  printf("kP: %lf, kI: %lf, kD: %lf\r\n", kP, kI, kD); // Print the float values
+    // double kP, kI, kD;
+    // char buffer[50];
+    // sprintf(buffer, "0.1 0.2 0.3"); // Example string with three float values separated by spaces
+    // sscanf(buffer, "%lf %lf %lf", &kP, &kI, &kD); // Parse the float values
+    // printf("kP: %lf, kI: %lf, kD: %lf\r\n", kP, kI, kD); // Print the float values
   
-     HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_13);
-     HAL_Delay(200);
+    //  HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_13);
+    //  HAL_Delay(200);
 
 
     /*--------------------------------------ESC test--------------------------------------*/
@@ -430,6 +434,10 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
       HAL_Delay(100);  
       button_counter++;
       Wrist_Roll.set_zero_angle_sw();
+      
+      HAL_Delay(100);
+      Wrist_Roll.newSetpoint(1.0);  //TODO check this?
+      
       brakeSet = 1;
       HAL_Delay(100);
       return;

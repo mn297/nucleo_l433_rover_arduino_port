@@ -71,6 +71,8 @@ class RoverArmMotor{
 
         void begin(double aggP, double aggI, double aggD, double regP, double regI, double regD);
         void tick();
+        void stop();
+
 
     private:
     public: // TESTING only

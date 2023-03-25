@@ -205,6 +205,9 @@ void RoverArmMotor::tick(){ // worry about currentAngle and setpoint
     lastAngle = currentAngle;
     
 }
+void RoverArmMotor::stop(){
+    __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, (int) 0);
+}
 void RoverArmMotor::set_PID_params(double aggP, double aggI, double aggD, double regP, double regI, double regD) {
     regularKp = regP;
     regularKi = regI;
