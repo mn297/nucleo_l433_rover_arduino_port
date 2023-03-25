@@ -106,7 +106,7 @@ uint8_t PID::Compute(void)
 	double dInput;
 	double output;
 	// _outputSum = _outMin;	//mn297 hotfix1 TODO check if this is correct
-	if (_outputSum > 50) _outputSum = 50;	//mn297 hotfix2 TODO check if this is correct
+	// if (_outputSum > 50) _outputSum = 50;	//mn297 hotfix2 TODO check if this is correct
 
 	/* ~~~~~~~~~~ Check PID mode ~~~~~~~~~~ */
 	if (!_inAuto)
@@ -122,8 +122,11 @@ uint8_t PID::Compute(void)
 	{
 		/* ..... Compute all the working error variables ..... */
 		input   = *_myInput;
-		error   = abs(*_mySetpoint - input);	//mn297 fix
-		dInput  = abs(input - _lastInput);		//mn297 fix TODO: check if this is correct
+
+		// error   = abs(*_mySetpoint - input);	//mn297 fix
+		// dInput  = abs(input - _lastInput);		//mn297 fix TODO: check if this is correct
+		error   = *_mySetpoint - input;	//mn297 fix
+		dInput  = input - _lastInput;		//mn297 fix TODO: check if this is correct
 		
 		_outputSum += (_ki * error);
 		

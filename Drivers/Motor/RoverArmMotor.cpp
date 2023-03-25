@@ -55,7 +55,7 @@ void RoverArmMotor::begin(double aggP, double aggI, double aggD, double regP, do
 
     /*------------------set PID parameters------------------*/
     if(escType == CYTRON){
-        internalPIDInstance.SetOutputLimits(5, 99); // PWM duty cycle mn297 TOOD: check this
+        internalPIDInstance.SetOutputLimits(-99, 99); // PWM duty cycle mn297 TOOD: check this
     }
     else if(escType == BLUE_ROBOTICS){
         internalPIDInstance.SetOutputLimits(0, 400); // 1500 +- 400 for BlueRobotics ESC
@@ -177,7 +177,7 @@ void RoverArmMotor::tick(){ // worry about currentAngle and setpoint
 
         // Interpret sign of the error signal as the direction pin value
         // (gap > 0) ? digitalWrite(dir, HIGH) : digitalWrite(dir, LOW); // invert if needed mn297
-        if (gap > 0) {
+        if (output > 0) {
             HAL_GPIO_WritePin(dir.port, dir.pin, GPIO_PIN_SET); //mn297
         }
         else {
