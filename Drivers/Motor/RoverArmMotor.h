@@ -12,11 +12,11 @@ struct Pin {
     uint16_t pin;
     bool valid;
     TIM_HandleTypeDef* p_tim;
-    unsigned int channel;
+    unsigned int tim_channel;
 
-    Pin() : port(nullptr), pin(0), valid(false), p_tim(nullptr), channel(0) {}
-    Pin(GPIO_TypeDef* p, uint16_t pn) : port(p), pin(pn), valid(true), p_tim(nullptr), channel(0) {} // no timer
-    Pin(GPIO_TypeDef* p, uint16_t pn, TIM_HandleTypeDef* t, unsigned int c) : port(p), pin(pn), valid(true), p_tim(t), channel(c) {}
+    Pin() : port(nullptr), pin(0), valid(false), p_tim(nullptr), tim_channel(0) {}
+    Pin(GPIO_TypeDef* p, uint16_t pn) : port(p), pin(pn), valid(true), p_tim(nullptr), tim_channel(0) {} // no timer
+    Pin(GPIO_TypeDef* p, uint16_t pn, TIM_HandleTypeDef* t, unsigned int c) : port(p), pin(pn), valid(true), p_tim(t), tim_channel(c) {}
 };
 
 
@@ -38,7 +38,7 @@ class RoverArmMotor{
         // RoverArmMotor(int pwm_pin, int encoder_pin, int esc_type, double minimum_angle, 
         //               double maximum_angle, int dir_pin, int brake_pin);
         RoverArmMotor(SPI_HandleTypeDef* spi_handle, Pin pwm_pin, Pin dir_pin, Pin encoder_pin, 
-        int esc_type, double minimum_angle, double maximum_angle, Pin brake_pin = Pin());
+                int esc_type, double minimum_angle, double maximum_angle, Pin brake_pin = Pin());
 
         // Setters for various tunable parameters of our motors
         void set_PID_params(double aggP, double aggI, double aggD, double regP, double regI, double regD); //mn297

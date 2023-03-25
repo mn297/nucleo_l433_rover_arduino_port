@@ -4,15 +4,15 @@ pid.cpp:47:1:PID::PID(double*, double*, double*, double, double, double, PIDCD_T
 pid.cpp:55:6:void PID::Init()	3
 pid.cpp:73:6:void PID::Init(double*, double*, double*, double, double, double, PIDPON_TypeDef, PIDCD_TypeDef)	1
 pid.cpp:92:6:void PID::Init(double*, double*, double*, double, double, double, PIDCD_TypeDef)	1
-pid.cpp:98:9:uint8_t PID::Compute()	9
-pid.cpp:185:17:void PID::SetMode(PIDMode_TypeDef)	3
-pid.cpp:199:17:PIDMode_TypeDef PID::GetMode()	2
-pid.cpp:205:6:void PID::SetOutputLimits(double, double)	7
-pid.cpp:247:6:void PID::SetTunings(double, double, double)	1
-pid.cpp:251:6:void PID::SetTunings(double, double, double, PIDPON_TypeDef)	5
-pid.cpp:290:15:void PID::SetControllerDirection(PIDCD_TypeDef)	3
-pid.cpp:305:15:PIDCD_TypeDef PID::GetDirection()	1
-pid.cpp:311:6:void PID::SetSampleTime(int32_t)	2
-pid.cpp:331:8:double PID::GetKp()	1
-pid.cpp:335:8:double PID::GetKi()	1
-pid.cpp:339:8:double PID::GetKd()	1
+pid.cpp:98:9:uint8_t PID::Compute()	10
+pid.cpp:186:17:void PID::SetMode(PIDMode_TypeDef)	3
+pid.cpp:200:17:PIDMode_TypeDef PID::GetMode()	2
+pid.cpp:206:6:void PID::SetOutputLimits(double, double)	7
+pid.cpp:248:6:void PID::SetTunings(double, double, double)	1
+pid.cpp:252:6:void PID::SetTunings(double, double, double, PIDPON_TypeDef)	5
+pid.cpp:291:15:void PID::SetControllerDirection(PIDCD_TypeDef)	3
+pid.cpp:306:15:PIDCD_TypeDef PID::GetDirection()	1
+pid.cpp:312:6:void PID::SetSampleTime(int32_t)	2
+pid.cpp:332:8:double PID::GetKp()	1
+pid.cpp:336:8:double PID::GetKi()	1
+pid.cpp:340:8:double PID::GetKd()	1

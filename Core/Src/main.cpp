@@ -54,8 +54,8 @@
 /* USER CODE BEGIN PV */
 // double aggKp=0.025, aggKi=0.019,  aggKd=0.0, elbaggKp=0.025, elbaggKi=0.019,  elbaggKd=0;
 // double regKp=0.025, regKi=0.014, regKd=0, elbregKp=0.025, elbregKi=0.014,  elbregKd=0;
-double aggKp=0.6, aggKi=0.01,  aggKd=0.01, elbaggKp=0.025, elbaggKi=0,  elbaggKd=0;
-double regKp=0.6, regKi=0.01, regKd=0.01, elbregKp=0.025, elbregKi=0,  elbregKd=0;
+double aggKp=0.6, aggKi=0.1,  aggKd=0.1, elbaggKp=0.025, elbaggKi=0,  elbaggKd=0;
+double regKp=0.6, regKi=0.1, regKd=0.1, elbregKp=0.025, elbregKi=0,  elbregKd=0;
 
 /* USER CODE END PV */
 
@@ -253,37 +253,27 @@ int main(void)
 
     /*--------------------------------------CYTRON angle limit test--------------------------------------*/
     // high first because we just set zero 
-    // Wrist_Roll.newSetpoint(Wrist_Roll.highestAngle);
-    // while(true) {
-    //   if (!(current_angle_sw >= Wrist_Roll.highestAngle - 1.0)) {
-    //     print_CYTRON("UP");
-    //     Wrist_Roll.tick();
-    //   }
-    //   else {
-    //     break;
-    //   }
-    // }
-    // Wrist_Roll.newSetpoint(Wrist_Roll.lowestAngle);
-    // while(true) {
-    //   if (!(current_angle_sw <= Wrist_Roll.lowestAngle + 1.0)) {
-    //     print_CYTRON("DOWN");
-    //     Wrist_Roll.tick();
-    //   }
-    //   else {
-    //     break;
-    //   }
-    // }
+    Wrist_Roll.newSetpoint(Wrist_Roll.highestAngle);
+    while(!(current_angle_sw >= Wrist_Roll.highestAngle - 1.0)) {
+        print_CYTRON("UP");
+        Wrist_Roll.tick();
+    }
+    Wrist_Roll.newSetpoint(Wrist_Roll.lowestAngle);
+    while(!(current_angle_sw <= Wrist_Roll.lowestAngle + 1.0)) {
+        print_CYTRON("DOWN");
+        Wrist_Roll.tick();
+    }
 
     /*--------------------------------------UART test loop--------------------------------------*/
     // HAL_UART_Receive(&huart2, rx_buffer, 4, 2000);
-     HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_13);
-     HAL_Delay(200);
-//    double kP, kI, kD;
-//    char buffer[50];
-//    sprintf(buffer, "0.1 0.2 0.3"); // Example string with three float values separated by spaces
-//    sscanf(buffer, "%lf %lf %lf", &kP, &kI, &kD); // Parse the float values
-//    printf("kP: %lf, kI: %lf, kD: %lf\r\n", kP, kI, kD); // Print the float values
-
+  //  double kP, kI, kD;
+  //  char buffer[50];
+  //  sprintf(buffer, "0.1 0.2 0.3"); // Example string with three float values separated by spaces
+  //  sscanf(buffer, "%lf %lf %lf", &kP, &kI, &kD); // Parse the float values
+  //  printf("kP: %lf, kI: %lf, kD: %lf\r\n", kP, kI, kD); // Print the float values
+  
+    //  HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_13);
+    //  HAL_Delay(200);
 
 
     /*--------------------------------------ESC test--------------------------------------*/

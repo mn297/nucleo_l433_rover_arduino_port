@@ -2,7 +2,7 @@ movingAvg.h:12:9:movingAvg::movingAvg(int)	1
 RoverArmMotor.h:17:5:Pin::Pin()	1
 RoverArmMotor.cpp:13:1:RoverArmMotor::RoverArmMotor(SPI_HandleTypeDef*, Pin, Pin, Pin, int, double, double, Pin)	1
 RoverArmMotor.cpp:36:6:void RoverArmMotor::begin(double, double, double, double, double, double)	3
-RoverArmMotor.cpp:101:6:void RoverArmMotor::tick()	8
+RoverArmMotor.cpp:101:6:void RoverArmMotor::tick()	13
 RoverArmMotor.cpp:202:6:void RoverArmMotor::set_PID_params(double, double, double, double, double, double)	1
 RoverArmMotor.cpp:212:6:bool RoverArmMotor::setMultiplierBool(bool, double)	3
 RoverArmMotor.cpp:221:8:double RoverArmMotor::getSetpoint()	1

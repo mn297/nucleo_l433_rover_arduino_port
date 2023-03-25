@@ -183,7 +183,7 @@ void RoverArmMotor::tick(){ // worry about currentAngle and setpoint
         //TODO port to HAL
         // analogWrite(pwm, abs(output)); //mn297 function execute quickly and jumps to next tick()
         double test_output = abs(output);     //smoothing
-        __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, (int) test_output);
+        __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, (int) test_output);
 
     }
 
