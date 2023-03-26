@@ -114,14 +114,14 @@ void print_CYTRON(char* msg){
   double current_angle_multi = Wrist_Roll.get_current_angle_multi();
   double current_angle_sw = Wrist_Roll.get_current_angle_sw();
   int turn_count = Wrist_Roll.get_turn_count();
-  printf("%s turn_count %d, angle_sw %.2f, setpoint %.2f, zero_sw %.2f, angle_raw %.2f, angle_raw_multi %.2f, _outputSum %.2f, output %.2f\r\n", 
+  printf("%s turn_count %d, setpoint %.2f, angle_sw %.2f, zero_sw %.2f, angle_raw_multi %.2f, angle_raw %.2f, _outputSum %.2f, output %.2f\r\n", 
         msg, 
         turn_count,
-        current_angle_sw, 
         Wrist_Roll.setpoint, 
+        current_angle_sw, 
         Wrist_Roll.zero_angle_sw,
-        current_angle, 
         current_angle_multi,
+        current_angle, 
         Wrist_Roll.internalPIDInstance._outputSum, 
         *Wrist_Roll.internalPIDInstance._myOutput);
 }
@@ -208,7 +208,7 @@ int main(void)
   Wrist_Roll.wrist_waist = 1;
   Wrist_Roll.begin(aggKp, aggKi, aggKd, regKp, regKi, regKd);
   Wrist_Roll.setGearRatio(4.0f);
-  Wrist_Roll.setAngleLimits(1, 359.0f); //TODO check good angle limits
+  Wrist_Roll.setAngleLimits(0, 359.99f); //TODO check good angle limits
 
   // Wrist_Roll.reset_encoder(); // useless since absoulte encoder
   // turn = Wrist_Roll.get_turns_encoder();
@@ -452,11 +452,11 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
       HAL_Delay(100);  
       button_counter++;
       Wrist_Roll.set_zero_angle_sw();
-      Wrist_Roll.set_zero_angle();
+      // Wrist_Roll.set_zero_angle();
       // Wrist_Roll.reset_encoder(); // reset rurns? TODO check this
 
       HAL_Delay(100);
-      Wrist_Roll.newSetpoint(1.0);  //TODO check this?
+      Wrist_Roll.newSetpoint(0.0);  //TODO check this?
       
       brakeSet = 1;
       HAL_Delay(100);
