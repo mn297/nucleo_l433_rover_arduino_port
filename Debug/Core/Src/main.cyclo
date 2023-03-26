@@ -5,11 +5,11 @@ gthr-default.h:229:1:int __gthread_key_delete(__gthread_key_t)	1
 main.cpp:71:6:void print(const char*)	1
 main.cpp:76:5:)	1
 main.cpp:88:6:void delay_us(uint16_t)	2
-main.cpp:112:6:void print_CYTRON(char*)	1
+main.cpp:112:6:void print_MOTOR(char*, RoverArmMotor*)	1
 main.cpp:146:5:int main()	2
-main.cpp:399:6:void SystemClock_Config()	4
-main.cpp:446:6:void HAL_GPIO_EXTI_Callback(uint16_t)	2
-main.cpp:467:6:void HAL_UART_RxCpltCallback(UART_HandleTypeDef*)	7
-main.cpp:514:6:void Error_Handler()	1
-main.cpp:523:1:void __static_initialization_and_destruction_0(int, int)	3
-main.cpp:523:1:cpp)	1
+main.cpp:404:6:void SystemClock_Config()	4
+main.cpp:451:6:void HAL_GPIO_EXTI_Callback(uint16_t)	2
+main.cpp:474:6:void HAL_UART_RxCpltCallback(UART_HandleTypeDef*)	7
+main.cpp:522:6:void Error_Handler()	1
+main.cpp:531:1:void __static_initialization_and_destruction_0(int, int)	3
+main.cpp:531:1:cpp)	1

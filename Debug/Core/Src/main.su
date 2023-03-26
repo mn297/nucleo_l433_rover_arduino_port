@@ -5,11 +5,11 @@ d:\st\stm32cubeide_1.11.0\stm32cubeide\plugins\com.st.stm32cube.ide.mcu.external
 ../Core/Src/main.cpp:71:6:void print(const char*)	24	static
 ../Core/Src/main.cpp:76:5:)	272	static
 ../Core/Src/main.cpp:88:6:void delay_us(uint16_t)	16	static
-../Core/Src/main.cpp:112:6:void print_CYTRON(char*)	128	static
+../Core/Src/main.cpp:112:6:void print_MOTOR(char*, RoverArmMotor*)	128	static
 ../Core/Src/main.cpp:146:5:int main()	32	static
-../Core/Src/main.cpp:399:6:void SystemClock_Config()	96	static
-../Core/Src/main.cpp:446:6:void HAL_GPIO_EXTI_Callback(uint16_t)	16	static
-../Core/Src/main.cpp:467:6:void HAL_UART_RxCpltCallback(UART_HandleTypeDef*)	40	static
-../Core/Src/main.cpp:514:6:void Error_Handler()	4	static,ignoring_inline_asm
-../Core/Src/main.cpp:523:1:void __static_initialization_and_destruction_0(int, int)	120	static
-../Core/Src/main.cpp:523:1:cpp)	8	static
+../Core/Src/main.cpp:404:6:void SystemClock_Config()	96	static
+../Core/Src/main.cpp:451:6:void HAL_GPIO_EXTI_Callback(uint16_t)	16	static
+../Core/Src/main.cpp:474:6:void HAL_UART_RxCpltCallback(UART_HandleTypeDef*)	40	static
+../Core/Src/main.cpp:522:6:void Error_Handler()	4	static,ignoring_inline_asm
+../Core/Src/main.cpp:531:1:void __static_initialization_and_destruction_0(int, int)	120	static
+../Core/Src/main.cpp:531:1:cpp)	8	static

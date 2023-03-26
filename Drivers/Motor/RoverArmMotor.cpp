@@ -58,7 +58,7 @@ void RoverArmMotor::begin(double aggP, double aggI, double aggD, double regP, do
         internalPIDInstance.SetOutputLimits(-99, 99); // PWM duty cycle mn297 TOOD: check this
     }
     else if(escType == BLUE_ROBOTICS){
-        internalPIDInstance.SetOutputLimits(-350, 350); // 1500 +- 400 for BlueRobotics ESC
+        internalPIDInstance.SetOutputLimits(-100, 100); // 1500 +- 400 for BlueRobotics ESC
     }
     
     /*------------------Initialize moving average------------------*/
@@ -196,7 +196,7 @@ void RoverArmMotor::tick(){ // worry about currentAngle and setpoint
         // This one is more straightforward since we already defined the output range
         // from 1100us to 1900us
         // internalServoInstance.writeMicroseconds(output);
-        __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, 1500-1 + output);
+        __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, 1500-1 + (-1) *output);
 
     }
 
