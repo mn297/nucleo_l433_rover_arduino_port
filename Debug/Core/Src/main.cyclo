@@ -6,10 +6,10 @@ main.cpp:71:6:void print(const char*)	1
 main.cpp:76:5:)	1
 main.cpp:88:6:void delay_us(uint16_t)	2
 main.cpp:112:6:void print_CYTRON(char*)	1
-main.cpp:146:5:int main()	6
-main.cpp:397:6:void SystemClock_Config()	4
-main.cpp:444:6:void HAL_GPIO_EXTI_Callback(uint16_t)	2
-main.cpp:465:6:void HAL_UART_RxCpltCallback(UART_HandleTypeDef*)	7
-main.cpp:512:6:void Error_Handler()	1
-main.cpp:521:1:void __static_initialization_and_destruction_0(int, int)	3
-main.cpp:521:1:cpp)	1
+main.cpp:146:5:int main()	2
+main.cpp:399:6:void SystemClock_Config()	4
+main.cpp:446:6:void HAL_GPIO_EXTI_Callback(uint16_t)	2
+main.cpp:467:6:void HAL_UART_RxCpltCallback(UART_HandleTypeDef*)	7
+main.cpp:514:6:void Error_Handler()	1
+main.cpp:523:1:void __static_initialization_and_destruction_0(int, int)	3
+main.cpp:523:1:cpp)	1

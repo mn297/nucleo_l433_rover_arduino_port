@@ -286,7 +286,7 @@ void RoverArmMotor::engageBrake(){
     }
 }
 
-double RoverArmMotor::get_current_angle_avg(){    //mn297
+double RoverArmMotor::get_current_angle_avg(){    //UNSUPPORTED
     // return currentAngle / gearRatio;
     uint16_t encoderData = getPositionSPI(spi, encoder.port, encoder.pin, 12, nullptr); //timer not used, so nullptr
     adcResult = internalAveragerInstance.reading(encoderData);  // implicit cast to int
@@ -297,7 +297,7 @@ double RoverArmMotor::get_current_angle(){    //mn297
     // return currentAngle / gearRatio;
     uint16_t encoderData = getPositionSPI(spi, encoder.port, encoder.pin, 12, nullptr); //timer not used, so nullptr
     currentAngle = mapFloat((float) encoderData, MIN_ADC_VALUE, MAX_ADC_VALUE, 0, 359.99f); //mn297 potentiometer encoder
-    return currentAngle / gearRatio;
+    return currentAngle;
 }
 
 double RoverArmMotor::get_current_angle_multi(){    //mn297

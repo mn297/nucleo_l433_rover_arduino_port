@@ -207,7 +207,9 @@ int main(void)
   HAL_Delay(10);
   Wrist_Roll.wrist_waist = 1;
   Wrist_Roll.begin(aggKp, aggKi, aggKd, regKp, regKi, regKd);
-  Wrist_Roll.setAngleLimits(2, 358.0f); //TODO check good angle limits
+  Wrist_Roll.setGearRatio(4.0f);
+  Wrist_Roll.setAngleLimits(1, 359.0f); //TODO check good angle limits
+
   // Wrist_Roll.reset_encoder(); // useless since absoulte encoder
   // turn = Wrist_Roll.get_turns_encoder();
   // printf("current angle: %f, setpoint: %f, turn %d, button %d\r\n", current_angle, setpoint, turn, button_counter);
@@ -285,23 +287,23 @@ int main(void)
 
     /*--------------------------------------CYTRON angle limit test--------------------------------------*/
     // high first because we just set zero 
-    Wrist_Roll.newSetpoint(Wrist_Roll.highestAngle);
-    while(!(Wrist_Roll.get_current_angle_sw() >= Wrist_Roll.highestAngle - 2.0)) {
-        print_CYTRON("UP");
-        Wrist_Roll.tick();
-    }
-    Wrist_Roll.stop();
+    // Wrist_Roll.newSetpoint(Wrist_Roll.highestAngle);
+    // while(!(Wrist_Roll.get_current_angle_sw() >= Wrist_Roll.highestAngle - 2.0)) {
+    //     print_CYTRON("UP");
+    //     Wrist_Roll.tick();
+    // }
+    // Wrist_Roll.stop();
 
-    Wrist_Roll.newSetpoint(Wrist_Roll.lowestAngle);
-    while(!(Wrist_Roll.get_current_angle_sw() <= Wrist_Roll.lowestAngle + 2.0)) {
-        print_CYTRON("DOWN");
-        Wrist_Roll.tick();
-    }
-    Wrist_Roll.stop();
+    // Wrist_Roll.newSetpoint(Wrist_Roll.lowestAngle);
+    // while(!(Wrist_Roll.get_current_angle_sw() <= Wrist_Roll.lowestAngle + 2.0)) {
+    //     print_CYTRON("DOWN");
+    //     Wrist_Roll.tick();
+    // }
+    // Wrist_Roll.stop();
 
     /*--------------------------------------CYTRON setpoint test--------------------------------------*/
-    // print_CYTRON("SETPOINT");
-    // Wrist_Roll.tick();
+    print_CYTRON("SETPOINT");
+    Wrist_Roll.tick();
 
     /*--------------------------------------UART test loop--------------------------------------*/
     // HAL_UART_Receive(&huart2, rx_buffer, 4, 2000);
@@ -454,7 +456,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
       // Wrist_Roll.reset_encoder(); // reset rurns? TODO check this
 
       HAL_Delay(100);
-      Wrist_Roll.newSetpoint(2.0);  //TODO check this?
+      Wrist_Roll.newSetpoint(1.0);  //TODO check this?
       
       brakeSet = 1;
       HAL_Delay(100);
