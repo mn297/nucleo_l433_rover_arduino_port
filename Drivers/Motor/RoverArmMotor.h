@@ -61,7 +61,9 @@ class RoverArmMotor{
 
         double get_current_angle_avg();    //mn297
         double get_current_angle();  //mn297
+        double get_current_angle_multi();   //mn297
         double get_current_angle_sw();  //mn297
+        double get_current_angle_sw_multi();   // multi-turn angle
         
         double getSetpoint();
         double getCurrentOutput();
@@ -72,6 +74,9 @@ class RoverArmMotor{
         void begin(double aggP, double aggI, double aggD, double regP, double regI, double regD);
         void tick();
         void stop();
+        void setGearRatio(double ratio);
+        int get_turn_count();  //mn297
+
 
 
     private:
@@ -101,8 +106,9 @@ class RoverArmMotor{
         int actuationState;
         double gearRatio;
 
-        int sw_angle;  //mn297
+        int useSwAngle;  //mn297
         double zero_angle_sw;  //mn297
+        int turn_count;  //mn297
 
 
 

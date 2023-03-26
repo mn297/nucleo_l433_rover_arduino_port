@@ -9,17 +9,21 @@
 ../Drivers/Motor/RoverArmMotor.cpp:230:8:double RoverArmMotor::getSetpoint()	16	static
 ../Drivers/Motor/RoverArmMotor.cpp:234:6:bool RoverArmMotor::newSetpoint(double)	32	static
 ../Drivers/Motor/RoverArmMotor.cpp:244:5:int RoverArmMotor::getDirection()	16	static
+../Drivers/Motor/RoverArmMotor.cpp:249:6:void RoverArmMotor::setGearRatio(double)	24	static
 ../Drivers/Motor/RoverArmMotor.cpp:253:6:void RoverArmMotor::setAngleLimits(double, double)	32	static
 ../Drivers/Motor/RoverArmMotor.cpp:258:6:void RoverArmMotor::set_zero_angle()	16	static
 ../Drivers/Motor/RoverArmMotor.cpp:261:6:void RoverArmMotor::reset_encoder()	16	static
 ../Drivers/Motor/RoverArmMotor.cpp:264:6:void RoverArmMotor::set_zero_angle_sw()	16	static
-../Drivers/Motor/RoverArmMotor.cpp:267:10:uint32_t RoverArmMotor::get_turns_encoder()	32	static
-../Drivers/Motor/RoverArmMotor.cpp:273:6:void RoverArmMotor::disengageBrake()	16	static
-../Drivers/Motor/RoverArmMotor.cpp:280:6:void RoverArmMotor::engageBrake()	16	static
-../Drivers/Motor/RoverArmMotor.cpp:287:8:double RoverArmMotor::get_current_angle_avg()	32	static
-../Drivers/Motor/RoverArmMotor.cpp:294:8:double RoverArmMotor::get_current_angle()	32	static
-../Drivers/Motor/RoverArmMotor.cpp:300:8:double RoverArmMotor::get_current_angle_sw()	40	static
-../Drivers/Motor/RoverArmMotor.cpp:310:8:double RoverArmMotor::getCurrentOutput()	16	static
-../Drivers/Motor/RoverArmMotor.cpp:314:8:double RoverArmMotor::mapFloat(float, float, float, float, float)	40	static
-../Drivers/Motor/RoverArmMotor.cpp:320:8:double RoverArmMotor::getRatio()	16	static
-../Drivers/Motor/RoverArmMotor.cpp:324:6:void RoverArmMotor::WatchdogISR()	16	static
+../Drivers/Motor/RoverArmMotor.cpp:269:10:uint32_t RoverArmMotor::get_turns_encoder()	32	static
+../Drivers/Motor/RoverArmMotor.cpp:275:6:void RoverArmMotor::disengageBrake()	16	static
+../Drivers/Motor/RoverArmMotor.cpp:282:6:void RoverArmMotor::engageBrake()	16	static
+../Drivers/Motor/RoverArmMotor.cpp:289:8:double RoverArmMotor::get_current_angle_avg()	32	static
+../Drivers/Motor/RoverArmMotor.cpp:296:8:double RoverArmMotor::get_current_angle()	32	static
+../Drivers/Motor/RoverArmMotor.cpp:303:8:double RoverArmMotor::get_current_angle_multi()	48	static
+../Drivers/Motor/RoverArmMotor.cpp:318:8:double RoverArmMotor::get_current_angle_sw()	32	static
+../Drivers/Motor/RoverArmMotor.cpp:332:8:double RoverArmMotor::get_current_angle_sw_multi()	16	static
+../Drivers/Motor/RoverArmMotor.cpp:335:8:double RoverArmMotor::getCurrentOutput()	16	static
+../Drivers/Motor/RoverArmMotor.cpp:339:8:double RoverArmMotor::mapFloat(float, float, float, float, float)	40	static
+../Drivers/Motor/RoverArmMotor.cpp:345:8:double RoverArmMotor::getRatio()	16	static
+../Drivers/Motor/RoverArmMotor.cpp:349:5:int RoverArmMotor::get_turn_count()	40	static
+../Drivers/Motor/RoverArmMotor.cpp:357:6:void RoverArmMotor::WatchdogISR()	16	static

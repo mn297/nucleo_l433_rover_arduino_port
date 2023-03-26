@@ -40,8 +40,8 @@ RoverArmMotor::RoverArmMotor(SPI_HandleTypeDef* spi_handle, Pin pwm_pin, Pin dir
     input = 0;
     output = 0;
     lastAngle = 0;
-    sw_angle = 1;  //use software angle
-    zero_angle_sw = 0;  //mn297
+    useSwAngle = 1;  //default use software angle
+    zero_angle_sw = 0;  // default no offset
     
 }
 
@@ -58,7 +58,7 @@ void RoverArmMotor::begin(double aggP, double aggI, double aggD, double regP, do
         internalPIDInstance.SetOutputLimits(-99, 99); // PWM duty cycle mn297 TOOD: check this
     }
     else if(escType == BLUE_ROBOTICS){
-        internalPIDInstance.SetOutputLimits(0, 400); // 1500 +- 400 for BlueRobotics ESC
+        internalPIDInstance.SetOutputLimits(-350, 350); // 1500 +- 400 for BlueRobotics ESC
     }
     
     /*------------------Initialize moving average------------------*/
@@ -106,7 +106,7 @@ void RoverArmMotor::tick(){ // worry about currentAngle and setpoint
 
     /*------------------Get current angle------------------*/
     // adcResult = internalAveragerInstance.reading(analogRead(encoder));
-    if (sw_angle) {
+    if (useSwAngle) {
         currentAngle = get_current_angle_sw(); 
     }   else {
         currentAngle = get_current_angle(); 
@@ -178,10 +178,10 @@ void RoverArmMotor::tick(){ // worry about currentAngle and setpoint
         // Interpret sign of the error signal as the direction pin value
         // (gap > 0) ? digitalWrite(dir, HIGH) : digitalWrite(dir, LOW); // invert if needed mn297
         if (output > 0) {
-            HAL_GPIO_WritePin(dir.port, dir.pin, GPIO_PIN_SET); //mn297
+            HAL_GPIO_WritePin(dir.port, dir.pin, GPIO_PIN_SET); // B high
         }
         else {
-            HAL_GPIO_WritePin(dir.port, dir.pin, GPIO_PIN_RESET); //mn297
+            HAL_GPIO_WritePin(dir.port, dir.pin, GPIO_PIN_RESET); // A high
         }
         // Write to PWM pin
         //TODO port to HAL
@@ -196,7 +196,7 @@ void RoverArmMotor::tick(){ // worry about currentAngle and setpoint
         // This one is more straightforward since we already defined the output range
         // from 1100us to 1900us
         // internalServoInstance.writeMicroseconds(output);
-        __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, 1500-1+output);
+        __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, 1500-1 + output);
 
     }
 
@@ -246,9 +246,9 @@ int RoverArmMotor::getDirection(){
     return (HAL_GPIO_ReadPin(dir.port, dir.pin) == GPIO_PIN_SET) ? FWD : REV; //mn297, TODO check if this is correct
 }
 
-// void RoverArmMotor::setGearRatio(double ratio){
-//     gearRatio = ratio;
-// }
+void RoverArmMotor::setGearRatio(double ratio){
+    gearRatio = ratio;
+}
 
 void RoverArmMotor::setAngleLimits(double lowest, double highest){
     lowestAngle = lowest * gearRatio;
@@ -262,7 +262,9 @@ void RoverArmMotor::reset_encoder(){
     resetAMT22(spi, encoder.port, encoder.pin, nullptr); //timer not used, so nullptr
 }
 void RoverArmMotor::set_zero_angle_sw(){
-    zero_angle_sw = this->get_current_angle();
+    // zero_angle_sw = this->get_current_angle();
+    zero_angle_sw = this->get_current_angle_multi();
+
 }  //mn297 software zero angle
 uint32_t RoverArmMotor::get_turns_encoder(){    //mn297
     uint32_t turns = get_turns_AMT22(spi, encoder.port, encoder.pin, 12, nullptr);
@@ -288,25 +290,48 @@ double RoverArmMotor::get_current_angle_avg(){    //mn297
     // return currentAngle / gearRatio;
     uint16_t encoderData = getPositionSPI(spi, encoder.port, encoder.pin, 12, nullptr); //timer not used, so nullptr
     adcResult = internalAveragerInstance.reading(encoderData);  // implicit cast to int
-    currentAngle = mapFloat((float) adcResult, MIN_ADC_VALUE, MAX_ADC_VALUE, 0, 359.0f); //mn297 potentiometer encoder
+    currentAngle = mapFloat((float) adcResult, MIN_ADC_VALUE, MAX_ADC_VALUE, 0, 359.99f); //mn297 potentiometer encoder
     return currentAngle / gearRatio;
 }
 double RoverArmMotor::get_current_angle(){    //mn297
     // return currentAngle / gearRatio;
     uint16_t encoderData = getPositionSPI(spi, encoder.port, encoder.pin, 12, nullptr); //timer not used, so nullptr
-    currentAngle = mapFloat((float) encoderData, MIN_ADC_VALUE, MAX_ADC_VALUE, 0, 359.0f); //mn297 potentiometer encoder
+    currentAngle = mapFloat((float) encoderData, MIN_ADC_VALUE, MAX_ADC_VALUE, 0, 359.99f); //mn297 potentiometer encoder
     return currentAngle / gearRatio;
 }
-double RoverArmMotor::get_current_angle_sw(){    //TODO mn297
+
+double RoverArmMotor::get_current_angle_multi(){    //mn297
     // return currentAngle / gearRatio;
-    uint16_t encoderData = getPositionSPI(spi, encoder.port, encoder.pin, 12, nullptr); //timer not used, so nullptr
-    currentAngle = mapFloat((float) encoderData, MIN_ADC_VALUE, MAX_ADC_VALUE, 0, 359.0f); //mn297 potentiometer encoder
-    
-    double diff = currentAngle - zero_angle_sw;
-    if(diff < 0) diff += 360;
-    return diff / gearRatio;
+    int16_t result_arr[2];
+    getTurnCounterSPI(result_arr, spi, encoder.port, encoder.pin, 12, nullptr); //timer not used, so nullptr
+    double angle_raw = mapFloat((float) result_arr[0], MIN_ADC_VALUE, MAX_ADC_VALUE, 0, 359.99f); //mn297 potentiometer encoder
+    int turns = result_arr[1];
+    if (turns > 0) {
+        return angle_raw + 360 * turns;
+    } else if (turns < 0) {
+        return angle_raw + 360 * turns;
+    } else {
+        return angle_raw;
+    }
 }
 
+double RoverArmMotor::get_current_angle_sw(){    //TODO mn297
+    // return currentAngle / gearRatio;
+
+    // uint16_t encoderData = getPositionSPI(spi, encoder.port, encoder.pin, 12, nullptr); //timer not used, so nullptr
+    // currentAngle = mapFloat((float) encoderData, MIN_ADC_VALUE, MAX_ADC_VALUE, 0, 359.99f); //mn297 potentiometer encoder
+    
+    // double diff = currentAngle - zero_angle_sw;
+    // if(diff < 0) diff += 360;
+    // return diff / gearRatio;
+
+    double angle_raw = get_current_angle_multi();
+    double diff = angle_raw - zero_angle_sw;
+    return diff;
+}
+double RoverArmMotor::get_current_angle_sw_multi(){ 
+    //UNUSED
+}
 double RoverArmMotor::getCurrentOutput(){
     return output;
 }
@@ -320,6 +345,14 @@ double RoverArmMotor::mapFloat(float x, float in_min, float in_max, float out_mi
 double RoverArmMotor::getRatio(){
     return gearRatio;
 }
+
+int RoverArmMotor::get_turn_count(){
+    int16_t result_arr[2];
+    getTurnCounterSPI(result_arr, spi, encoder.port, encoder.pin, 12, nullptr); //timer not used, so nullptr
+    return result_arr[1];
+    // return turn_count;
+}
+
 
 void RoverArmMotor::WatchdogISR(){
     // Get current angle
