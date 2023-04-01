@@ -1,20 +1,20 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file           : main.c
-  * @brief          : Main program body
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2023 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file           : main.c
+ * @brief          : Main program body
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2023 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
@@ -28,7 +28,7 @@
 /* USER CODE BEGIN Includes */
 #include "RoverArmMotor.h"
 #include "AMT22.h"
-//Standard includes
+// Standard includes
 #include <stdint.h>
 #include <string.h>
 #include <stdio.h>
@@ -55,8 +55,9 @@
 /* USER CODE BEGIN PV */
 // double aggKp=0.025, aggKi=0.019,  aggKd=0.0, elbaggKp=0.025, elbaggKi=0.019,  elbaggKd=0;
 // double regKp=0.025, regKi=0.014, regKd=0, elbregKp=0.025, elbregKi=0.014,  elbregKd=0;
-double aggKp=0.6, aggKi=0.1,  aggKd=0.01, elbaggKp=0.025, elbaggKi=0,  elbaggKd=0;
-double regKp=1, regKi=0.01, regKd=0.1, elbregKp=0.025, elbregKi=0,  elbregKd=0;
+double aggKp = 0.6, aggKi = 0.1, aggKd = 0.01, elbaggKp = 0.025, elbaggKi = 0, elbaggKd = 0;
+// double regKp=1, regKi=0.01, regKd=0.0, elbregKp=0.025, elbregKi=0,  elbregKd=0;  // PI for CYTRON
+double regKp = 0.4, regKi = 0.0, regKd = 0.0, elbregKp = 0.025, elbregKi = 0, elbregKd = 0;
 
 /* USER CODE END PV */
 
@@ -68,27 +69,30 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-void print(const char* s){
-//	#ifdef PRINT
-	HAL_StatusTypeDef code = HAL_UART_Transmit(&huart2, (uint8_t*) s, strlen(s), HAL_MAX_DELAY);
-//	#endif
-}
-int printf(const char* s, ...){
-	char buffer[256];
-//	#ifdef PRINT
-	va_list args;
-	va_start(args, s);
-	vsprintf(buffer, s, args);
-	perror(buffer);
-	print(buffer);
-	va_end(args);
-//	#endif
-	return strlen(buffer);
-}
-void delay_us (uint16_t us)
+void print(const char *s)
 {
-	__HAL_TIM_SET_COUNTER(&htim1,0);  // set the counter value a 0
-	while (__HAL_TIM_GET_COUNTER(&htim1) < us);  // wait for the counter to reach the us input in the parameter
+  //	#ifdef PRINT
+  HAL_StatusTypeDef code = HAL_UART_Transmit(&huart2, (uint8_t *)s, strlen(s), HAL_MAX_DELAY);
+  //	#endif
+}
+int printf(const char *s, ...)
+{
+  char buffer[256];
+  //	#ifdef PRINT
+  va_list args;
+  va_start(args, s);
+  vsprintf(buffer, s, args);
+  perror(buffer);
+  print(buffer);
+  va_end(args);
+  //	#endif
+  return strlen(buffer);
+}
+void delay_us(uint16_t us)
+{
+  __HAL_TIM_SET_COUNTER(&htim1, 0); // set the counter value a 0
+  while (__HAL_TIM_GET_COUNTER(&htim1) < us)
+    ; // wait for the counter to reach the us input in the parameter
 }
 
 /*---------------------CYTRON DECLARATIONS---------------------*/
@@ -106,27 +110,26 @@ int button_counter = 0;
 Pin dummy_pin;
 Pin SERVO_PWM_1(SERVO_PWM_1_GPIO_Port, SERVO_PWM_1_Pin, &htim1, TIM_CHANNEL_2);
 RoverArmMotor Waist(&hspi1, SERVO_PWM_1, dummy_pin, AMT22_1, BLUE_ROBOTICS, 0, 359.99f);
-
+int is_turning = 0;
 
 /*---------------------HELPER---------------------*/
-void print_MOTOR(char* msg, RoverArmMotor* pMotor){
+void print_MOTOR(char *msg, RoverArmMotor *pMotor)
+{
   double current_angle = pMotor->get_current_angle();
   double current_angle_multi = pMotor->get_current_angle_multi();
   double current_angle_sw = pMotor->get_current_angle_sw();
   int turn_count = pMotor->get_turn_count();
-  printf("%s turn_count %d, setpoint %.2f, angle_sw %.2f, zero_sw %.2f, angle_raw_multi %.2f, angle_raw %.2f, _outputSum %.2f, output %.2f\r\n", 
-        msg, 
-        turn_count,
-        pMotor->setpoint, 
-        current_angle_sw, 
-        pMotor->zero_angle_sw,
-        current_angle_multi,
-        current_angle, 
-        pMotor->internalPIDInstance._outputSum, 
-        *(pMotor->internalPIDInstance._myOutput));
+  printf("%s turn_count %d, setpoint %.2f, angle_sw %.2f, zero_sw %.2f, angle_raw_multi %.2f, angle_raw %.2f, _outputSum %.2f, output %.2f\r\n",
+         msg,
+         turn_count,
+         pMotor->setpoint,
+         current_angle_sw,
+         pMotor->zero_angle_sw,
+         current_angle_multi,
+         current_angle,
+         pMotor->internalPIDInstance._outputSum,
+         (*(pMotor->internalPIDInstance._myOutput)) + 1500.0 - 1.0);
 }
-
-
 
 /*---------------------UART---------------------*/
 const int RX_BUFFER_SIZE = 30;
@@ -136,13 +139,12 @@ uint32_t rx_index = 0;
 char command_buffer[20];
 double param1, param2, param3;
 
-
 /* USER CODE END 0 */
 
 /**
-  * @brief  The application entry point.
-  * @retval int
-  */
+ * @brief  The application entry point.
+ * @retval int
+ */
 int main(void)
 {
   /* USER CODE BEGIN 1 */
@@ -170,7 +172,7 @@ int main(void)
   MX_DMA_Init();
   MX_USART2_UART_Init();
   MX_SPI1_Init();
-//  MX_SPI2_Init();
+  //  MX_SPI2_Init();
   MX_SPI3_Init();
   MX_TIM1_Init();
   MX_TIM2_Init();
@@ -182,42 +184,34 @@ int main(void)
   uint16_t encoder_min = 4100;
   HAL_TIM_Base_Start(&htim1);
 
-
-
-
-
-
   /*---AMT22 setup---*/
   // resetAMT22(&hspi1, GPIOC, GPIO_PIN_7, &htim1);
 
   /*---SERVO setup---*/
-  int32_t  CH2_ESC = 1500-1;
+  int32_t CH2_ESC = 1500 - 1;
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
   HAL_Delay(500);
-  __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 1500-1);
+  Waist.begin(aggKp, aggKi, aggKd, regKp, regKi, regKd);
+  // __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 1500 - 1);
   HAL_Delay(500);
-
-
-
+  Waist.wrist_waist = 1;
+  Waist.setAngleLimits(0, 359.99f); // TODO check good angle limits
 
   /*---CYTRON setup---*/
-  int32_t  CH2_DC = 0;
+  int32_t CH2_DC = 0;
   // HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
   // __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
   HAL_Delay(10);
   Wrist_Roll.wrist_waist = 1;
   Wrist_Roll.begin(aggKp, aggKi, aggKd, regKp, regKi, regKd);
-  Wrist_Roll.setGearRatio(1.0f);
-  Wrist_Roll.setAngleLimits(0, 359.99f); //TODO check good angle limits
-  
-  HAL_Delay(10);
-  Waist.wrist_waist = 1;
-  Waist.begin(aggKp, aggKi, aggKd, regKp, regKi, regKd);
-  Waist.setAngleLimits(0, 359.99f); //TODO check good angle limits
+  Wrist_Roll.setGearRatio(2.672222f);
+  Wrist_Roll.setAngleLimits(-359.99, 359.99f); // TODO check good angle limits
+
 
 
   __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 30);
-  while(!brakeSet){
+  while (!brakeSet)
+  {
     print_MOTOR("BRAKE", &Wrist_Roll);
     // printf("waiting for brake set\r\n");
   }
@@ -225,7 +219,6 @@ int main(void)
 
   /*---UART setup---*/
   HAL_UART_Receive_IT(&huart2, rx_data, 1);
-
 
   /* USER CODE END 2 */
 
@@ -255,14 +248,11 @@ int main(void)
     // printf("%s\r\n", y.to_string().c_str());
     // HAL_Delay(100);
 
-
-
-
     /*--------------------------------------CYTRON test--------------------------------------*/
     // printf("0\r\n");
     // __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
-    // HAL_Delay(1000);    
-    
+    // HAL_Delay(1000);
+
     // printf("20\r\n");
     // __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 20);
     // HAL_Delay(1000);
@@ -273,7 +263,7 @@ int main(void)
     // current_angle = Wrist_Roll.get_current_angle();
     // printf("current angle is %f\r\n, current_angle");
     // HAL_Delay(50);
-    // Wrist_Roll.newSetpoint(current_angle + 10);    
+    // Wrist_Roll.newSetpoint(current_angle + 10);
     // Wrist_Roll.tick();
     // HAL_Delay(1); // safety delay
 
@@ -283,9 +273,8 @@ int main(void)
     // setpoint = Wrist_Roll.getSetpoint();
     // printf("current angle: %f, setpoint: %f, current_angle_sw: %f\r\n", current_angle, setpoint, current_angle_sw);
 
-
     /*--------------------------------------CYTRON angle limit test--------------------------------------*/
-    // high first because we just set zero 
+    // high first because we just set zero
     // Wrist_Roll.newSetpoint(Wrist_Roll.highestAngle);
     // while(!(Wrist_Roll.get_current_angle_sw() >= Wrist_Roll.highestAngle - 2.0)) {
     //     print_MOTOR("UP");
@@ -301,9 +290,9 @@ int main(void)
     // Wrist_Roll.stop();
 
     /*--------------------------------------CYTRON setpoint test--------------------------------------*/
-    print_MOTOR("SP Wrist_Roll", &Wrist_Roll);
-    Wrist_Roll.tick();
-    
+    // print_MOTOR("SP Wrist_Roll", &Wrist_Roll);
+    // Wrist_Roll.tick();
+
     /*--------------------------------------SERVO setpoint test--------------------------------------*/
     // print_MOTOR("SP Waist", &Waist);
     // Waist.tick();
@@ -311,15 +300,12 @@ int main(void)
     /*--------------------------------------CYTRON direction test--------------------------------------*/
     // Wrist_Roll.setpoint = 99999;  // to make sure turn in positive direction, should be CCW
     // print_MOTOR("SP Wrist_Roll", &Wrist_Roll);
-    // Wrist_Roll.tick();  
+    // Wrist_Roll.tick();
 
     /*--------------------------------------SERVO direction test--------------------------------------*/
     // Waist.setpoint = 99999;  // to make sure turn in positive direction, should be CCW
     // print_MOTOR("SP Waist", &Waist);
-    // Waist.tick();  
-
-
-
+    // Waist.tick();
 
     /*--------------------------------------UART test loop--------------------------------------*/
     // HAL_UART_Receive(&huart2, rx_buffer, 4, 2000);
@@ -328,23 +314,24 @@ int main(void)
     // sprintf(buffer, "0.1 0.2 0.3"); // Example string with three float values separated by spaces
     // sscanf(buffer, "%lf %lf %lf", &kP, &kI, &kD); // Parse the float values
     // printf("kP: %lf, kI: %lf, kD: %lf\r\n", kP, kI, kD); // Print the float values
-  
+
     //  HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_13);
     //  HAL_Delay(200);
 
-
     /*--------------------------------------ESC test--------------------------------------*/
-    // HAL_Delay(1000);
-    // __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 1500-1);
-    // HAL_Delay(1000);
-    // __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 1550-1);
+    print_MOTOR("WAIST", &Waist);
+    printf("%d\r\n", is_turning);
+    // __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 1500 - 1);
+    // printf("1500\r\n");
+    // HAL_Delay(2000);
+    // __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 1550);
     // printf("1550\r\n");
+    // HAL_Delay(2000);
     // HAL_Delay(1000);
     // __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 1500-1);
     // HAL_Delay(1000);
     // __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 1450-1);
     // printf("1450\r\n");
-
 
     /*--------------------------------------ESC sweep test--------------------------------------*/
     // while(CH2_ESC < 1600)
@@ -364,44 +351,39 @@ int main(void)
     //   HAL_Delay(50);
     // }
 
+    // LEGACY CODE
+    //  if(encoderData_3 > encoder_max && encoderData_3 != 65535) encoder_max = encoderData_3;
+    //  if(encoderData_3 < encoder_min && encoderData_3 != 65535) encoder_min = encoderData_3;
+    //  printf("encoder_max is %d\r\n", encoder_max);
+    //  printf("encoder_min is %d\r\n", encoder_min);
 
+    // PWM test
+    //  while(CH2_DC < 65535)
+    //  {
+    //      // TIM2->CCR2 = CH2_DC;
+    //  	printf("current CH2_DC %d\r\n", CH2_DC);
+    //      __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, CH2_DC); //this is the same as above
+    //      CH2_DC += 70;
+    //      HAL_Delay(10);
+    //  }
+    //  while(CH2_DC > 0)
+    //  {
+    //      // TIM2->CCR2 = CH2_DC;
+    //  	printf("current CH2_DC %d\r\n", CH2_DC);
+    //      __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, CH2_DC); //this is the same as above
+    //      CH2_DC -= 70;
+    //      HAL_Delay(10);
+    //  }
 
-    //LEGACY CODE
-	  // if(encoderData_3 > encoder_max && encoderData_3 != 65535) encoder_max = encoderData_3;
-	  // if(encoderData_3 < encoder_min && encoderData_3 != 65535) encoder_min = encoderData_3;
-	  // printf("encoder_max is %d\r\n", encoder_max);
-	  // printf("encoder_min is %d\r\n", encoder_min);
+    // TIMER TEST
+    //  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_SET);
+    //  HAL_Delay(1000);
+    //  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_RESET);
+    //  HAL_Delay(1000);
 
-
-    //PWM test
-    // while(CH2_DC < 65535)
-    // {
-    //     // TIM2->CCR2 = CH2_DC;
-    // 	printf("current CH2_DC %d\r\n", CH2_DC);
-    //     __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, CH2_DC); //this is the same as above
-    //     CH2_DC += 70;
-    //     HAL_Delay(10);
-    // }
-    // while(CH2_DC > 0)
-    // {
-    //     // TIM2->CCR2 = CH2_DC;
-    // 	printf("current CH2_DC %d\r\n", CH2_DC);
-    //     __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, CH2_DC); //this is the same as above
-    //     CH2_DC -= 70;
-    //     HAL_Delay(10);
-    // }
-
-
-	  //TIMER TEST
-	  // HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_SET);
-	  // HAL_Delay(1000);
-	  // HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_RESET);
-	  // HAL_Delay(1000);
-
-	  //TIMER US TEST
-//	   HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_15);
-//	   delay_us(3);
-
+    // TIMER US TEST
+    //	   HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_15);
+    //	   delay_us(3);
 
     /* USER CODE END WHILE */
 
@@ -411,24 +393,24 @@ int main(void)
 }
 
 /**
-  * @brief System Clock Configuration
-  * @retval None
-  */
+ * @brief System Clock Configuration
+ * @retval None
+ */
 void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
   /** Configure the main internal regulator output voltage
-  */
+   */
   if (HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE1) != HAL_OK)
   {
     Error_Handler();
   }
 
   /** Initializes the RCC Oscillators according to the specified parameters
-  * in the RCC_OscInitTypeDef structure.
-  */
+   * in the RCC_OscInitTypeDef structure.
+   */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
@@ -445,9 +427,8 @@ void SystemClock_Config(void)
   }
 
   /** Initializes the CPU, AHB and APB buses clocks
-  */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
-                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+   */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
@@ -464,74 +445,89 @@ void SystemClock_Config(void)
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
   // if(!brakeSet) {
-    if(GPIO_Pin == B1_Pin) // INT Source is pin A9
+  if (GPIO_Pin == B1_Pin) // INT Source is pin A9
+  {
+    if (is_turning == 0)
     {
-      __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);  // set encoder stationary
-      HAL_Delay(100);  
-      button_counter++;
-      Wrist_Roll.set_zero_angle_sw();
-      Waist.set_zero_angle_sw();
-      // Wrist_Roll.set_zero_angle();
-      // Wrist_Roll.reset_encoder(); // reset rurns? TODO check this
-
-      HAL_Delay(100);
-      Wrist_Roll.newSetpoint(0.0);  //TODO check this?
-      Waist.newSetpoint(0.0);  //TODO check this?
-      
+      __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 1499 + 100); // set encoder stationary
+      is_turning = 1;
       brakeSet = 1;
-      HAL_Delay(100);
+      // Waist.reset_encoder(); // reset rurns? TODO check this
       return;
     }
+    else
+    {
+      __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 1500 - 1); // set encoder stationary
+      is_turning = 0;
+      brakeSet = 1;
+      return;
+    }
+    __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0); // set encoder stationary
+    HAL_Delay(100);
+    button_counter++;
+    Wrist_Roll.set_zero_angle_sw();
+    Waist.set_zero_angle_sw();
+    // Wrist_Roll.set_zero_angle();
+    // Wrist_Roll.reset_encoder(); // reset rurns? TODO check this
+
+    HAL_Delay(100);
+    Wrist_Roll.newSetpoint(0.0); // TODO check this?
+    Waist.newSetpoint(0.0);      // TODO check this?
+
+    brakeSet = 1;
+    HAL_Delay(100);
+    return;
+  }
   // }
 }
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
   // if(huart->Instance == USART2)
   // {
-    if(rx_index < RX_BUFFER_SIZE - 1) // check if buffer is not full
-    {
-      rx_buffer[rx_index++] = (uint8_t)rx_data[0]; // add received byte to buffer
-      if(rx_data[0] == '\n' || rx_data[0] == '\r') // check for Enter key
-      {
-        rx_buffer[rx_index] = '\0'; // add null terminator to make it a string
-        rx_index = 0; // reset buffer index
-        // do something with the received data
-        sscanf(rx_buffer, "%s %lf %lf %lf", command_buffer, &param1, &param2, &param3);
-        //check if commmand_buffer is "pid"
-        if(strcmp(command_buffer, "pid") == 0)
-        {
-          Wrist_Roll.set_PID_params(param1, param2, param3, param1, param2, param3);
-          printf("set to Kp: %lf, Ki: %lf, Kd: %lf\r\n", param1, param2, param3);
-        }
-        else if (strcmp(command_buffer, "sp") == 0) 
-        {
-          Wrist_Roll.newSetpoint(param1);
-          Waist.newSetpoint(param1);  //TODO check this?
-          printf("new Setpoint at %lf\r\n", param1);
-        } 
-      }
-      else {
-          printf("invalid command %s\r\n", command_buffer);
-        }
-        
-    }
-    else if (rx_index == RX_BUFFER_SIZE - 1) // buffer is full
+  if (rx_index < RX_BUFFER_SIZE - 1) // check if buffer is not full
+  {
+    rx_buffer[rx_index++] = (uint8_t)rx_data[0];  // add received byte to buffer
+    if (rx_data[0] == '\n' || rx_data[0] == '\r') // check for Enter key
     {
       rx_buffer[rx_index] = '\0'; // add null terminator to make it a string
-      rx_index = 0; // reset buffer index
+      rx_index = 0;               // reset buffer index
       // do something with the received data
       sscanf(rx_buffer, "%s %lf %lf %lf", command_buffer, &param1, &param2, &param3);
-      printf("set to Kp: %lf, Ki: %lf, Kd: %lf\r\n", param1, param2, param3);
+      // check if commmand_buffer is "pid"
+      if (strcmp(command_buffer, "pid") == 0)
+      {
+        Wrist_Roll.set_PID_params(param1, param2, param3, param1, param2, param3);
+        printf("set to Kp: %lf, Ki: %lf, Kd: %lf\r\n", param1, param2, param3);
+      }
+      else if (strcmp(command_buffer, "sp") == 0)
+      {
+        Wrist_Roll.newSetpoint(param1);
+        Waist.newSetpoint(param1); // TODO check this?
+        printf("new Setpoint at %lf\r\n", param1);
+      }
     }
+    else
+    {
+      printf("invalid command %s\r\n", command_buffer);
+    }
+  }
+  else if (rx_index == RX_BUFFER_SIZE - 1) // buffer is full
+  {
+    rx_buffer[rx_index] = '\0'; // add null terminator to make it a string
+    rx_index = 0;               // reset buffer index
+    // do something with the received data
+    sscanf(rx_buffer, "%s %lf %lf %lf", command_buffer, &param1, &param2, &param3);
+    printf("set to Kp: %lf, Ki: %lf, Kd: %lf\r\n", param1, param2, param3);
+  }
   // }
   HAL_UART_Receive_IT(&huart2, rx_data, 1); // start listening for next byte
 }
 /* USER CODE END 4 */
 
 /**
-  * @brief  This function is executed in case of error occurrence.
-  * @retval None
-  */
+ * @brief  This function is executed in case of error occurrence.
+ * @retval None
+ */
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
@@ -543,14 +539,14 @@ void Error_Handler(void)
   /* USER CODE END Error_Handler_Debug */
 }
 
-#ifdef  USE_FULL_ASSERT
+#ifdef USE_FULL_ASSERT
 /**
-  * @brief  Reports the name of the source file and the source line number
-  *         where the assert_param error has occurred.
-  * @param  file: pointer to the source file name
-  * @param  line: assert_param error line source number
-  * @retval None
-  */
+ * @brief  Reports the name of the source file and the source line number
+ *         where the assert_param error has occurred.
+ * @param  file: pointer to the source file name
+ * @param  line: assert_param error line source number
+ * @retval None
+ */
 void assert_failed(uint8_t *file, uint32_t line)
 {
   /* USER CODE BEGIN 6 */

@@ -50,7 +50,12 @@ void RoverArmMotor::begin(double aggP, double aggI, double aggD, double regP, do
 
     /*------------------Initialize timers------------------*/ 
     HAL_TIM_PWM_Start(pwm.p_tim, pwm.tim_channel);
-    __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, 0); // stop motor
+    if(escType == CYTRON){
+        __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, 0); // stop motor
+    }
+    else if(escType == BLUE_ROBOTICS){
+        __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, 1500-1); // stop motor
+    }
 
 
     /*------------------set PID parameters------------------*/
