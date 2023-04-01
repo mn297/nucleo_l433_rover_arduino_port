@@ -56,7 +56,7 @@
 // double aggKp=0.025, aggKi=0.019,  aggKd=0.0, elbaggKp=0.025, elbaggKi=0.019,  elbaggKd=0;
 // double regKp=0.025, regKi=0.014, regKd=0, elbregKp=0.025, elbregKi=0.014,  elbregKd=0;
 double aggKp=0.6, aggKi=0.1,  aggKd=0.01, elbaggKp=0.025, elbaggKi=0,  elbaggKd=0;
-double regKp=1, regKi=0.01, regKd=0, elbregKp=0.025, elbregKi=0,  elbregKd=0;
+double regKp=1, regKi=0.01, regKd=0.1, elbregKp=0.025, elbregKi=0,  elbregKd=0;
 
 /* USER CODE END PV */
 
@@ -108,7 +108,7 @@ Pin SERVO_PWM_1(SERVO_PWM_1_GPIO_Port, SERVO_PWM_1_Pin, &htim1, TIM_CHANNEL_2);
 RoverArmMotor Waist(&hspi1, SERVO_PWM_1, dummy_pin, AMT22_1, BLUE_ROBOTICS, 0, 359.99f);
 
 
-
+/*---------------------HELPER---------------------*/
 void print_MOTOR(char* msg, RoverArmMotor* pMotor){
   double current_angle = pMotor->get_current_angle();
   double current_angle_multi = pMotor->get_current_angle_multi();
@@ -207,7 +207,7 @@ int main(void)
   HAL_Delay(10);
   Wrist_Roll.wrist_waist = 1;
   Wrist_Roll.begin(aggKp, aggKi, aggKd, regKp, regKi, regKd);
-  Wrist_Roll.setGearRatio(4.0f);
+  Wrist_Roll.setGearRatio(1.0f);
   Wrist_Roll.setAngleLimits(0, 359.99f); //TODO check good angle limits
   
   HAL_Delay(10);
@@ -301,8 +301,8 @@ int main(void)
     // Wrist_Roll.stop();
 
     /*--------------------------------------CYTRON setpoint test--------------------------------------*/
-    // print_MOTOR("SP Wrist_Roll", &Wrist_Roll);
-    // Wrist_Roll.tick();
+    print_MOTOR("SP Wrist_Roll", &Wrist_Roll);
+    Wrist_Roll.tick();
     
     /*--------------------------------------SERVO setpoint test--------------------------------------*/
     // print_MOTOR("SP Waist", &Waist);
@@ -314,9 +314,9 @@ int main(void)
     // Wrist_Roll.tick();  
 
     /*--------------------------------------SERVO direction test--------------------------------------*/
-    Waist.setpoint = 99999;  // to make sure turn in positive direction, should be CCW
-    print_MOTOR("SP Waist", &Waist);
-    Waist.tick();  
+    // Waist.setpoint = 99999;  // to make sure turn in positive direction, should be CCW
+    // print_MOTOR("SP Waist", &Waist);
+    // Waist.tick();  
 
 
 
