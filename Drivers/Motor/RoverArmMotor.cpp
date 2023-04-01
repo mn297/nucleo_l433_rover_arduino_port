@@ -196,7 +196,9 @@ void RoverArmMotor::tick(){ // worry about currentAngle and setpoint
         // This one is more straightforward since we already defined the output range
         // from 1100us to 1900us
         // internalServoInstance.writeMicroseconds(output);
-        __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, 1500-1 + (-1) *output);
+        servo_dir = 1;  //TODO refactor
+        __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, 1500-1 + servo_dir *output);
+        HAL_Delay(100);
 
     }
 

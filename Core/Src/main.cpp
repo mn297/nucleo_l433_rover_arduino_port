@@ -305,8 +305,21 @@ int main(void)
     // Wrist_Roll.tick();
     
     /*--------------------------------------SERVO setpoint test--------------------------------------*/
+    // print_MOTOR("SP Waist", &Waist);
+    // Waist.tick();
+
+    /*--------------------------------------CYTRON direction test--------------------------------------*/
+    // Wrist_Roll.setpoint = 99999;  // to make sure turn in positive direction, should be CCW
+    // print_MOTOR("SP Wrist_Roll", &Wrist_Roll);
+    // Wrist_Roll.tick();  
+
+    /*--------------------------------------SERVO direction test--------------------------------------*/
+    Waist.setpoint = 99999;  // to make sure turn in positive direction, should be CCW
     print_MOTOR("SP Waist", &Waist);
-    Waist.tick();
+    Waist.tick();  
+
+
+
 
     /*--------------------------------------UART test loop--------------------------------------*/
     // HAL_UART_Receive(&huart2, rx_buffer, 4, 2000);

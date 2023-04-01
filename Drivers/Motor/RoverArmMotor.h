@@ -109,7 +109,7 @@ class RoverArmMotor{
         int useSwAngle;  //mn297
         double zero_angle_sw;  //mn297
         int turn_count;  //mn297
-
+        int servo_dir;  //mn297
 
 
         enum ActuationStates
