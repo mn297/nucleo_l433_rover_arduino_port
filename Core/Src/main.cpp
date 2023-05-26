@@ -189,19 +189,13 @@ int main(void)
 
   /*---SERVO setup---*/
   int32_t CH2_ESC = 1500 - 1;
-  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
-  HAL_Delay(500);
-  Waist.begin(aggKp, aggKi, aggKd, regKp, regKi, regKd);
-  // __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 1500 - 1);
   HAL_Delay(500);
   Waist.wrist_waist = 1;
-  Waist.setAngleLimits(0, 359.99f); // TODO check good angle limits
+  Waist.begin(aggKp, aggKi, aggKd, regKp, regKi, regKd);
+  Waist.setAngleLimits(-359.99, 359.99f); // TODO check good angle limits
 
   /*---CYTRON setup---*/
   int32_t CH2_DC = 0;
-  // HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
-  // __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
-  HAL_Delay(10);
   Wrist_Roll.wrist_waist = 1;
   Wrist_Roll.begin(aggKp, aggKi, aggKd, regKp, regKi, regKd);
   Wrist_Roll.setGearRatio(2.672222f);
@@ -247,7 +241,11 @@ int main(void)
     // std::bitset<16> y(turn_count[1]);
     // printf("%s\r\n", y.to_string().c_str());
     // HAL_Delay(100);
-
+    /*--------------------------------------SPI test--------------------------------------*/
+    uint8_t sendByte = 0x00;
+    uint8_t data = 0x00;
+    int err = HAL_SPI_TransmitReceive(&hspi1, &sendByte, &data, 1, 10);
+    uint8_t data2 = 0x00;
     /*--------------------------------------CYTRON test--------------------------------------*/
     // printf("0\r\n");
     // __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
@@ -319,8 +317,8 @@ int main(void)
     //  HAL_Delay(200);
 
     /*--------------------------------------ESC test--------------------------------------*/
-    print_MOTOR("WAIST", &Waist);
-    printf("%d\r\n", is_turning);
+    // print_MOTOR("WAIST", &Waist);
+    // printf("%d\r\n", is_turning);
     // __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 1500 - 1);
     // printf("1500\r\n");
     // HAL_Delay(2000);
@@ -449,7 +447,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
   {
     if (is_turning == 0)
     {
-      __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 1499 + 100); // set encoder stationary
+      __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 1499 + 300); // set encoder stationary
       is_turning = 1;
       brakeSet = 1;
       // Waist.reset_encoder(); // reset rurns? TODO check this
@@ -457,7 +455,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
     }
     else
     {
-      __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 1500 - 1); // set encoder stationary
+      __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 1499); // set encoder stationary
       is_turning = 0;
       brakeSet = 1;
       return;
@@ -504,6 +502,10 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
         Wrist_Roll.newSetpoint(param1);
         Waist.newSetpoint(param1); // TODO check this?
         printf("new Setpoint at %lf\r\n", param1);
+      }
+      else if (strcmp(command_buffer, "s") == 0)
+      {
+        __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, (int) param1); // set servo output
       }
     }
     else

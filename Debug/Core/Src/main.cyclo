@@ -7,9 +7,9 @@ main.cpp:78:5:)	1
 main.cpp:91:6:void delay_us(uint16_t)	2
 main.cpp:116:6:void print_MOTOR(char*, RoverArmMotor*)	1
 main.cpp:148:5:int main()	2
-main.cpp:399:6:void SystemClock_Config()	4
-main.cpp:445:6:void HAL_GPIO_EXTI_Callback(uint16_t)	3
-main.cpp:483:6:void HAL_UART_RxCpltCallback(UART_HandleTypeDef*)	7
-main.cpp:531:6:void Error_Handler()	1
-main.cpp:540:1:void __static_initialization_and_destruction_0(int, int)	3
-main.cpp:540:1:cpp)	1
+main.cpp:397:6:void SystemClock_Config()	4
+main.cpp:443:6:void HAL_GPIO_EXTI_Callback(uint16_t)	3
+main.cpp:481:6:void HAL_UART_RxCpltCallback(UART_HandleTypeDef*)	8
+main.cpp:533:6:void Error_Handler()	1
+main.cpp:542:1:void __static_initialization_and_destruction_0(int, int)	3
+main.cpp:542:1:cpp)	1

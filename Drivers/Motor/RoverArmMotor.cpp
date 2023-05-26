@@ -50,11 +50,12 @@ void RoverArmMotor::begin(double aggP, double aggI, double aggD, double regP, do
 
     /*------------------Initialize timers------------------*/ 
     HAL_TIM_PWM_Start(pwm.p_tim, pwm.tim_channel);
+    HAL_Delay(500); // wait for the motor to start up
     if(escType == CYTRON){
         __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, 0); // stop motor
     }
     else if(escType == BLUE_ROBOTICS){
-        __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, 1500-1); // stop motor
+        __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, 1500-1); // astop motor
     }
 
 
@@ -121,7 +122,7 @@ void RoverArmMotor::tick(){ // worry about currentAngle and setpoint
     if(abs(currentAngle - lastAngle) < 1.0){
         currentAngle = lastAngle;
     }
-    input = currentAngle; // range [0,359]
+    input = currentAngle; // range is R line
 
 
 
@@ -130,32 +131,27 @@ void RoverArmMotor::tick(){ // worry about currentAngle and setpoint
     // Find the shortest from the current position to the set point
     double gap; //mn297 could be negative
 
-    if(wrist_waist){
-        // (abs(setpoint-input) < abs((setpoint + 360.0f)-input)) ? 
-        // gap = setpoint - input : gap = (setpoint + 360.0f) - input; 
+    gap = setpoint - input;
+    // if(wrist_waist){
+    //     // (abs(setpoint-input) < abs((setpoint + 360.0f)-input)) ? 
+    //     // gap = setpoint - input : gap = (setpoint + 360.0f) - input; 
 
-        // if(abs(setpoint-input) < abs((setpoint + 360.0f)-input)) { 
-        //     gap = setpoint - input; 
-        // } else {
-        //     gap = (setpoint + 360.0f) - input; 
-        // }
-        if(abs(setpoint-input) > abs((setpoint + 360.0f)-input)) { 
-            gap = input - (setpoint + 360.0f); 
-        } else {
-            gap = setpoint - input; 
-        }
+    //     // if(abs(setpoint-input) < abs((setpoint + 360.0f)-input)) { 
+    //     //     gap = setpoint - input; 
+    //     // } else {
+    //     //     gap = (setpoint + 360.0f) - input; 
+    //     // }
+    //     if(abs(setpoint-input) > abs((setpoint + 360.0f)-input)) { // TODO check if this is correct
+    //         gap = input - (setpoint + 360.0f); 
+    //     } else {
+    //         gap = setpoint - input; 
+    //     }
         
-    }
-    else{
-        gap = setpoint - input;
-    }
-
-
-    //TODO check if this is correct, mn297
-    // If we are outside of angle bounds, make a setpoint intervention to bring the shaft to the midpoint
-    // if(input <= lowestAngle || input >= highestAngle){
-    //     setpoint = gearRatio * (lowestAngle + highestAngle) / 2 ;
     // }
+    // else{
+    //     gap = setpoint - input;
+    // }
+
 
     // Tone down P and I as the motor hones onto position
     if (abs(gap) < 10){
@@ -165,16 +161,10 @@ void RoverArmMotor::tick(){ // worry about currentAngle and setpoint
         // internalPIDInstance.SetTunings(aggressiveKp, aggressiveKi, aggressiveKd);
     }
     internalPIDInstance.Compute(); // return value stored in output
-    // Serial.print("current output is ");
-    // Serial.println(output, 4); 
 
-    // Refuse to go to setpoint if it is outside of boundaries
-    // if(setpoint <= lowestAngle || setpoint >= highestAngle){
-    //     output = 0;
-    // }
 
-    // Make sure we aren't snapping our tendons - move back a little bit if we are
-    // if(currentAngle >= (highestAngle - 2) && currentAngle <= (lowestAngle + 2)) output = 0.0;
+    //------------------SAFETY------------------//
+    if(currentAngle >= (highestAngle - 2) && currentAngle <= (lowestAngle + 2)) output = 0.0;
 
 
     //------------------Write to motor------------------//
@@ -202,7 +192,7 @@ void RoverArmMotor::tick(){ // worry about currentAngle and setpoint
         // from 1100us to 1900us
         // internalServoInstance.writeMicroseconds(output);
         servo_dir = 1;  //TODO refactor
-        __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, 1500-1 + servo_dir *output);
+        __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, 1500-1 + output);
         HAL_Delay(100);
 
     }
@@ -323,15 +313,6 @@ double RoverArmMotor::get_current_angle_multi(){    //mn297
 }
 
 double RoverArmMotor::get_current_angle_sw(){    //TODO mn297
-    // return currentAngle / gearRatio;
-
-    // uint16_t encoderData = getPositionSPI(spi, encoder.port, encoder.pin, 12, nullptr); //timer not used, so nullptr
-    // currentAngle = mapFloat((float) encoderData, MIN_ADC_VALUE, MAX_ADC_VALUE, 0, 359.99f); //mn297 potentiometer encoder
-    
-    // double diff = currentAngle - zero_angle_sw;
-    // if(diff < 0) diff += 360;
-    // return diff / gearRatio;
-
     double angle_raw = get_current_angle_multi();
     double diff = angle_raw - zero_angle_sw;
     return diff;
