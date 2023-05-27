@@ -201,8 +201,6 @@ int main(void)
   Wrist_Roll.setGearRatio(2.672222f);
   Wrist_Roll.setAngleLimits(-359.99, 359.99f); // TODO check good angle limits
 
-
-
   __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 30);
   while (!brakeSet)
   {
@@ -294,8 +292,8 @@ int main(void)
     // Wrist_Roll.tick();
 
     /*--------------------------------------SERVO setpoint test--------------------------------------*/
-    // print_MOTOR("SP Waist", &Waist);
-    // Waist.tick();
+    print_MOTOR("SP Waist", &Waist);
+    Waist.tick();
 
     /*--------------------------------------CYTRON direction test--------------------------------------*/
     // Wrist_Roll.setpoint = 99999;  // to make sure turn in positive direction, should be CCW
@@ -507,7 +505,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
       }
       else if (strcmp(command_buffer, "s") == 0)
       {
-        __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, (int) param1); // set servo output
+        __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, (int)param1); // set servo output
       }
     }
     else
