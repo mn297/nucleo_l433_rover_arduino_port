@@ -57,9 +57,13 @@
 // double regKp=0.025, regKi=0.014, regKd=0, elbregKp=0.025, elbregKi=0.014,  elbregKd=0;
 // double regKp=1, regKi=0.01, regKd=0.0, elbregKp=0.025, elbregKi=0,  elbregKd=0;  // PI for CYTRON
 
+//CYTRON
+// double aggKp = 0.6, aggKi = 0.1, aggKd = 0.01, elbaggKp = 0.025, elbaggKi = 0, elbaggKd = 0;
+// double regKp = 0.4, regKi = 0.0, regKd = 0.0, elbregKp = 0.025, elbregKi = 0, elbregKd = 0;
+
+
 double aggKp = 0.6, aggKi = 0.1, aggKd = 0.01, elbaggKp = 0.025, elbaggKi = 0, elbaggKd = 0;
 double regKp = 0.4, regKi = 0.0, regKd = 0.0, elbregKp = 0.025, elbregKi = 0, elbregKd = 0;
-
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -447,17 +451,17 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
   {
     if (is_turning == 0)
     {
-      __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 1499 + 300); // set encoder stationary
+      __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 1499 + 200);
       is_turning = 1;
       brakeSet = 1;
-      return;
+      // return;
     }
     else
     {
       __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 1499); // set encoder stationary
       is_turning = 0;
       brakeSet = 1;
-      return;
+      // return;
     }
     __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0); // set encoder stationary
     HAL_Delay(100);
