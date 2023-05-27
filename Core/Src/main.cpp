@@ -243,10 +243,10 @@ int main(void)
     // HAL_Delay(100);
 
     /*--------------------------------------SPI test--------------------------------------*/
-    uint8_t sendByte = 0x00;
-    uint8_t data = 0x00;
-    int err = HAL_SPI_TransmitReceive(&hspi1, &sendByte, &data, 1, 10);
-    uint8_t data2 = 0x00;
+    // uint8_t sendByte = 0x00;
+    // uint8_t data = 0x00;
+    // int err = HAL_SPI_TransmitReceive(&hspi1, &sendByte, &data, 1, 10);
+    // uint8_t data2 = 0x00;
 
     /*--------------------------------------CYTRON test--------------------------------------*/
     // printf("0\r\n");
