@@ -92,7 +92,7 @@ void RoverArmMotor::begin(double aggP, double aggI, double aggD, double regP, do
 
     internalPIDInstance.SetTunings(regularKp, regularKi, regularKd);
     // if(brake)  engageBrake(); //use brake if there is one
-    if (brake.valid != 0)
+    if (limit_switch.valid != 0)
         engageBrake(); // use brake if there is one
 
     // initialize the multiplier bool to false and the multiplier to 1.
@@ -233,9 +233,9 @@ double RoverArmMotor::getSetpoint()
     return setpoint / gearRatio;
 }
 
-bool RoverArmMotor::newSetpoint(double angl)
+bool RoverArmMotor::newSetpoint(double angle)
 {
-    double setpoint_test = angl * gearRatio;
+    double setpoint_test = angle * gearRatio;
     if (setpoint_test >= lowestAngle && setpoint_test <= highestAngle)
     {
         setpoint = setpoint_test;
@@ -286,19 +286,19 @@ uint32_t RoverArmMotor::get_turns_encoder()
 
 void RoverArmMotor::disengageBrake()
 {
-    if (brake.valid != 0)
+    if (limit_switch.valid != 0)
     {
         //   digitalWrite(brake, LOW);
-        HAL_GPIO_WritePin(brake.port, brake.pin, GPIO_PIN_RESET); // mn297
+        HAL_GPIO_WritePin(limit_switch.port, limit_switch.pin, GPIO_PIN_RESET); // mn297
     }
 }
 
 void RoverArmMotor::engageBrake()
 {
-    if (brake.valid != 0)
+    if (limit_switch.valid != 0)
     {
         //    digitalWrite(brake, HIGH);
-        HAL_GPIO_WritePin(brake.port, brake.pin, GPIO_PIN_SET); // mn297
+        HAL_GPIO_WritePin(limit_switch.port, limit_switch.pin, GPIO_PIN_SET); // mn297
     }
 }
 
@@ -341,8 +341,8 @@ double RoverArmMotor::get_current_angle_multi()
 
 double RoverArmMotor::get_current_angle_sw()
 { // TODO mn297
-    double angle_raw = get_current_angle_multi();
-    double diff = angle_raw - zero_angle_sw;
+    double current_angle_multi = get_current_angle_multi();
+    double diff = current_angle_multi - zero_angle_sw;
     return diff;
 }
 double RoverArmMotor::get_current_angle_sw_multi()
