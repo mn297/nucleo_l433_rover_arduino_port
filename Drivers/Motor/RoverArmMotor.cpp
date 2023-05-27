@@ -17,10 +17,10 @@
  * @param  esc_type: CYTRON or BLUE_ROBOTICS
  * @param  minimum_angle: minimum angle of the motor
  * @param  maximum_angle: maximum angle of the motor
- * @param  brake_pin: pin for the brake or limit switch
+ * @param  limit_switch_pin: pin for the brake or limit switch
  * @retval None
  */
-RoverArmMotor::RoverArmMotor(SPI_HandleTypeDef *spi_handle, Pin pwm_pin, Pin dir_pin, Pin encoder_pin, int esc_type, double minimum_angle, double maximum_angle, Pin brake_pin)
+RoverArmMotor::RoverArmMotor(SPI_HandleTypeDef *spi_handle, Pin pwm_pin, Pin dir_pin, Pin encoder_pin, int esc_type, double minimum_angle, double maximum_angle, Pin limit_switch_pin)
     : internalPIDInstance(&input, &output, &setpoint, regularKp, regularKi, regularKd, _PID_CD_DIRECT), internalAveragerInstance(15)
 {
 
@@ -29,7 +29,7 @@ RoverArmMotor::RoverArmMotor(SPI_HandleTypeDef *spi_handle, Pin pwm_pin, Pin dir
     pwm = pwm_pin;
     dir = dir_pin;
     encoder = encoder_pin;
-    brake = brake_pin;
+    limit_switch = limit_switch_pin;
     escType = esc_type;
     lowestAngle = minimum_angle;
     highestAngle = maximum_angle;
@@ -183,7 +183,6 @@ void RoverArmMotor::tick()
             HAL_GPIO_WritePin(dir.port, dir.pin, GPIO_PIN_RESET); // A high
         }
         // Write to PWM pin
-        // TODO port to HAL
         // analogWrite(pwm, abs(output)); //mn297 function execute quickly and jumps to next tick()
         double test_output = abs(output); // smoothing
         __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, (int)test_output);

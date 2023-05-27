@@ -34,10 +34,8 @@ public:
 #define FWD 1
 #define REV -1
 
-    // RoverArmMotor(int pwm_pin, int encoder_pin, int esc_type, double minimum_angle,
-    //               double maximum_angle, int dir_pin, int brake_pin);
     RoverArmMotor(SPI_HandleTypeDef *spi_handle, Pin pwm_pin, Pin dir_pin, Pin encoder_pin,
-                  int esc_type, double minimum_angle, double maximum_angle, Pin brake_pin = Pin());
+                  int esc_type, double minimum_angle, double maximum_angle, Pin limit_switch_pin = Pin());
 
     // Setters for various tunable parameters of our motors
     void set_PID_params(double aggP, double aggI, double aggD, double regP, double regI, double regD); // mn297
@@ -87,7 +85,7 @@ public: // TESTING only
 
     double aggressiveKp, aggressiveKi, aggressiveKd, regularKp, regularKi, regularKd;
     // PINS
-    Pin pwm, dir, encoder, brake;
+    Pin pwm, dir, encoder, limit_switch;
     SPI_HandleTypeDef *spi; // encoder spi handle
 
     int movingAverageWindowSize;
