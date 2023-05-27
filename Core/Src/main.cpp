@@ -450,7 +450,6 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
       __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 1499 + 300); // set encoder stationary
       is_turning = 1;
       brakeSet = 1;
-      // Waist.reset_encoder(); // reset rurns? TODO check this
       return;
     }
     else
@@ -465,8 +464,6 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
     button_counter++;
     Wrist_Roll.set_zero_angle_sw();
     Waist.set_zero_angle_sw();
-    // Wrist_Roll.set_zero_angle();
-    // Wrist_Roll.reset_encoder(); // reset rurns? TODO check this
 
     HAL_Delay(100);
     Wrist_Roll.newSetpoint(0.0); // TODO check this?
