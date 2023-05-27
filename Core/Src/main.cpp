@@ -55,8 +55,9 @@
 /* USER CODE BEGIN PV */
 // double aggKp=0.025, aggKi=0.019,  aggKd=0.0, elbaggKp=0.025, elbaggKi=0.019,  elbaggKd=0;
 // double regKp=0.025, regKi=0.014, regKd=0, elbregKp=0.025, elbregKi=0.014,  elbregKd=0;
-double aggKp = 0.6, aggKi = 0.1, aggKd = 0.01, elbaggKp = 0.025, elbaggKi = 0, elbaggKd = 0;
 // double regKp=1, regKi=0.01, regKd=0.0, elbregKp=0.025, elbregKi=0,  elbregKd=0;  // PI for CYTRON
+
+double aggKp = 0.6, aggKi = 0.1, aggKd = 0.01, elbaggKp = 0.025, elbaggKi = 0, elbaggKd = 0;
 double regKp = 0.4, regKi = 0.0, regKd = 0.0, elbregKp = 0.025, elbregKi = 0, elbregKd = 0;
 
 /* USER CODE END PV */
@@ -96,7 +97,6 @@ void delay_us(uint16_t us)
 }
 
 /*---------------------CYTRON DECLARATIONS---------------------*/
-
 double setpoint = 0;
 int turn = 0;
 int brakeSet = 0;
@@ -241,11 +241,13 @@ int main(void)
     // std::bitset<16> y(turn_count[1]);
     // printf("%s\r\n", y.to_string().c_str());
     // HAL_Delay(100);
+
     /*--------------------------------------SPI test--------------------------------------*/
     uint8_t sendByte = 0x00;
     uint8_t data = 0x00;
     int err = HAL_SPI_TransmitReceive(&hspi1, &sendByte, &data, 1, 10);
     uint8_t data2 = 0x00;
+
     /*--------------------------------------CYTRON test--------------------------------------*/
     // printf("0\r\n");
     // __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
