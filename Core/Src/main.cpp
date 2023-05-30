@@ -57,13 +57,14 @@
 // double regKp=0.025, regKi=0.014, regKd=0, elbregKp=0.025, elbregKi=0.014,  elbregKd=0;
 // double regKp=1, regKi=0.01, regKd=0.0, elbregKp=0.025, elbregKi=0,  elbregKd=0;  // PI for CYTRON
 
-//CYTRON
-// double aggKp = 0.6, aggKi = 0.1, aggKd = 0.01, elbaggKp = 0.025, elbaggKi = 0, elbaggKd = 0;
-// double regKp = 0.4, regKi = 0.0, regKd = 0.0, elbregKp = 0.025, elbregKi = 0, elbregKd = 0;
+// WRIST (DC)
+//  double aggKp = 0.6, aggKi = 0.1, aggKd = 0.01, elbaggKp = 0.025, elbaggKi = 0, elbaggKd = 0;
+//  double regKp = 0.4, regKi = 0.0, regKd = 0.0, elbregKp = 0.025, elbregKi = 0, elbregKd = 0;
 
-
+// WAIST (SERVO)
 double aggKp = 0.6, aggKi = 0.1, aggKd = 0.01, elbaggKp = 0.025, elbaggKi = 0, elbaggKd = 0;
-double regKp = 0.4, regKi = 0.0, regKd = 0.0, elbregKp = 0.025, elbregKi = 0, elbregKd = 0;
+double regKp = 0.3, regKi = 0.1, regKd = 0.0, elbregKp = 0.025, elbregKi = 0, elbregKd = 0;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -117,13 +118,13 @@ RoverArmMotor Waist(&hspi1, SERVO_PWM_1, dummy_pin, AMT22_1, BLUE_ROBOTICS, 0, 3
 int is_turning = 0;
 
 /*---------------------HELPER---------------------*/
-void print_MOTOR(char *msg, RoverArmMotor *pMotor)
+static void print_MOTOR(char *msg, RoverArmMotor *pMotor)
 {
   double current_angle = pMotor->get_current_angle();
   double current_angle_multi = pMotor->get_current_angle_multi();
   double current_angle_sw = pMotor->get_current_angle_sw();
   int turn_count = pMotor->get_turn_count();
-  printf("%s turn_count %d, setpoint %.2f, angle_sw %.2f, zero_sw %.2f, angle_raw_multi %.2f, angle_raw %.2f, _outputSum %.2f, output %.2f\r\n",
+  printf("%s turn_count %d, setpoint %.2f, angle_sw %.2f, zero_sw %.2f, angle_raw_multi %.2f, angle_raw %.2f, _outputSum %.2f, output_specific %.2f, output_raw %.2f\r\n",
          msg,
          turn_count,
          pMotor->setpoint,
@@ -132,7 +133,8 @@ void print_MOTOR(char *msg, RoverArmMotor *pMotor)
          current_angle_multi,
          current_angle,
          pMotor->internalPIDInstance._outputSum,
-         (*(pMotor->internalPIDInstance._myOutput)) + 1500.0 - 1.0);
+         (*(pMotor->internalPIDInstance._myOutput)) + 1500.0 - 1.0),
+      pMotor->output;
 }
 
 /*---------------------UART---------------------*/
@@ -180,6 +182,7 @@ int main(void)
   MX_SPI3_Init();
   MX_TIM1_Init();
   MX_TIM2_Init();
+  MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
   uint16_t encoderData_1 = 99;
   uint16_t encoderData_2 = 99;
@@ -187,6 +190,7 @@ int main(void)
   uint16_t encoder_max = 0;
   uint16_t encoder_min = 4100;
   HAL_TIM_Base_Start(&htim1);
+  HAL_TIM_Base_Start_IT(&htim6);
 
   /*---AMT22 setup---*/
   // resetAMT22(&hspi1, GPIOC, GPIO_PIN_7, &htim1);
@@ -205,13 +209,12 @@ int main(void)
   Wrist_Roll.setGearRatio(2.672222f);
   Wrist_Roll.setAngleLimits(-359.99, 359.99f); // TODO check good angle limits
 
-  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 30);
-  while (!brakeSet)
-  {
-    print_MOTOR("BRAKE", &Wrist_Roll);
-    // printf("waiting for brake set\r\n");
-  }
-  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
+  // __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 30);
+  // while (!brakeSet)
+  // {
+  //   print_MOTOR("BRAKE", &Waist);
+  // }
+  // __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
 
   /*---UART setup---*/
   HAL_UART_Receive_IT(&huart2, rx_data, 1);
@@ -297,7 +300,8 @@ int main(void)
 
     /*--------------------------------------SERVO setpoint test--------------------------------------*/
     print_MOTOR("SP Waist", &Waist);
-    Waist.tick();
+    HAL_Delay(100);
+    // Waist.tick();
 
     /*--------------------------------------CYTRON direction test--------------------------------------*/
     // Wrist_Roll.setpoint = 99999;  // to make sure turn in positive direction, should be CCW
@@ -524,6 +528,16 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
   }
   // }
   HAL_UART_Receive_IT(&huart2, rx_data, 1); // start listening for next byte
+}
+// Callback: timer has rolled over
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  // Check which version of the timer triggered this callback and toggle LED
+  if (htim == &htim6 )
+  {
+    // print_MOTOR("SP Waist", &Waist);
+    Waist.tick();
+  }
 }
 /* USER CODE END 4 */
 

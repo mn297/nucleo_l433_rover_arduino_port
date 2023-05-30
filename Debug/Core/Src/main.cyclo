@@ -2,14 +2,15 @@ RoverArmMotor.h:17:5:Pin::Pin()	1
 RoverArmMotor.h:18:5:Pin::Pin(GPIO_TypeDef*, uint16_t)	1
 RoverArmMotor.h:19:5:Pin::Pin(GPIO_TypeDef*, uint16_t, TIM_HandleTypeDef*, unsigned int)	1
 gthr-default.h:229:1:int __gthread_key_delete(__gthread_key_t)	1
-main.cpp:77:6:void print(const char*)	1
-main.cpp:83:5:)	1
-main.cpp:96:6:void delay_us(uint16_t)	2
-main.cpp:120:6:void print_MOTOR(char*, RoverArmMotor*)	1
-main.cpp:152:5:int main()	2
-main.cpp:401:6:void SystemClock_Config()	4
-main.cpp:447:6:void HAL_GPIO_EXTI_Callback(uint16_t)	3
-main.cpp:482:6:void HAL_UART_RxCpltCallback(UART_HandleTypeDef*)	8
-main.cpp:534:6:void Error_Handler()	1
-main.cpp:543:1:void __static_initialization_and_destruction_0(int, int)	3
-main.cpp:543:1:cpp)	1
+main.cpp:78:6:void print(const char*)	1
+main.cpp:84:5:)	1
+main.cpp:97:6:void delay_us(uint16_t)	2
+main.cpp:121:13:void print_MOTOR(char*, RoverArmMotor*)	1
+main.cpp:154:5:int main()	1
+main.cpp:405:6:void SystemClock_Config()	4
+main.cpp:451:6:void HAL_GPIO_EXTI_Callback(uint16_t)	3
+main.cpp:486:6:void HAL_UART_RxCpltCallback(UART_HandleTypeDef*)	8
+main.cpp:533:6:void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef*)	2
+main.cpp:548:6:void Error_Handler()	1
+main.cpp:557:1:void __static_initialization_and_destruction_0(int, int)	3
+main.cpp:557:1:cpp)	1

@@ -3,6 +3,7 @@
 #include "AMT22.h"
 #include <cstdlib>
 #include "tim.h"
+#include <stdio.h>
 
 // TODO: Test this class with the old code, remember to create backup beforehand!
 // I'm very suspicious of the way I handled user defined pointers...
@@ -54,7 +55,7 @@ void RoverArmMotor::begin(double aggP, double aggI, double aggD, double regP, do
     }
     else if (escType == BLUE_ROBOTICS)
     {
-        __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, 1500 - 1); // astop motor
+        __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, 1500 - 1); // stop motor
     }
 
     /*------------------set PID parameters------------------*/
@@ -64,11 +65,11 @@ void RoverArmMotor::begin(double aggP, double aggI, double aggD, double regP, do
     }
     else if (escType == BLUE_ROBOTICS)
     {
-        internalPIDInstance.SetOutputLimits(-100, 100); // 1500 +- 400 for BlueRobotics ESC
+        internalPIDInstance.SetOutputLimits(-300, 300); // 1500 +- 400 for BlueRobotics ESC
     }
 
     /*------------------Initialize moving average------------------*/
-    internalAveragerInstance.begin();
+    // internalAveragerInstance.begin();
 
     /*------------------Initialize PID------------------*/
     internalPIDInstance.Init();
@@ -79,7 +80,7 @@ void RoverArmMotor::begin(double aggP, double aggI, double aggD, double regP, do
     // as the microcontroller initializes.
     // adcResult = internalAveragerInstance.reading(analogRead(encoder));
     // after setup, currentAngle is same as setpoint
-    currentAngle = get_current_angle(); // fix setpoint not equal to current angle
+    currentAngle = get_current_angle_sw(); // fix setpoint not equal to current angle
     setpoint = currentAngle;
 
     /*------------------Set PID parameters------------------*/
@@ -109,29 +110,14 @@ void RoverArmMotor::tick()
 { // worry about currentAngle and setpoint
 
     /*------------------Get current angle------------------*/
-    // adcResult = internalAveragerInstance.reading(analogRead(encoder));
-    if (useSwAngle)
-    {
-        currentAngle = get_current_angle_sw();
-    }
-    else
-    {
-        currentAngle = get_current_angle();
-    }
+    currentAngle = get_current_angle_sw();
 
-    // Measurement deadband - ignore sub-degree noise
-    if (abs(currentAngle - lastAngle) < 1.0)
-    {
-        currentAngle = lastAngle;
-    }
     input = currentAngle; // range is R line
 
     //------------------Compute PID------------------//
     // Compute distance, retune PID if necessary. Less aggressive tuning params for small errors
     // Find the shortest from the current position to the set point
-    double gap; // mn297 could be negative
 
-    gap = setpoint - input;
     // if(wrist_waist){
     //     // (abs(setpoint-input) < abs((setpoint + 360.0f)-input)) ?
     //     // gap = setpoint - input : gap = (setpoint + 360.0f) - input;
@@ -153,54 +139,52 @@ void RoverArmMotor::tick()
     // }
 
     // Tone down P and I as the motor hones onto position
-    if (abs(gap) < 10)
-    {
-        internalPIDInstance.SetTunings(regularKp, regularKi, regularKd);
-    }
-    else
-    { // TODO agressive tuning params
-        internalPIDInstance.SetTunings(regularKp, regularKi, regularKd);
-        // internalPIDInstance.SetTunings(aggressiveKp, aggressiveKi, aggressiveKd);
-    }
     internalPIDInstance.Compute(); // return value stored in output
 
     //------------------SAFETY------------------//
-    if (currentAngle >= (highestAngle - 2) && currentAngle <= (lowestAngle + 2))
-        output = 0.0;
+    // if (currentAngle >= (highestAngle - 2) && currentAngle <= (lowestAngle + 2))
+    //     output = 0.0;
 
     //------------------Write to motor------------------//
-    if (escType == CYTRON)
-    {
-
-        // Interpret sign of the error signal as the direction pin value
-        // (gap > 0) ? digitalWrite(dir, HIGH) : digitalWrite(dir, LOW); // invert if needed mn297
-        if (output > 0)
-        {
-            HAL_GPIO_WritePin(dir.port, dir.pin, GPIO_PIN_SET); // B high
-        }
-        else
-        {
-            HAL_GPIO_WritePin(dir.port, dir.pin, GPIO_PIN_RESET); // A high
-        }
-        // Write to PWM pin
-        // analogWrite(pwm, abs(output)); //mn297 function execute quickly and jumps to next tick()
-        double test_output = abs(output); // smoothing
-        __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, (int)test_output);
-    }
+    // if (escType == CYTRON)
+    // {
+    //     // Interpret sign of the error signal as the direction pin value
+    //     if (output > 0)
+    //     {
+    //         HAL_GPIO_WritePin(dir.port, dir.pin, GPIO_PIN_SET); // B high
+    //     }
+    //     else
+    //     {
+    //         HAL_GPIO_WritePin(dir.port, dir.pin, GPIO_PIN_RESET); // A high
+    //     }
+    //     // Write to PWM pin
+    //     double test_output = abs(output); // smoothing
+    //     __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, (int)test_output);
+    // }
 
     // TODO: Add support for other ESC types
-    else if (escType == BLUE_ROBOTICS)
-    {
+    // else if (escType == BLUE_ROBOTICS)
         // This one is more straightforward since we already defined the output range
         // from 1100us to 1900us
-        // internalServoInstance.writeMicroseconds(output);
-        servo_dir = 1; // TODO refactor
-        __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, 1500 - 1 + output);
-        HAL_Delay(100);
-    }
+        // int deadband = 30;
 
-    //------------------Update angle------------------//
-    lastAngle = currentAngle;
+        // // Check if the PID output is within the deadband
+        // if (abs(output) <= deadband)
+        // {
+        //     output = 0;
+        // }
+        // else
+        // {
+        //     if (output > 0)
+        //     {
+        //         output = (output - deadband);
+        //     }
+        //     else
+        //     {
+        //         output = (output + deadband);
+        //     }
+        // }
+        __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, 1500 - 1 + output);
 }
 void RoverArmMotor::stop()
 {
