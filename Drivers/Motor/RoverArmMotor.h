@@ -77,11 +77,7 @@ public:
 private:
 public: // TESTING only
     // Default to open loop, will need to enter the coefficients to begin
-    PID internalPIDInstance;
-    movingAvg internalAveragerInstance;
-
-    // TODO: Add support for other ESC types
-    //  Servo internalServoInstance;
+    PID* internalPIDInstance;
 
     double aggressiveKp, aggressiveKi, aggressiveKd, regularKp, regularKi, regularKd;
     // PINS

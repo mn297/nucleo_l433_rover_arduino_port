@@ -22,7 +22,6 @@
  * @retval None
  */
 RoverArmMotor::RoverArmMotor(SPI_HandleTypeDef *spi_handle, Pin pwm_pin, Pin dir_pin, Pin encoder_pin, int esc_type, double minimum_angle, double maximum_angle, Pin limit_switch_pin)
-    : internalPIDInstance(&input, &output, &setpoint, regularKp, regularKi, regularKd, _PID_CD_DIRECT), internalAveragerInstance(15)
 {
 
     // constructor
@@ -58,22 +57,15 @@ void RoverArmMotor::begin(double aggP, double aggI, double aggD, double regP, do
         __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, 1500 - 1); // stop motor
     }
 
-    /*------------------set PID parameters------------------*/
+    /*------------------Initialize PID------------------*/
     if (escType == CYTRON)
     {
-        internalPIDInstance.SetOutputLimits(-99, 99); // PWM duty cycle mn297 TOOD: check this
+        internalPIDInstance = new PID(0.01, 99.0, -99.0, regP, regD, regI);
     }
     else if (escType == BLUE_ROBOTICS)
     {
-        internalPIDInstance.SetOutputLimits(-300, 300); // 1500 +- 400 for BlueRobotics ESC
+        internalPIDInstance = new PID(0.01, 300.0, -300.0, regP, regD, regI);
     }
-
-    /*------------------Initialize moving average------------------*/
-    // internalAveragerInstance.begin();
-
-    /*------------------Initialize PID------------------*/
-    internalPIDInstance.Init();
-    internalPIDInstance.SetMode(_PID_MODE_AUTOMATIC);
 
     /*------------------Get setpoint------------------*/
     // Get current location and set it as setpoint. Essential to prevent jerkiness
@@ -91,7 +83,6 @@ void RoverArmMotor::begin(double aggP, double aggI, double aggD, double regP, do
     aggressiveKi = aggI;
     aggressiveKd = aggD;
 
-    internalPIDInstance.SetTunings(regularKp, regularKi, regularKd);
     // if(brake)  engageBrake(); //use brake if there is one
     if (limit_switch.valid != 0)
         engageBrake(); // use brake if there is one
@@ -132,14 +123,13 @@ void RoverArmMotor::tick()
     //     } else {
     //         gap = setpoint - input;
     //     }
-
     // }
     // else{
     //     gap = setpoint - input;
     // }
 
     // Tone down P and I as the motor hones onto position
-    internalPIDInstance.Compute(); // return value stored in output
+    output = internalPIDInstance->calculate(setpoint, input); // return value stored in output
 
     //------------------SAFETY------------------//
     // if (currentAngle >= (highestAngle - 2) && currentAngle <= (lowestAngle + 2))
@@ -164,30 +154,30 @@ void RoverArmMotor::tick()
 
     // TODO: Add support for other ESC types
     // else if (escType == BLUE_ROBOTICS)
-        // This one is more straightforward since we already defined the output range
-        // from 1100us to 1900us
-        int deadband = 30;
+    // This one is more straightforward since we already defined the output range
+    // from 1100us to 1900us
+    int deadband = 30;
 
-        // Check if the PID output is within the deadband
-        if (abs(output) <= deadband)
+    // Check if the PID output is within the deadband
+    if (abs(output) <= deadband)
+    {
+        output = 0;
+    }
+    else
+    {
+        if (output > 0)
         {
-            output = 0;
+            output = (output + deadband / 2);
         }
         else
         {
-            if (output > 0)
-            {
-                output = (output + deadband*2);
-            }
-            else
-            {
-                output = (output - deadband*2);
-            }
+            output = (output - deadband / 2);
         }
-    	double output_actual = 1500 - 1 + output;
-    __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, output_actual);
-        // __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, output_actual);
-        printf("OUTPUT: %f\r\n", output_actual);
+    }
+    double output_actual = 1500 - 1 + output;
+    // __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, output_actual);
+    __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, output_actual);
+    printf("OUTPUT: %f\r\n", output_actual);
 }
 void RoverArmMotor::stop()
 {
@@ -201,7 +191,6 @@ void RoverArmMotor::set_PID_params(double aggP, double aggI, double aggD, double
     aggressiveKp = aggP;
     aggressiveKi = aggI;
     aggressiveKd = aggD;
-    internalPIDInstance.SetTunings(regularKp, regularKi, regularKd);
 }
 
 bool RoverArmMotor::setMultiplierBool(bool mult, double ratio)
@@ -289,14 +278,14 @@ void RoverArmMotor::engageBrake()
     }
 }
 
-double RoverArmMotor::get_current_angle_avg()
-{ // UNSUPPORTED
-    // return currentAngle / gearRatio;
-    uint16_t encoderData = getPositionSPI(spi, encoder.port, encoder.pin, 12, nullptr);  // timer not used, so nullptr
-    adcResult = internalAveragerInstance.reading(encoderData);                           // implicit cast to int
-    currentAngle = mapFloat((float)adcResult, MIN_ADC_VALUE, MAX_ADC_VALUE, 0, 359.99f); // mn297 potentiometer encoder
-    return currentAngle / gearRatio;
-}
+// double RoverArmMotor::get_current_angle_avg()
+//{ // UNSUPPORTED
+//     // return currentAngle / gearRatio;
+//     uint16_t encoderData = getPositionSPI(spi, encoder.port, encoder.pin, 12, nullptr);  // timer not used, so nullptr
+//     adcResult = internalAveragerInstance.reading(encoderData);                           // implicit cast to int
+//     currentAngle = mapFloat((float)adcResult, MIN_ADC_VALUE, MAX_ADC_VALUE, 0, 359.99f); // mn297 potentiometer encoder
+//     return currentAngle / gearRatio;
+// }
 double RoverArmMotor::get_current_angle()
 { // mn297
     // return currentAngle / gearRatio;
@@ -332,10 +321,7 @@ double RoverArmMotor::get_current_angle_sw()
     double diff = current_angle_multi - zero_angle_sw;
     return diff;
 }
-double RoverArmMotor::get_current_angle_sw_multi()
-{
-    // UNUSED
-}
+
 double RoverArmMotor::getCurrentOutput()
 {
     return output;

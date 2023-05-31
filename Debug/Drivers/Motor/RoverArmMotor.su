@@ -1,0 +1,26 @@
+../Drivers/Motor/RoverArmMotor.h:17:5:Pin::Pin()	16	static
+../Drivers/Motor/RoverArmMotor.cpp:24:1:RoverArmMotor::RoverArmMotor(SPI_HandleTypeDef*, Pin, Pin, Pin, int, double, double, Pin)	40	static
+../Drivers/Motor/RoverArmMotor.cpp:45:6:void RoverArmMotor::begin(double, double, double, double, double, double)	72	static
+../Drivers/Motor/RoverArmMotor.cpp:100:6:void RoverArmMotor::tick()	40	static
+../Drivers/Motor/RoverArmMotor.cpp:182:6:void RoverArmMotor::stop()	16	static
+../Drivers/Motor/RoverArmMotor.cpp:186:6:void RoverArmMotor::set_PID_params(double, double, double, double, double, double)	64	static
+../Drivers/Motor/RoverArmMotor.cpp:196:6:bool RoverArmMotor::setMultiplierBool(bool, double)	32	static
+../Drivers/Motor/RoverArmMotor.cpp:207:8:double RoverArmMotor::getSetpoint()	16	static
+../Drivers/Motor/RoverArmMotor.cpp:212:6:bool RoverArmMotor::newSetpoint(double)	32	static
+../Drivers/Motor/RoverArmMotor.cpp:226:5:int RoverArmMotor::getDirection()	16	static
+../Drivers/Motor/RoverArmMotor.cpp:232:6:void RoverArmMotor::setGearRatio(double)	24	static
+../Drivers/Motor/RoverArmMotor.cpp:237:6:void RoverArmMotor::setAngleLimits(double, double)	32	static
+../Drivers/Motor/RoverArmMotor.cpp:243:6:void RoverArmMotor::set_zero_angle()	16	static
+../Drivers/Motor/RoverArmMotor.cpp:247:6:void RoverArmMotor::reset_encoder()	16	static
+../Drivers/Motor/RoverArmMotor.cpp:251:6:void RoverArmMotor::set_zero_angle_sw()	16	static
+../Drivers/Motor/RoverArmMotor.cpp:257:10:uint32_t RoverArmMotor::get_turns_encoder()	32	static
+../Drivers/Motor/RoverArmMotor.cpp:263:6:void RoverArmMotor::disengageBrake()	16	static
+../Drivers/Motor/RoverArmMotor.cpp:272:6:void RoverArmMotor::engageBrake()	16	static
+../Drivers/Motor/RoverArmMotor.cpp:289:8:double RoverArmMotor::get_current_angle()	32	static
+../Drivers/Motor/RoverArmMotor.cpp:297:8:double RoverArmMotor::get_current_angle_multi()	48	static
+../Drivers/Motor/RoverArmMotor.cpp:318:8:double RoverArmMotor::get_current_angle_sw()	32	static
+../Drivers/Motor/RoverArmMotor.cpp:325:8:double RoverArmMotor::getCurrentOutput()	16	static
+../Drivers/Motor/RoverArmMotor.cpp:330:8:double RoverArmMotor::mapFloat(float, float, float, float, float)	40	static
+../Drivers/Motor/RoverArmMotor.cpp:337:8:double RoverArmMotor::getRatio()	16	static
+../Drivers/Motor/RoverArmMotor.cpp:342:5:int RoverArmMotor::get_turn_count()	40	static
+../Drivers/Motor/RoverArmMotor.cpp:350:6:void RoverArmMotor::WatchdogISR()	16	static
