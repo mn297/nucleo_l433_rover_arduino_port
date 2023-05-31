@@ -63,7 +63,7 @@
 
 // WAIST (SERVO)
 double aggKp = 0.6, aggKi = 0.1, aggKd = 0.01, elbaggKp = 0.025, elbaggKi = 0, elbaggKd = 0;
-double regKp = 0.3, regKi = 0.1, regKd = 0.0, elbregKp = 0.025, elbregKi = 0, elbregKd = 0;
+double regKp = 0.9, regKi = 0.0, regKd = 0.0, elbregKp = 0.025, elbregKi = 0, elbregKd = 0;
 
 /* USER CODE END PV */
 
@@ -118,25 +118,36 @@ RoverArmMotor Waist(&hspi1, SERVO_PWM_1, dummy_pin, AMT22_1, BLUE_ROBOTICS, 0, 3
 int is_turning = 0;
 
 /*---------------------HELPER---------------------*/
+// static void print_MOTOR(char *msg, RoverArmMotor *pMotor)
+// {
+//   double current_angle = pMotor->get_current_angle();
+//   double current_angle_multi = pMotor->get_current_angle_multi();
+//   double current_angle_sw = pMotor->get_current_angle_sw();
+//   int turn_count = pMotor->get_turn_count();
+//   printf("%s turn_count %d, setpoint %.2f, angle_sw %.2f, zero_sw %.2f, angle_raw_multi %.2f, angle_raw %.2f, _outputSum %.2f, output_specific %.2f, output_raw %.2f\r\n",
+//          msg,
+//          turn_count,
+//          pMotor->setpoint,
+//          current_angle_sw,
+//          pMotor->zero_angle_sw,
+//          current_angle_multi,
+//          current_angle,
+//          pMotor->internalPIDInstance._outputSum,
+//          (*(pMotor->internalPIDInstance._myOutput)) + 1500.0 - 1.0,
+//         pMotor->output);
+// }
 static void print_MOTOR(char *msg, RoverArmMotor *pMotor)
 {
   double current_angle = pMotor->get_current_angle();
   double current_angle_multi = pMotor->get_current_angle_multi();
   double current_angle_sw = pMotor->get_current_angle_sw();
   int turn_count = pMotor->get_turn_count();
-  printf("%s turn_count %d, setpoint %.2f, angle_sw %.2f, zero_sw %.2f, angle_raw_multi %.2f, angle_raw %.2f, _outputSum %.2f, output_specific %.2f, output_raw %.2f\r\n",
+  printf("%s setpoint %.2f, angle_sw %.2f, output %.2f\r\n",
          msg,
-         turn_count,
          pMotor->setpoint,
          current_angle_sw,
-         pMotor->zero_angle_sw,
-         current_angle_multi,
-         current_angle,
-         pMotor->internalPIDInstance._outputSum,
-         (*(pMotor->internalPIDInstance._myOutput)) + 1500.0 - 1.0),
-      pMotor->output;
+        pMotor->output);
 }
-
 /*---------------------UART---------------------*/
 const int RX_BUFFER_SIZE = 30;
 uint8_t rx_data[5]; // 1 byte
@@ -200,7 +211,7 @@ int main(void)
   HAL_Delay(500);
   Waist.wrist_waist = 1;
   Waist.begin(aggKp, aggKi, aggKd, regKp, regKi, regKd);
-  Waist.setAngleLimits(-359.99, 359.99f); // TODO check good angle limits
+  Waist.setAngleLimits(-359.99, 999359.99f); // TODO check good angle limits
 
   /*---CYTRON setup---*/
   int32_t CH2_DC = 0;
@@ -299,8 +310,7 @@ int main(void)
     // Wrist_Roll.tick();
 
     /*--------------------------------------SERVO setpoint test--------------------------------------*/
-    print_MOTOR("SP Waist", &Waist);
-    HAL_Delay(100);
+    // print_MOTOR("SP Waist", &Waist);
     // Waist.tick();
 
     /*--------------------------------------CYTRON direction test--------------------------------------*/
@@ -311,7 +321,8 @@ int main(void)
     /*--------------------------------------SERVO direction test--------------------------------------*/
     // Waist.setpoint = 99999;  // to make sure turn in positive direction, should be CCW
     // print_MOTOR("SP Waist", &Waist);
-    // Waist.tick();
+    HAL_Delay(100);
+    // __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 1600);
 
     /*--------------------------------------UART test loop--------------------------------------*/
     // HAL_UART_Receive(&huart2, rx_buffer, 4, 2000);
@@ -485,8 +496,6 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 }
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-  // if(huart->Instance == USART2)
-  // {
   if (rx_index < RX_BUFFER_SIZE - 1) // check if buffer is not full
   {
     rx_buffer[rx_index++] = (uint8_t)rx_data[0];  // add received byte to buffer
@@ -494,24 +503,31 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     {
       rx_buffer[rx_index] = '\0'; // add null terminator to make it a string
       rx_index = 0;               // reset buffer index
+
+      //---------------------UART COMMANDS---------------------//
       // do something with the received data
-      sscanf(rx_buffer, "%s %lf %lf %lf", command_buffer, &param1, &param2, &param3);
-      // check if commmand_buffer is "pid"
-      if (strcmp(command_buffer, "pid") == 0)
-      {
-        Wrist_Roll.set_PID_params(param1, param2, param3, param1, param2, param3);
-        printf("set to Kp: %lf, Ki: %lf, Kd: %lf\r\n", param1, param2, param3);
-      }
-      else if (strcmp(command_buffer, "sp") == 0)
-      {
-        Wrist_Roll.newSetpoint(param1);
-        Waist.newSetpoint(param1); // TODO check this?
-        printf("new Setpoint at %lf\r\n", param1);
-      }
-      else if (strcmp(command_buffer, "s") == 0)
-      {
-        __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, (int)param1); // set servo output
-      }
+      // sscanf(rx_buffer, "%s %lf %lf %lf", command_buffer, &param1, &param2, &param3);
+      // // check if commmand_buffer is "pid"
+      // if (strcmp(command_buffer, "pid") == 0)
+      // {
+      //   Wrist_Roll.set_PID_params(param1, param2, param3, param1, param2, param3);
+      //   printf("set to Kp: %lf, Ki: %lf, Kd: %lf\r\n", param1, param2, param3);
+      // }
+      // else if (strcmp(command_buffer, "sp") == 0)
+      // {
+      //   Wrist_Roll.newSetpoint(param1);
+      //   Waist.newSetpoint(param1); // TODO check this?
+      //   printf("new Setpoint at %lf\r\n", param1);
+      // }
+      // else if (strcmp(command_buffer, "s") == 0)
+      // {
+      //   __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, (int)param1); // set servo output
+      // }
+
+      //---------------------FLOAT---------------------//
+      sscanf(rx_buffer, "%lf", &param1);
+      Waist.newSetpoint(param1);
+      printf("new Setpoint at %lf\r\n", param1);
     }
     else
     {

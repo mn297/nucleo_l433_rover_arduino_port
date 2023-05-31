@@ -48,12 +48,12 @@ PID::PID(double *Input, double *Output, double *Setpoint, double Kp, double Ki, 
 {
 }
 
-void PID::printPID()
-{
-	double error = *_mySetpoint - *_myInput;
-	printf("_outputSum: %f, _myInput: %f, _myOutput: %f, _mySetpoint: %f, error: %f\n",
-		   _outputSum, *_myInput, *_myOutput, *_mySetpoint, error);
-}
+// void PID::printPID()
+// {
+// 	double error = *_mySetpoint - *_myInput;
+// 	printf("_outputSum: %f, _myInput: %f, _myOutput: %f, _mySetpoint: %f, error: %f\n",
+// 		   _outputSum, *_myInput, *_myOutput, *_mySetpoint, error);
+// }
 
 /* ~~~~~~~~~~~~~~~~~ Initialize ~~~~~~~~~~~~~~~~ */
 void PID::Init(void)
@@ -113,17 +113,17 @@ uint8_t PID::Compute(void)
 	// if (_outputSum > 50) _outputSum = 50;	//mn297 hotfix2 TODO check if this is correct
 
 	/* ~~~~~~~~~~ Check PID mode ~~~~~~~~~~ */
-	if (!_inAuto)
-	{
-		return _FALSE;
-	}
+//	if (!_inAuto)
+//	{
+//		return _FALSE;
+//	}
 
 	/* ~~~~~~~~~~ Calculate time ~~~~~~~~~~ */
 	now = GetTime();
 	timeChange = (now - _lastTime);
 
-	if (timeChange >= _sampleTime)
-	{
+//	if (timeChange >= _sampleTime)
+//	{
 		/* ..... Compute all the working error variables ..... */
 		input = *_myInput;
 
@@ -176,18 +176,18 @@ uint8_t PID::Compute(void)
 		}
 
 		*_myOutput = output;
-		printPID();
+//		printPID();
 
 		/* ..... Remember some variables for next time ..... */
 		_lastInput = input;
 		_lastTime = now;
 
 		return _TRUE;
-	}
-	else
-	{
-		return _FALSE;
-	}
+//	}
+//	else
+//	{
+//		return _FALSE;
+//	}
 }
 
 /* ~~~~~~~~~~~~~~~~~ PID Mode ~~~~~~~~~~~~~~~~~~ */

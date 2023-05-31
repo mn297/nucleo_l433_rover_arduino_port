@@ -259,7 +259,7 @@ public:
 	double GetKi(void);
 	double GetKd(void);
 
-	void printPID();
+	// void printPID();
 };
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ End of the program ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */

@@ -166,25 +166,28 @@ void RoverArmMotor::tick()
     // else if (escType == BLUE_ROBOTICS)
         // This one is more straightforward since we already defined the output range
         // from 1100us to 1900us
-        // int deadband = 30;
+        int deadband = 30;
 
-        // // Check if the PID output is within the deadband
-        // if (abs(output) <= deadband)
-        // {
-        //     output = 0;
-        // }
-        // else
-        // {
-        //     if (output > 0)
-        //     {
-        //         output = (output - deadband);
-        //     }
-        //     else
-        //     {
-        //         output = (output + deadband);
-        //     }
-        // }
-        __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, 1500 - 1 + output);
+        // Check if the PID output is within the deadband
+        if (abs(output) <= deadband)
+        {
+            output = 0;
+        }
+        else
+        {
+            if (output > 0)
+            {
+                output = (output + deadband*2);
+            }
+            else
+            {
+                output = (output - deadband*2);
+            }
+        }
+    	double output_actual = 1500 - 1 + output;
+    __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, output_actual);
+        // __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, output_actual);
+        printf("OUTPUT: %f\r\n", output_actual);
 }
 void RoverArmMotor::stop()
 {
