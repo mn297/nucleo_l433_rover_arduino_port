@@ -158,26 +158,27 @@ void RoverArmMotor::tick()
     // from 1100us to 1900us
     int deadband = 30;
 
-    // Check if the PID output is within the deadband
-    if (abs(output) <= deadband)
-    {
-        output = 0;
-    }
-    else
-    {
-        if (output > 0)
-        {
-            output = (output + deadband / 2);
-        }
-        else
-        {
-            output = (output - deadband / 2);
-        }
-    }
+    //------------------DEADBAND------------------//
+    // if (abs(output) <= deadband)
+    // {
+    //     output = 0;
+    // }
+    // else
+    // {
+    //     if (output > 0)
+    //     {
+    //         output = (output + deadband / 2);
+    //     }
+    //     else
+    //     {
+    //         output = (output - deadband / 2);
+    //     }
+    // }
+
     double output_actual = 1500 - 1 + output;
     // __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, output_actual);
     __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, output_actual);
-    printf("OUTPUT: %f\r\n", output_actual);
+    printf("output_actual %f\r\n", output_actual);
 }
 void RoverArmMotor::stop()
 {
@@ -298,7 +299,12 @@ double RoverArmMotor::get_current_angle_multi()
 { // mn297
     // return currentAngle / gearRatio;
     int16_t result_arr[2];
-    getTurnCounterSPI(result_arr, spi, encoder.port, encoder.pin, 12, nullptr);                  // timer not used, so nullptr
+    getTurnCounterSPI(result_arr, spi, encoder.port, encoder.pin, 12, nullptr); // timer not used, so nullptr
+    if (result_arr[0] == -1)
+    {
+        printf("ERROR: getTurnCounterSPI() returned -1\r\n");
+        return 0;
+    }
     double angle_raw = mapFloat((float)result_arr[0], MIN_ADC_VALUE, MAX_ADC_VALUE, 0, 359.99f); // mn297 potentiometer encoder
     int turns = result_arr[1];
     if (turns > 0)

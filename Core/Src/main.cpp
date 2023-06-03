@@ -63,7 +63,7 @@
 
 // WAIST (SERVO)
 double aggKp = 0.6, aggKi = 0.1, aggKd = 0.01, elbaggKp = 0.025, elbaggKi = 0, elbaggKd = 0;
-double regKp = 0.9, regKi = 0.0, regKd = 0.0, elbregKp = 0.025, elbregKi = 0, elbregKd = 0;
+double regKp = 0.2, regKi = 0.0, regKd = 0.0, elbregKp = 0.025, elbregKi = 0, elbregKd = 0;
 
 /* USER CODE END PV */
 
@@ -138,19 +138,18 @@ int is_turning = 0;
 // }
 static void print_MOTOR(char *msg, RoverArmMotor *pMotor)
 {
-  double current_angle = pMotor->get_current_angle();
   double current_angle_multi = pMotor->get_current_angle_multi();
   double current_angle_sw = pMotor->get_current_angle_sw();
   int turn_count = pMotor->get_turn_count();
-  printf("%s setpoint %.2f, angle_sw %.2f, output %.2f\r\n",
+  printf("%s setpoint %.2f, angle_sw %.2f, output %.2f, ",
          msg,
          pMotor->setpoint,
          current_angle_sw,
-        pMotor->output);
+         pMotor->output);
 }
 /*---------------------UART---------------------*/
-const int RX_BUFFER_SIZE = 30;
-uint8_t rx_data[5]; // 1 byte
+const int RX_BUFFER_SIZE = 32;
+uint8_t rx_data[8]; // 1 byte
 char rx_buffer[RX_BUFFER_SIZE];
 uint32_t rx_index = 0;
 char command_buffer[20];
@@ -201,7 +200,6 @@ int main(void)
   uint16_t encoder_max = 0;
   uint16_t encoder_min = 4100;
   HAL_TIM_Base_Start(&htim1);
-  HAL_TIM_Base_Start_IT(&htim6);
 
   /*---AMT22 setup---*/
   // resetAMT22(&hspi1, GPIOC, GPIO_PIN_7, &htim1);
@@ -212,6 +210,8 @@ int main(void)
   Waist.wrist_waist = 1;
   Waist.begin(aggKp, aggKi, aggKd, regKp, regKi, regKd);
   Waist.setAngleLimits(-359.99, 999359.99f); // TODO check good angle limits
+  Waist.reset_encoder();
+  HAL_TIM_Base_Start_IT(&htim6);
 
   /*---CYTRON setup---*/
   int32_t CH2_DC = 0;
@@ -464,32 +464,15 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
   // if(!brakeSet) {
   if (GPIO_Pin == B1_Pin) // INT Source is pin A9
   {
-    if (is_turning == 0)
-    {
-      __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 1499 + 200);
-      is_turning = 1;
-      brakeSet = 1;
-      // return;
-    }
-    else
-    {
-      __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 1499); // set encoder stationary
-      is_turning = 0;
-      brakeSet = 1;
-      // return;
-    }
-    __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0); // set encoder stationary
-    HAL_Delay(100);
-    button_counter++;
+    is_turning = !is_turning;
+
     Wrist_Roll.set_zero_angle_sw();
     Waist.set_zero_angle_sw();
-
-    HAL_Delay(100);
+    HAL_Delay(10);
     Wrist_Roll.newSetpoint(0.0); // TODO check this?
     Waist.newSetpoint(0.0);      // TODO check this?
-
     brakeSet = 1;
-    HAL_Delay(100);
+    button_counter++;
     return;
   }
   // }
@@ -523,15 +506,15 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
       // {
       //   __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, (int)param1); // set servo output
       // }
+      //   else
+      // {
+      //   printf("invalid command %s\r\n", command_buffer);
+      // }
 
       //---------------------FLOAT---------------------//
       sscanf(rx_buffer, "%lf", &param1);
       Waist.newSetpoint(param1);
       printf("new Setpoint at %lf\r\n", param1);
-    }
-    else
-    {
-      printf("invalid command %s\r\n", command_buffer);
     }
   }
   else if (rx_index == RX_BUFFER_SIZE - 1) // buffer is full
@@ -549,10 +532,10 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
   // Check which version of the timer triggered this callback and toggle LED
-  if (htim == &htim6 )
+  if (htim == &htim6)
   {
-    // print_MOTOR("SP Waist", &Waist);
     Waist.tick();
+    print_MOTOR("SP Waist", &Waist);
   }
 }
 /* USER CODE END 4 */
