@@ -72,7 +72,7 @@ void RoverArmMotor::begin(double aggP, double aggI, double aggD, double regP, do
     // as the microcontroller initializes.
     // adcResult = internalAveragerInstance.reading(analogRead(encoder));
     // after setup, currentAngle is same as setpoint
-    currentAngle = get_current_angle_sw(); // fix setpoint not equal to current angle
+    int error = get_current_angle_sw(&currentAngle); // fix setpoint not equal to current angle
     setpoint = currentAngle;
 
     /*------------------Set PID parameters------------------*/
@@ -101,7 +101,21 @@ void RoverArmMotor::tick()
 { // worry about currentAngle and setpoint
 
     /*------------------Get current angle------------------*/
-    currentAngle = get_current_angle_sw();
+    int error = get_current_angle_sw(&currentAngle);
+    if (error == -1)
+    {
+        printf("ERROR: get_current_angle_sw() returned -1 from tick()\r\n");
+        if (escType == CYTRON)
+        {
+            __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, 0);
+            return;
+        }
+        else if (escType == BLUE_ROBOTICS)
+        {
+            __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, 1499);
+            return;
+        }
+    }
 
     input = currentAngle; // range is R line
 
@@ -177,13 +191,14 @@ void RoverArmMotor::tick()
 
         double output_actual = 1500 - 1 + output;
         __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, output_actual);
-        printf("output_actual %f\r\n", output_actual);
     }
 }
+
 void RoverArmMotor::stop()
 {
     __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, (int)0);
 }
+
 void RoverArmMotor::set_PID_params(double aggP, double aggI, double aggD, double regP, double regI, double regD)
 {
     regularKp = regP;
@@ -245,16 +260,17 @@ void RoverArmMotor::set_zero_angle()
 {
     setZeroSPI(spi, encoder.port, encoder.pin, nullptr); // timer not used, so nullptr
 }
+
 void RoverArmMotor::reset_encoder()
 {
     resetAMT22(spi, encoder.port, encoder.pin, nullptr); // timer not used, so nullptr
 }
+
 void RoverArmMotor::set_zero_angle_sw()
 {
-    // zero_angle_sw = this->get_current_angle();
-    zero_angle_sw = this->get_current_angle_multi();
+   this->get_current_angle_multi(&zero_angle_sw);
+}
 
-} // mn297 software zero angle
 uint32_t RoverArmMotor::get_turns_encoder()
 { // mn297
     uint32_t turns = get_turns_AMT22(spi, encoder.port, encoder.pin, 12, nullptr);
@@ -287,45 +303,45 @@ void RoverArmMotor::engageBrake()
 //     currentAngle = mapFloat((float)adcResult, MIN_ADC_VALUE, MAX_ADC_VALUE, 0, 359.99f); // mn297 potentiometer encoder
 //     return currentAngle / gearRatio;
 // }
+
 double RoverArmMotor::get_current_angle()
-{ // mn297
-    // return currentAngle / gearRatio;
+{                                                                                          // mn297
     uint16_t encoderData = getPositionSPI(spi, encoder.port, encoder.pin, 12, nullptr);    // timer not used, so nullptr
     currentAngle = mapFloat((float)encoderData, MIN_ADC_VALUE, MAX_ADC_VALUE, 0, 359.99f); // mn297 potentiometer encoder
     return currentAngle;
 }
 
-double RoverArmMotor::get_current_angle_multi()
+int RoverArmMotor::get_current_angle_multi(double *angle)
 { // mn297
-    // return currentAngle / gearRatio;
     int16_t result_arr[2];
-    getTurnCounterSPI(result_arr, spi, encoder.port, encoder.pin, 12, nullptr); // timer not used, so nullptr
-    if (result_arr[0] == -1)
+    int error = getTurnCounterSPI(result_arr, spi, encoder.port, encoder.pin, 12, nullptr); // timer not used, so nullptr
+    if (error == -1)
     {
-        printf("ERROR: getTurnCounterSPI() returned -1\r\n");
+        printf("ERROR: getTurnCounterSPI() returned -1 from get_current_angle_multi()\r\n");
         return 0;
     }
+
     double angle_raw = mapFloat((float)result_arr[0], MIN_ADC_VALUE, MAX_ADC_VALUE, 0, 359.99f); // mn297 potentiometer encoder
     int turns = result_arr[1];
-    if (turns > 0)
-    {
-        return angle_raw + 360 * turns;
-    }
-    else if (turns < 0)
-    {
-        return angle_raw + 360 * turns;
-    }
-    else
-    {
-        return angle_raw;
-    }
+    *angle = angle_raw + 360 * turns;
+
+    return 0;
 }
 
-double RoverArmMotor::get_current_angle_sw()
-{ // TODO mn297
-    double current_angle_multi = get_current_angle_multi();
+int RoverArmMotor::get_current_angle_sw(double *angle)
+{
+    double current_angle_multi;
+    int error = get_current_angle_multi(&current_angle_multi);
+    if (error == -1)
+    {
+        printf("ERROR: get_current_angle_multi() returned -1 from get_current_angle_sw()\r\n");
+        return -1;
+    }
+
     double diff = current_angle_multi - zero_angle_sw;
-    return diff;
+    *angle = diff;
+
+    return 0; // return 0 on success
 }
 
 double RoverArmMotor::getCurrentOutput()
@@ -350,7 +366,6 @@ int RoverArmMotor::get_turn_count()
     int16_t result_arr[2];
     getTurnCounterSPI(result_arr, spi, encoder.port, encoder.pin, 12, nullptr); // timer not used, so nullptr
     return result_arr[1];
-    // return turn_count;
 }
 
 void RoverArmMotor::WatchdogISR()

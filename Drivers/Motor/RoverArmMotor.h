@@ -56,11 +56,10 @@ public:
     void disengageBrake();
     void engageBrake();
 
-    double get_current_angle_avg();      // mn297
-    double get_current_angle();          // mn297
-    double get_current_angle_multi();    // mn297
-    double get_current_angle_sw();       // mn297
-    double get_current_angle_sw_multi(); // multi-turn angle
+    double get_current_angle_avg(); // mn297
+    double get_current_angle();     // mn297
+    int get_current_angle_multi(double *angle);
+    int get_current_angle_sw(double *angle);
 
     double getSetpoint();
     double getCurrentOutput();
@@ -77,7 +76,7 @@ public:
 private:
 public: // TESTING only
     // Default to open loop, will need to enter the coefficients to begin
-    PID* internalPIDInstance;
+    PID *internalPIDInstance;
 
     double aggressiveKp, aggressiveKi, aggressiveKd, regularKp, regularKi, regularKd;
     // PINS

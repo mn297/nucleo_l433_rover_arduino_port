@@ -138,14 +138,19 @@ int is_turning = 0;
 // }
 static void print_MOTOR(char *msg, RoverArmMotor *pMotor)
 {
-  double current_angle_multi = pMotor->get_current_angle_multi();
-  double current_angle_sw = pMotor->get_current_angle_sw();
-  int turn_count = pMotor->get_turn_count();
-  printf("%s setpoint %.2f, angle_sw %.2f, output %.2f, ",
+  double current_angle_multi;
+  double current_angle_sw;
+  // int turn_count = pMotor->get_turn_count();
+
+  pMotor->get_current_angle_multi(&current_angle_multi);
+  pMotor->get_current_angle_sw(&current_angle_sw);
+
+  printf("%s setpoint %.2f, angle_sw %.2f, output %.2f, output_actual %.2f\r\n",
          msg,
          pMotor->setpoint,
          current_angle_sw,
-         pMotor->output);
+         pMotor->output,
+         pMotor->output + 1500 - 1);
 }
 /*---------------------UART---------------------*/
 const int RX_BUFFER_SIZE = 32;

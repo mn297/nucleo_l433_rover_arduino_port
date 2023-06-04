@@ -113,7 +113,7 @@ void setZeroSPI(SPI_HandleTypeDef *hspi, GPIO_TypeDef* encoderPort, uint16_t enc
 void resetAMT22(SPI_HandleTypeDef *hspi, GPIO_TypeDef* encoderPort, uint16_t encoderPin, TIM_HandleTypeDef *timer);
 
 
-void getTurnCounterSPI(int16_t* returnArr, SPI_HandleTypeDef *hspi, GPIO_TypeDef* encoderPort, uint16_t encoderPin, uint8_t resolution, TIM_HandleTypeDef *timer);
+int getTurnCounterSPI(int16_t* returnArr, SPI_HandleTypeDef *hspi, GPIO_TypeDef* encoderPort, uint16_t encoderPin, uint8_t resolution, TIM_HandleTypeDef *timer);
 
 /*
  * @brief	  Delay in microseconds. Uses HW timer in order to unload CPU.
