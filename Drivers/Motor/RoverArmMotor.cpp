@@ -146,8 +146,8 @@ void RoverArmMotor::tick()
     output = internalPIDInstance->calculate(setpoint, input); // return value stored in output
 
     //------------------SAFETY------------------//
-    // if (currentAngle >= (highestAngle - 2) && currentAngle <= (lowestAngle + 2))
-    //     output = 0.0;
+    if (currentAngle >= (highestAngle - 2) || currentAngle <= (lowestAngle + 2))
+        output = 0.0;
 
     //------------------Write to motor------------------//
     if (escType == CYTRON)
@@ -268,7 +268,7 @@ void RoverArmMotor::reset_encoder()
 
 void RoverArmMotor::set_zero_angle_sw()
 {
-   this->get_current_angle_multi(&zero_angle_sw);
+    this->get_current_angle_multi(&zero_angle_sw);
 }
 
 uint32_t RoverArmMotor::get_turns_encoder()

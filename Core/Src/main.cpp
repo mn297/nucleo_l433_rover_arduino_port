@@ -136,6 +136,7 @@ int is_turning = 0;
 //          (*(pMotor->internalPIDInstance._myOutput)) + 1500.0 - 1.0,
 //         pMotor->output);
 // }
+
 static void print_MOTOR(char *msg, RoverArmMotor *pMotor)
 {
   double current_angle_multi;
@@ -152,6 +153,7 @@ static void print_MOTOR(char *msg, RoverArmMotor *pMotor)
          pMotor->output,
          pMotor->output + 1500 - 1);
 }
+
 /*---------------------UART---------------------*/
 const int RX_BUFFER_SIZE = 32;
 uint8_t rx_data[8]; // 1 byte
@@ -214,7 +216,7 @@ int main(void)
   HAL_Delay(500);
   Waist.wrist_waist = 1;
   Waist.begin(aggKp, aggKi, aggKd, regKp, regKi, regKd);
-  Waist.setAngleLimits(-359.99, 999359.99f); // TODO check good angle limits
+  Waist.setAngleLimits(-359.99, 999999.99f); // TODO check good angle limits
   Waist.reset_encoder();
   HAL_TIM_Base_Start_IT(&htim6);
 
