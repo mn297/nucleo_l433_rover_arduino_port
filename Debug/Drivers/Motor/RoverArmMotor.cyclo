@@ -1,0 +1,26 @@
+RoverArmMotor.h:17:5:Pin::Pin()	1
+RoverArmMotor.cpp:24:1:RoverArmMotor::RoverArmMotor(SPI_HandleTypeDef*, Pin, Pin, Pin, int, double, double, Pin)	1
+RoverArmMotor.cpp:45:6:void RoverArmMotor::begin(double, double, double, double, double, double)	16
+RoverArmMotor.cpp:100:6:void RoverArmMotor::tick()	14
+RoverArmMotor.cpp:183:6:void RoverArmMotor::stop()	6
+RoverArmMotor.cpp:187:6:void RoverArmMotor::set_PID_params(double, double, double, double, double, double)	1
+RoverArmMotor.cpp:197:6:bool RoverArmMotor::setMultiplierBool(bool, double)	3
+RoverArmMotor.cpp:208:8:double RoverArmMotor::getSetpoint()	1
+RoverArmMotor.cpp:213:6:bool RoverArmMotor::newSetpoint(double)	3
+RoverArmMotor.cpp:227:5:int RoverArmMotor::getDirection()	2
+RoverArmMotor.cpp:233:6:void RoverArmMotor::setGearRatio(double)	1
+RoverArmMotor.cpp:238:6:void RoverArmMotor::setAngleLimits(double, double)	1
+RoverArmMotor.cpp:244:6:void RoverArmMotor::set_zero_angle()	1
+RoverArmMotor.cpp:248:6:void RoverArmMotor::reset_encoder()	1
+RoverArmMotor.cpp:252:6:void RoverArmMotor::set_zero_angle_sw()	1
+RoverArmMotor.cpp:258:10:uint32_t RoverArmMotor::get_turns_encoder()	1
+RoverArmMotor.cpp:264:6:void RoverArmMotor::disengageBrake()	2
+RoverArmMotor.cpp:273:6:void RoverArmMotor::engageBrake()	2
+RoverArmMotor.cpp:290:8:double RoverArmMotor::get_current_angle()	1
+RoverArmMotor.cpp:298:8:double RoverArmMotor::get_current_angle_multi()	4
+RoverArmMotor.cpp:324:8:double RoverArmMotor::get_current_angle_sw()	1
+RoverArmMotor.cpp:331:8:double RoverArmMotor::getCurrentOutput()	1
+RoverArmMotor.cpp:336:8:double RoverArmMotor::mapFloat(float, float, float, float, float)	1
+RoverArmMotor.cpp:343:8:double RoverArmMotor::getRatio()	1
+RoverArmMotor.cpp:348:5:int RoverArmMotor::get_turn_count()	1
+RoverArmMotor.cpp:356:6:void RoverArmMotor::WatchdogISR()	1

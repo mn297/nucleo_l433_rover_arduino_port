@@ -1,0 +1,9 @@
+AMT22.c:19:6:setCSLine	1
+AMT22.c:24:9:spiWriteRead	1
+AMT22.c:48:10:getPositionSPI	6
+AMT22.c:82:6:getTurnCounterSPI	9
+AMT22.c:153:10:get_turns_AMT22	6
+AMT22.c:194:6:setZeroSPI	1
+AMT22.c:211:6:resetAMT22	1
+AMT22.c:227:6:delay	2
+AMT22.c:238:6:delay_us_AMT22	2

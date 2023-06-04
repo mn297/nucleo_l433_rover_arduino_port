@@ -136,49 +136,49 @@ void RoverArmMotor::tick()
     //     output = 0.0;
 
     //------------------Write to motor------------------//
-    // if (escType == CYTRON)
-    // {
-    //     // Interpret sign of the error signal as the direction pin value
-    //     if (output > 0)
-    //     {
-    //         HAL_GPIO_WritePin(dir.port, dir.pin, GPIO_PIN_SET); // B high
-    //     }
-    //     else
-    //     {
-    //         HAL_GPIO_WritePin(dir.port, dir.pin, GPIO_PIN_RESET); // A high
-    //     }
-    //     // Write to PWM pin
-    //     double test_output = abs(output); // smoothing
-    //     __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, (int)test_output);
-    // }
+    if (escType == CYTRON)
+    {
+        // Interpret sign of the error signal as the direction pin value
+        if (output > 0)
+        {
+            HAL_GPIO_WritePin(dir.port, dir.pin, GPIO_PIN_SET); // B high
+        }
+        else
+        {
+            HAL_GPIO_WritePin(dir.port, dir.pin, GPIO_PIN_RESET); // A high
+        }
+        // Write to PWM pin
+        double test_output = abs(output); // smoothing
+        __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, (int)test_output);
+    }
 
-    // TODO: Add support for other ESC types
-    // else if (escType == BLUE_ROBOTICS)
     // This one is more straightforward since we already defined the output range
     // from 1100us to 1900us
-    int deadband = 30;
+    else if (escType == BLUE_ROBOTICS)
+    {
 
-    //------------------DEADBAND------------------//
-    // if (abs(output) <= deadband)
-    // {
-    //     output = 0;
-    // }
-    // else
-    // {
-    //     if (output > 0)
-    //     {
-    //         output = (output + deadband / 2);
-    //     }
-    //     else
-    //     {
-    //         output = (output - deadband / 2);
-    //     }
-    // }
+        //------------------DEADBAND------------------//
+        // int deadband = 30;
+        // if (abs(output) <= deadband)
+        // {
+        //     output = 0;
+        // }
+        // else
+        // {
+        //     if (output > 0)
+        //     {
+        //         output = (output + deadband / 2);
+        //     }
+        //     else
+        //     {
+        //         output = (output - deadband / 2);
+        //     }
+        // }
 
-    double output_actual = 1500 - 1 + output;
-    // __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, output_actual);
-    __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, output_actual);
-    printf("output_actual %f\r\n", output_actual);
+        double output_actual = 1500 - 1 + output;
+        __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, output_actual);
+        printf("output_actual %f\r\n", output_actual);
+    }
 }
 void RoverArmMotor::stop()
 {
