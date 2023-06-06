@@ -90,9 +90,9 @@ public: // TESTING only
     double currentAngle, lastAngle;
     bool wrist_waist;
     // int multiplier;
-    double input;
-    double output;
-    double setpoint;
+    volatile double input;
+    volatile double output;
+    volatile double setpoint;
     int actuationState;
     double gearRatio;
 

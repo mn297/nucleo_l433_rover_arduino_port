@@ -63,7 +63,7 @@
 
 // WAIST (SERVO)
 double aggKp = 0.6, aggKi = 0.1, aggKd = 0.01, elbaggKp = 0.025, elbaggKi = 0, elbaggKd = 0;
-double regKp = 0.2, regKi = 0.0, regKd = 0.0, elbregKp = 0.025, elbregKi = 0, elbregKd = 0;
+double regKp = 0.8, regKi = 0.2, regKd = 0.2, elbregKp = 0.025, elbregKi = 0, elbregKd = 0;
 
 /* USER CODE END PV */
 
@@ -113,7 +113,8 @@ int button_counter = 0;
 
 /*---------------------SERVO DECLARATIONS---------------------*/
 Pin dummy_pin;
-Pin SERVO_PWM_1(SERVO_PWM_1_GPIO_Port, SERVO_PWM_1_Pin, &htim1, TIM_CHANNEL_2);
+// Pin SERVO_PWM_1(SERVO_PWM_1_GPIO_Port, SERVO_PWM_1_Pin, &htim1, TIM_CHANNEL_2);
+Pin SERVO_PWM_1(CYTRON_PWM_1_GPIO_Port, CYTRON_PWM_1_Pin, &htim2, TIM_CHANNEL_2);
 RoverArmMotor Waist(&hspi1, SERVO_PWM_1, dummy_pin, AMT22_1, BLUE_ROBOTICS, 0, 359.99f);
 int is_turning = 0;
 
@@ -143,7 +144,7 @@ static void print_MOTOR(char *msg, RoverArmMotor *pMotor)
   double current_angle_sw;
   // int turn_count = pMotor->get_turn_count();
 
-  pMotor->get_current_angle_multi(&current_angle_multi);
+//  pMotor->get_current_angle_multi(&current_angle_multi);
   pMotor->get_current_angle_sw(&current_angle_sw);
 
   printf("%s setpoint %.2f, angle_sw %.2f, output %.2f, output_actual %.2f\r\n",
@@ -216,16 +217,16 @@ int main(void)
   HAL_Delay(500);
   Waist.wrist_waist = 1;
   Waist.begin(aggKp, aggKi, aggKd, regKp, regKi, regKd);
-  Waist.setAngleLimits(-359.99, 999999.99f); // TODO check good angle limits
+  Waist.setAngleLimits(-999999.99f, 999999.99f); // TODO check good angle limits
   Waist.reset_encoder();
   HAL_TIM_Base_Start_IT(&htim6);
 
   /*---CYTRON setup---*/
-  int32_t CH2_DC = 0;
-  Wrist_Roll.wrist_waist = 1;
-  Wrist_Roll.begin(aggKp, aggKi, aggKd, regKp, regKi, regKd);
-  Wrist_Roll.setGearRatio(2.672222f);
-  Wrist_Roll.setAngleLimits(-359.99, 359.99f); // TODO check good angle limits
+  // int32_t CH2_DC = 0;
+  // Wrist_Roll.wrist_waist = 1;
+  // Wrist_Roll.begin(aggKp, aggKi, aggKd, regKp, regKi, regKd);
+  // Wrist_Roll.setGearRatio(2.672222f);
+  // Wrist_Roll.setAngleLimits(-359.99, 359.99f); // TODO check good angle limits
 
   // __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 30);
   // while (!brakeSet)
@@ -328,6 +329,7 @@ int main(void)
     /*--------------------------------------SERVO direction test--------------------------------------*/
     // Waist.setpoint = 99999;  // to make sure turn in positive direction, should be CCW
     // print_MOTOR("SP Waist", &Waist);
+    print_MOTOR("SP Waist", &Waist);
     HAL_Delay(100);
     // __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 1600);
 
@@ -522,6 +524,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
       sscanf(rx_buffer, "%lf", &param1);
       Waist.newSetpoint(param1);
       printf("new Setpoint at %lf\r\n", param1);
+      // __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, (int)param1); // set servo output
     }
   }
   else if (rx_index == RX_BUFFER_SIZE - 1) // buffer is full
@@ -542,7 +545,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   if (htim == &htim6)
   {
     Waist.tick();
-    print_MOTOR("SP Waist", &Waist);
   }
 }
 /* USER CODE END 4 */

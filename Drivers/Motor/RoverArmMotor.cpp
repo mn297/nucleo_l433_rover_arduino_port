@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include "tim.h"
 #include <stdio.h>
+#include <inttypes.h>
 
 // TODO: Test this class with the old code, remember to create backup beforehand!
 // I'm very suspicious of the way I handled user defined pointers...
@@ -48,14 +49,7 @@ void RoverArmMotor::begin(double aggP, double aggI, double aggD, double regP, do
     /*------------------Initialize timers------------------*/
     HAL_TIM_PWM_Start(pwm.p_tim, pwm.tim_channel);
     HAL_Delay(500); // wait for the motor to start up
-    if (escType == CYTRON)
-    {
-        __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, 0); // stop motor
-    }
-    else if (escType == BLUE_ROBOTICS)
-    {
-        __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, 1500 - 1); // stop motor
-    }
+    this->stop();   // stop the motor
 
     /*------------------Initialize PID------------------*/
     if (escType == CYTRON)
@@ -64,7 +58,7 @@ void RoverArmMotor::begin(double aggP, double aggI, double aggD, double regP, do
     }
     else if (escType == BLUE_ROBOTICS)
     {
-        internalPIDInstance = new PID(0.01, 300.0, -300.0, regP, regD, regI);
+        internalPIDInstance = new PID(0.01, 350.0, -350.0, regP, regD, regI);
     }
 
     /*------------------Get setpoint------------------*/
@@ -74,6 +68,7 @@ void RoverArmMotor::begin(double aggP, double aggI, double aggD, double regP, do
     // after setup, currentAngle is same as setpoint
     int error = get_current_angle_sw(&currentAngle); // fix setpoint not equal to current angle
     setpoint = currentAngle;
+    lastAngle = currentAngle;
 
     /*------------------Set PID parameters------------------*/
     regularKp = regP;
@@ -100,24 +95,25 @@ double real_angle = 0;
 void RoverArmMotor::tick()
 { // worry about currentAngle and setpoint
 
+    this->stop(); // stop the motor
+
     /*------------------Get current angle------------------*/
     int error = get_current_angle_sw(&currentAngle);
     if (error == -1)
     {
         printf("ERROR: get_current_angle_sw() returned -1 from tick()\r\n");
-        if (escType == CYTRON)
-        {
-            __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, 0);
-            return;
-        }
-        else if (escType == BLUE_ROBOTICS)
-        {
-            __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, 1499);
-            return;
-        }
+        return;
+    }
+
+    //------------------remove jitter------------------//
+    // If the change in angle is less than the threshold, return early
+    if (abs(currentAngle - setpoint) < 2)
+    {
+        return;
     }
 
     input = currentAngle; // range is R line
+    lastAngle = currentAngle;
 
     //------------------Compute PID------------------//
     // Compute distance, retune PID if necessary. Less aggressive tuning params for small errors
@@ -141,8 +137,6 @@ void RoverArmMotor::tick()
     // else{
     //     gap = setpoint - input;
     // }
-
-    // Tone down P and I as the motor hones onto position
     output = internalPIDInstance->calculate(setpoint, input); // return value stored in output
 
     //------------------SAFETY------------------//
@@ -172,31 +166,54 @@ void RoverArmMotor::tick()
     {
 
         //------------------DEADBAND------------------//
-        // int deadband = 30;
-        // if (abs(output) <= deadband)
+        volatile double temp_output = output;
+        int deadband = 30;
+        if (abs(output) <= deadband)
+        {
+            temp_output = 0;
+        }
+        else
+        {
+            if (output > 0)
+            {
+                temp_output = (output + deadband / 2);
+            }
+            else
+            {
+                temp_output = (output - deadband / 2);
+            }
+        }
+        //TROLL
+        // if (output > 0)
         // {
-        //     output = 0;
+        //     temp_output = 50;
         // }
         // else
         // {
-        //     if (output > 0)
-        //     {
-        //         output = (output + deadband / 2);
-        //     }
-        //     else
-        //     {
-        //         output = (output - deadband / 2);
-        //     }
+        //     temp_output = -50;
         // }
-
-        double output_actual = 1500 - 1 + output;
-        __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, output_actual);
+        volatile double output_actual = 1500 - 1 + temp_output;
+        __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, (int)output_actual);
+        uint32_t compare_actual = __HAL_TIM_GET_COMPARE(pwm.p_tim, pwm.tim_channel);
+        printf("setpoint: %f, currentAngle: %f, lastAngle: %f ", setpoint, currentAngle, lastAngle);
+        printf("output_actual: %f, compare: ", output_actual);
+        printf("%" PRIu32 "\r\n", compare_actual);
     }
 }
 
 void RoverArmMotor::stop()
 {
-    __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, (int)0);
+//    output = 0;
+    if (escType == CYTRON)
+    {
+        __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, 0);
+        return;
+    }
+    else if (escType == BLUE_ROBOTICS)
+    {
+        __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, 1499);
+        return;
+    }
 }
 
 void RoverArmMotor::set_PID_params(double aggP, double aggI, double aggD, double regP, double regI, double regD)
@@ -318,7 +335,7 @@ int RoverArmMotor::get_current_angle_multi(double *angle)
     if (error == -1)
     {
         printf("ERROR: getTurnCounterSPI() returned -1 from get_current_angle_multi()\r\n");
-        return 0;
+        return -1;
     }
 
     double angle_raw = mapFloat((float)result_arr[0], MIN_ADC_VALUE, MAX_ADC_VALUE, 0, 359.99f); // mn297 potentiometer encoder
