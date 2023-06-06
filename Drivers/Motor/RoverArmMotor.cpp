@@ -174,14 +174,14 @@ void RoverArmMotor::tick()
         }
         else
         {
-            if (output > 0)
-            {
-                temp_output = (output + deadband / 2);
-            }
-            else
-            {
-                temp_output = (output - deadband / 2);
-            }
+            // if (output > 0)
+            // {
+            //     temp_output = (output + deadband / 2);
+            // }
+            // else
+            // {
+            //     temp_output = (output - deadband / 2);
+            // }
         }
         //TROLL
         // if (output > 0)

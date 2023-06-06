@@ -63,7 +63,7 @@
 
 // WAIST (SERVO)
 double aggKp = 0.6, aggKi = 0.1, aggKd = 0.01, elbaggKp = 0.025, elbaggKi = 0, elbaggKd = 0;
-double regKp = 0.8, regKi = 0.2, regKd = 0.2, elbregKp = 0.025, elbregKi = 0, elbregKd = 0;
+double regKp = 1.2, regKi = 0.4, regKd = 0.4, elbregKp = 0.025, elbregKi = 0, elbregKd = 0;
 
 /* USER CODE END PV */
 

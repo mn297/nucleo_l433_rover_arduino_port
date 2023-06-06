@@ -1,7 +1,7 @@
 RoverArmMotor.h:17:5:Pin::Pin()	1
 RoverArmMotor.cpp:25:1:RoverArmMotor::RoverArmMotor(SPI_HandleTypeDef*, Pin, Pin, Pin, int, double, double, Pin)	1
 RoverArmMotor.cpp:46:6:void RoverArmMotor::begin(double, double, double, double, double, double)	4
-RoverArmMotor.cpp:95:6:void RoverArmMotor::tick()	27
+RoverArmMotor.cpp:95:6:void RoverArmMotor::tick()	25
 RoverArmMotor.cpp:204:6:void RoverArmMotor::stop()	13
 RoverArmMotor.cpp:219:6:void RoverArmMotor::set_PID_params(double, double, double, double, double, double)	1
 RoverArmMotor.cpp:229:6:bool RoverArmMotor::setMultiplierBool(bool, double)	3
