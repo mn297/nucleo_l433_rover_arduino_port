@@ -5,6 +5,7 @@
 #include "tim.h"
 #include <stdio.h>
 #include <inttypes.h>
+#include <cmath>
 
 // TODO: Test this class with the old code, remember to create backup beforehand!
 // I'm very suspicious of the way I handled user defined pointers...
@@ -41,11 +42,12 @@ RoverArmMotor::RoverArmMotor(SPI_HandleTypeDef *spi_handle, Pin pwm_pin, Pin dir
     lastAngle = 0;
     useSwAngle = 1;    // default use software angle
     zero_angle_sw = 0; // default no offset
+    gearRatio = 1.0;   // default no multiplier
+    wrist_waist = false;
 }
 
-void RoverArmMotor::begin(double aggP, double aggI, double aggD, double regP, double regI, double regD)
+void RoverArmMotor::begin(double regP, double regI, double regD)
 {
-
     /*------------------Initialize timers------------------*/
     HAL_TIM_PWM_Start(pwm.p_tim, pwm.tim_channel);
     HAL_Delay(500); // wait for the motor to start up
@@ -74,18 +76,13 @@ void RoverArmMotor::begin(double aggP, double aggI, double aggD, double regP, do
     regularKp = regP;
     regularKi = regI;
     regularKd = regD;
-    aggressiveKp = aggP;
-    aggressiveKi = aggI;
-    aggressiveKd = aggD;
 
     // if(brake)  engageBrake(); //use brake if there is one
     if (limit_switch.valid != 0)
         engageBrake(); // use brake if there is one
 
-    // initialize the multiplier bool to false and the multiplier to 1.
-    wrist_waist = false;
-    // multiplier = 1;
-    gearRatio = 1; // TODO check if this is correct
+    /*------------------Set zero angle------------------*/
+    this->forward();
 }
 
 int positive_rezeros = 0;
@@ -101,14 +98,16 @@ void RoverArmMotor::tick()
     int error = get_current_angle_sw(&currentAngle);
     if (error == -1)
     {
+        output = 0;
         printf("ERROR: get_current_angle_sw() returned -1 from tick()\r\n");
         return;
     }
 
     //------------------remove jitter------------------//
     // If the change in angle is less than the threshold, return early
-    if (abs(currentAngle - setpoint) < 2)
+    if (abs(currentAngle - setpoint) < 0.5)
     {
+        output = 0;
         return;
     }
 
@@ -119,25 +118,41 @@ void RoverArmMotor::tick()
     // Compute distance, retune PID if necessary. Less aggressive tuning params for small errors
     // Find the shortest from the current position to the set point
 
-    // if(wrist_waist){
-    //     // (abs(setpoint-input) < abs((setpoint + 360.0f)-input)) ?
-    //     // gap = setpoint - input : gap = (setpoint + 360.0f) - input;
-
-    //     // if(abs(setpoint-input) < abs((setpoint + 360.0f)-input)) {
-    //     //     gap = setpoint - input;
-    //     // } else {
-    //     //     gap = (setpoint + 360.0f) - input;
-    //     // }
-    //     if(abs(setpoint-input) > abs((setpoint + 360.0f)-input)) { // TODO check if this is correct
-    //         gap = input - (setpoint + 360.0f);
-    //     } else {
-    //         gap = setpoint - input;
-    //     }
-    // }
-    // else{
-    //     gap = setpoint - input;
-    // }
-    output = internalPIDInstance->calculate(setpoint, input); // return value stored in output
+    if (wrist_waist)
+    {
+        forwardDistance = (setpoint > input) ? setpoint - input : (360 - input) + setpoint;
+        backwardDistance = (setpoint > input) ? (360 - setpoint) + input : input - setpoint;
+        if (backwardDistance < forwardDistance - 1.0) // handle hysterisis
+        {
+            if (setpoint > input)
+            {
+                output = internalPIDInstance->calculate(setpoint, input + 360); // buff it 360 to go backwards
+                printf("case 1\r\n");
+            }
+            else
+            {
+                output = internalPIDInstance->calculate(setpoint, input); // wrapped around so bigger so no need buff 360
+                printf("case 2\r\n");
+            }
+        }
+        else
+        {
+            if (setpoint > input)
+            {
+                output = internalPIDInstance->calculate(setpoint, input); //  wrapped around so bigger so no need nerf 360
+                printf("case 3\r\n");
+            }
+            else
+            {
+                output = internalPIDInstance->calculate(setpoint, input - 360); // nerf it 360 to go forwards
+                printf("case 4\r\n");
+            }
+        }
+    }
+    else
+    {
+        output = internalPIDInstance->calculate(setpoint, input); // return value stored in output
+    }
 
     //------------------SAFETY------------------//
     if (currentAngle >= (highestAngle - 2) || currentAngle <= (lowestAngle + 2))
@@ -183,15 +198,6 @@ void RoverArmMotor::tick()
             //     temp_output = (output - deadband / 2);
             // }
         }
-        //TROLL
-        // if (output > 0)
-        // {
-        //     temp_output = 50;
-        // }
-        // else
-        // {
-        //     temp_output = -50;
-        // }
         volatile double output_actual = 1500 - 1 + temp_output;
         __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, (int)output_actual);
         uint32_t compare_actual = __HAL_TIM_GET_COMPARE(pwm.p_tim, pwm.tim_channel);
@@ -201,9 +207,46 @@ void RoverArmMotor::tick()
     }
 }
 
+int RoverArmMotor::forward(int percentage_speed)
+{
+    if (percentage_speed < 0 || percentage_speed > 100)
+    {
+        return -1;
+    }
+    if (escType == CYTRON)
+    {
+        HAL_GPIO_WritePin(dir.port, dir.pin, GPIO_PIN_SET); // B high
+        __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, percentage_speed);
+        return 0;
+    }
+    else if (escType == BLUE_ROBOTICS)
+    {
+        __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, 1499 + 350 * percentage_speed / 100);
+        return 0;
+    }
+}
+
+int RoverArmMotor::reverse(int percentage_speed)
+{
+    if (percentage_speed < 0 || percentage_speed > 100)
+    {
+        return -1;
+    }
+    if (escType == CYTRON)
+    {
+        HAL_GPIO_WritePin(dir.port, dir.pin, GPIO_PIN_RESET); // A high
+        __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, percentage_speed);
+        return 0;
+    }
+    else if (escType == BLUE_ROBOTICS)
+    {
+        __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, 1499 - 350 * percentage_speed / 100);
+        return 0;
+    }
+}
+
 void RoverArmMotor::stop()
 {
-//    output = 0;
     if (escType == CYTRON)
     {
         __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, 0);
@@ -216,14 +259,12 @@ void RoverArmMotor::stop()
     }
 }
 
-void RoverArmMotor::set_PID_params(double aggP, double aggI, double aggD, double regP, double regI, double regD)
+// Useless at the moment.
+void RoverArmMotor::set_PID_params(double regP, double regI, double regD)
 {
     regularKp = regP;
     regularKi = regI;
     regularKd = regD;
-    aggressiveKp = aggP;
-    aggressiveKi = aggI;
-    aggressiveKd = aggD;
 }
 
 bool RoverArmMotor::setMultiplierBool(bool mult, double ratio)
@@ -298,7 +339,6 @@ void RoverArmMotor::disengageBrake()
 {
     if (limit_switch.valid != 0)
     {
-        //   digitalWrite(brake, LOW);
         HAL_GPIO_WritePin(limit_switch.port, limit_switch.pin, GPIO_PIN_RESET); // mn297
     }
 }
@@ -307,7 +347,6 @@ void RoverArmMotor::engageBrake()
 {
     if (limit_switch.valid != 0)
     {
-        //    digitalWrite(brake, HIGH);
         HAL_GPIO_WritePin(limit_switch.port, limit_switch.pin, GPIO_PIN_SET); // mn297
     }
 }
@@ -356,7 +395,21 @@ int RoverArmMotor::get_current_angle_sw(double *angle)
     }
 
     double diff = current_angle_multi - zero_angle_sw;
-    *angle = diff;
+    if (wrist_waist) // TODO optimize
+    {
+        double temp;
+        temp = std::fmod(diff, (360 * gearRatio));
+        if (temp < 0)
+        {
+            temp += (360 * gearRatio);
+        }
+        *angle = temp;
+        // printf("diff: %f, angle: %f\r\n", diff, *angle);
+    }
+    else
+    {
+        *angle = diff;
+    }
 
     return 0; // return 0 on success
 }

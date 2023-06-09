@@ -38,7 +38,7 @@ public:
                   int esc_type, double minimum_angle, double maximum_angle, Pin limit_switch_pin = Pin());
 
     // Setters for various tunable parameters of our motors
-    void set_PID_params(double aggP, double aggI, double aggD, double regP, double regI, double regD); // mn297
+    void set_PID_params(double regP, double regI, double regD); // mn297
 
     void setAggressiveCoefficients(double P, double I, double D);
     void setRegularCoefficients(double P, double I, double D);
@@ -67,8 +67,10 @@ public:
     double getRatio();
     // void setGearRatio(double ratio);
 
-    void begin(double aggP, double aggI, double aggD, double regP, double regI, double regD);
+    void begin(double regP, double regI, double regD);
     void tick();
+    int forward(int percentage_speed = 25);
+    int reverse(int percentage_speed = 25);
     void stop();
     void setGearRatio(double ratio);
     int get_turn_count(); // mn297
@@ -78,7 +80,7 @@ public: // TESTING only
     // Default to open loop, will need to enter the coefficients to begin
     PID *internalPIDInstance;
 
-    double aggressiveKp, aggressiveKi, aggressiveKd, regularKp, regularKi, regularKd;
+    double regularKp, regularKi, regularKd;
     // PINS
     Pin pwm, dir, encoder, limit_switch;
     SPI_HandleTypeDef *spi; // encoder spi handle
@@ -100,6 +102,8 @@ public: // TESTING only
     double zero_angle_sw; // mn297
     int turn_count;       // mn297
     int servo_dir;        // mn297
+    double forwardDistance;
+    double backwardDistance;
 
     enum ActuationStates
     {

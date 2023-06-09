@@ -34,7 +34,6 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <bitset>
-#include <limits>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -59,13 +58,12 @@
 // double regKp=1, regKi=0.01, regKd=0.0, elbregKp=0.025, elbregKi=0,  elbregKd=0;  // PI for CYTRON
 
 // WRIST (DC)
-// double regKp_wrist = 0.4, regKi_wrist = 0.0, regKd_wrist = 0.0;
-
-// WRIST_TESTBENCH (DC)
-double regKp_wrist = 0.6, regKi_wrist = 0.2, regKd_wrist = 0.1;
+//  double aggKp = 0.6, aggKi = 0.1, aggKd = 0.01, elbaggKp = 0.025, elbaggKi = 0, elbaggKd = 0;
+//  double regKp = 0.4, regKi = 0.0, regKd = 0.0, elbregKp = 0.025, elbregKi = 0, elbregKd = 0;
 
 // WAIST (SERVO)
-double regKp_waist = 1.2, regKi_waist = 0.4, regKd_waist = 0.4;
+double aggKp = 0.6, aggKi = 0.1, aggKd = 0.01, elbaggKp = 0.025, elbaggKi = 0, elbaggKd = 0;
+double regKp = 1.2, regKi = 0.4, regKd = 0.4, elbregKp = 0.025, elbregKi = 0, elbregKd = 0;
 
 /* USER CODE END PV */
 
@@ -106,7 +104,7 @@ void delay_us(uint16_t us)
 /*---------------------CYTRON DECLARATIONS---------------------*/
 double setpoint = 0;
 int turn = 0;
-int limit_set = 0;
+int brakeSet = 0;
 Pin CYTRON_DIR_1(CYTRON_DIR_1_GPIO_Port, CYTRON_DIR_1_Pin);
 Pin CYTRON_PWM_1(CYTRON_PWM_1_GPIO_Port, CYTRON_PWM_1_Pin, &htim2, TIM_CHANNEL_2);
 Pin AMT22_1(GPIOC, GPIO_PIN_7);
@@ -120,16 +118,41 @@ Pin SERVO_PWM_1(CYTRON_PWM_1_GPIO_Port, CYTRON_PWM_1_Pin, &htim2, TIM_CHANNEL_2)
 RoverArmMotor Waist(&hspi1, SERVO_PWM_1, dummy_pin, AMT22_1, BLUE_ROBOTICS, 0, 359.99f);
 int is_turning = 0;
 
+/*---------------------HELPER---------------------*/
+// static void print_MOTOR(char *msg, RoverArmMotor *pMotor)
+// {
+//   double current_angle = pMotor->get_current_angle();
+//   double current_angle_multi = pMotor->get_current_angle_multi();
+//   double current_angle_sw = pMotor->get_current_angle_sw();
+//   int turn_count = pMotor->get_turn_count();
+//   printf("%s turn_count %d, setpoint %.2f, angle_sw %.2f, zero_sw %.2f, angle_raw_multi %.2f, angle_raw %.2f, _outputSum %.2f, output_specific %.2f, output_raw %.2f\r\n",
+//          msg,
+//          turn_count,
+//          pMotor->setpoint,
+//          current_angle_sw,
+//          pMotor->zero_angle_sw,
+//          current_angle_multi,
+//          current_angle,
+//          pMotor->internalPIDInstance._outputSum,
+//          (*(pMotor->internalPIDInstance._myOutput)) + 1500.0 - 1.0,
+//         pMotor->output);
+// }
+
 static void print_MOTOR(char *msg, RoverArmMotor *pMotor)
 {
   double current_angle_multi;
   double current_angle_sw;
+  // int turn_count = pMotor->get_turn_count();
+
+//  pMotor->get_current_angle_multi(&current_angle_multi);
   pMotor->get_current_angle_sw(&current_angle_sw);
-  printf("%s setpoint %.2f, angle_sw %.2f, output %.2f\r\n",
+
+  printf("%s setpoint %.2f, angle_sw %.2f, output %.2f, output_actual %.2f\r\n",
          msg,
-         pMotor->setpoint / pMotor->gearRatio,
-         current_angle_sw / pMotor->gearRatio,
-         pMotor->output);
+         pMotor->setpoint,
+         current_angle_sw,
+         pMotor->output,
+         pMotor->output + 1500 - 1);
 }
 
 /*---------------------UART---------------------*/
@@ -186,24 +209,31 @@ int main(void)
   uint16_t encoder_min = 4100;
   HAL_TIM_Base_Start(&htim1);
 
-  /*---WAIST_SERVO setup---*/
-  // Waist.wrist_waist = 1;
-  // Waist.begin(regKp_waist, regKi_waist, regKd_waist);
-  // Waist.setAngleLimits(-999999.99f, 999999.99f); // TODO check good angle limits
-  // Waist.reset_encoder();
-  // HAL_TIM_Base_Start_IT(&htim6);
+  /*---AMT22 setup---*/
+  // resetAMT22(&hspi1, GPIOC, GPIO_PIN_7, &htim1);
 
-  /*---WRIST_CYTRON setup---*/
-  int32_t CH2_DC = 0;
-  Wrist_Roll.wrist_waist = 1;
-  Wrist_Roll.setGearRatio(2.672222f);
-  Wrist_Roll.setGearRatio(1);
-  // Wrist_Roll.setAngleLimits(-359.99f, 359.99f);
-  Wrist_Roll.setAngleLimits(-std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity());
-  Wrist_Roll.begin(regKp_wrist, regKi_wrist, regKd_wrist);
-  while (!limit_set)
-    ;
+  /*---SERVO setup---*/
+  int32_t CH2_ESC = 1500 - 1;
+  HAL_Delay(500);
+  Waist.wrist_waist = 1;
+  Waist.begin(aggKp, aggKi, aggKd, regKp, regKi, regKd);
+  Waist.setAngleLimits(-999999.99f, 999999.99f); // TODO check good angle limits
+  Waist.reset_encoder();
   HAL_TIM_Base_Start_IT(&htim6);
+
+  /*---CYTRON setup---*/
+  // int32_t CH2_DC = 0;
+  // Wrist_Roll.wrist_waist = 1;
+  // Wrist_Roll.begin(aggKp, aggKi, aggKd, regKp, regKi, regKd);
+  // Wrist_Roll.setGearRatio(2.672222f);
+  // Wrist_Roll.setAngleLimits(-359.99, 359.99f); // TODO check good angle limits
+
+  // __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 30);
+  // while (!brakeSet)
+  // {
+  //   print_MOTOR("BRAKE", &Waist);
+  // }
+  // __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
 
   /*---UART setup---*/
   HAL_UART_Receive_IT(&huart2, rx_data, 1);
@@ -214,10 +244,173 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    print_MOTOR("SP Wrist_Roll", &Wrist_Roll);
-    printf("forwardDistance: %f, backwardDistance: %f\r\n", Wrist_Roll.forwardDistance, Wrist_Roll.backwardDistance);
+    /*--------------------------------------FREE DEBUG--------------------------------------*/
+    // print_MOTOR("Wrist_Roll", &Waist);
+    // print_MOTOR("Wrist_Roll", &Wrist_Roll);
+    // HAL_Delay(100);
 
+    /*--------------------------------------AMT22 test--------------------------------------*/
+    // encoderData_1 = getPositionSPI(&hspi1, GPIOC, GPIO_PIN_7, 12, &htim1);
+    // encoderData_2 = getPositionSPI(&hspi2, GPIOB, GPIO_PIN_6, 12, &htim1);
+    // encoderData_3 = getPositionSPI(&hspi3, GPIOA, GPIO_PIN_8, 12, &htim1);
+    // printf("encoder 1 gives %d\r\n", encoderData_1);
+    // printf("encoder 2 gives %d\r\n", encoderData_2);
+    // printf("encoder 3 gives %d\r\n", encoderData_3);
+    // // int16_t* turn_count = (int16_t*)malloc(2*sizeof(int16_t));
+
+    // int16_t turn_count[2];
+    // int turn_count_WR = Wrist_Roll.get_turn_count();
+    // getTurnCounterSPI(turn_count, &hspi1, GPIOC, GPIO_PIN_7, 12, &htim1);
+    // printf("turn_count_WR is %d count is %d and %d\r\n", turn_count_WR, turn_count[0], turn_count[1]);
+    // std::bitset<16> y(turn_count[1]);
+    // printf("%s\r\n", y.to_string().c_str());
+    // HAL_Delay(100);
+
+    /*--------------------------------------SPI test--------------------------------------*/
+    // uint8_t sendByte = 0x00;
+    // uint8_t data = 0x00;
+    // int err = HAL_SPI_TransmitReceive(&hspi1, &sendByte, &data, 1, 10);
+    // uint8_t data2 = 0x00;
+
+    /*--------------------------------------CYTRON test--------------------------------------*/
+    // printf("0\r\n");
+    // __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
+    // HAL_Delay(1000);
+
+    // printf("20\r\n");
+    // __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 20);
+    // HAL_Delay(1000);
+
+    // printf("60\r\n");
+    // __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 60);
+    // HAL_Delay(1000);
+    // current_angle = Wrist_Roll.get_current_angle();
+    // printf("current angle is %f\r\n, current_angle");
+    // HAL_Delay(50);
+    // Wrist_Roll.newSetpoint(current_angle + 10);
+    // Wrist_Roll.tick();
+    // HAL_Delay(1); // safety delay
+
+    /*--------------------------------------CYTRON print--------------------------------------*/
+    // current_angle = Wrist_Roll.get_current_angle();
+    // current_angle_sw = Wrist_Roll.get_current_angle_sw();
+    // setpoint = Wrist_Roll.getSetpoint();
+    // printf("current angle: %f, setpoint: %f, current_angle_sw: %f\r\n", current_angle, setpoint, current_angle_sw);
+
+    /*--------------------------------------CYTRON angle limit test--------------------------------------*/
+    // high first because we just set zero
+    // Wrist_Roll.newSetpoint(Wrist_Roll.highestAngle);
+    // while(!(Wrist_Roll.get_current_angle_sw() >= Wrist_Roll.highestAngle - 2.0)) {
+    //     print_MOTOR("UP");
+    //     Wrist_Roll.tick();
+    // }
+    // Wrist_Roll.stop();
+
+    // Wrist_Roll.newSetpoint(Wrist_Roll.lowestAngle);
+    // while(!(Wrist_Roll.get_current_angle_sw() <= Wrist_Roll.lowestAngle + 2.0)) {
+    //     print_MOTOR("DOWN");
+    //     Wrist_Roll.tick();
+    // }
+    // Wrist_Roll.stop();
+
+    /*--------------------------------------CYTRON setpoint test--------------------------------------*/
+    // print_MOTOR("SP Wrist_Roll", &Wrist_Roll);
+    // Wrist_Roll.tick();
+
+    /*--------------------------------------SERVO setpoint test--------------------------------------*/
+    // print_MOTOR("SP Waist", &Waist);
+    // Waist.tick();
+
+    /*--------------------------------------CYTRON direction test--------------------------------------*/
+    // Wrist_Roll.setpoint = 99999;  // to make sure turn in positive direction, should be CCW
+    // print_MOTOR("SP Wrist_Roll", &Wrist_Roll);
+    // Wrist_Roll.tick();
+
+    /*--------------------------------------SERVO direction test--------------------------------------*/
+    // Waist.setpoint = 99999;  // to make sure turn in positive direction, should be CCW
+    // print_MOTOR("SP Waist", &Waist);
+    print_MOTOR("SP Waist", &Waist);
     HAL_Delay(100);
+    // __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 1600);
+
+    /*--------------------------------------UART test loop--------------------------------------*/
+    // HAL_UART_Receive(&huart2, rx_buffer, 4, 2000);
+    // double kP, kI, kD;
+    // char buffer[50];
+    // sprintf(buffer, "0.1 0.2 0.3"); // Example string with three float values separated by spaces
+    // sscanf(buffer, "%lf %lf %lf", &kP, &kI, &kD); // Parse the float values
+    // printf("kP: %lf, kI: %lf, kD: %lf\r\n", kP, kI, kD); // Print the float values
+
+    //  HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_13);
+    //  HAL_Delay(200);
+
+    /*--------------------------------------ESC test--------------------------------------*/
+    // print_MOTOR("WAIST", &Waist);
+    // printf("%d\r\n", is_turning);
+    // __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 1500 - 1);
+    // printf("1500\r\n");
+    // HAL_Delay(2000);
+    // __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 1550);
+    // printf("1550\r\n");
+    // HAL_Delay(2000);
+    // HAL_Delay(1000);
+    // __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 1500-1);
+    // HAL_Delay(1000);
+    // __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 1450-1);
+    // printf("1450\r\n");
+
+    /*--------------------------------------ESC sweep test--------------------------------------*/
+    // while(CH2_ESC < 1600)
+    // {
+    //     // TIM2->CCR2 = CH2_DC;
+    //   CH2_ESC += 1;
+    // 	printf("current CH2_DC %d\r\n", CH2_ESC);
+    //   __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, CH2_ESC); //this is the same as above
+    //   HAL_Delay(50);
+    // }
+    // while(CH2_ESC > 1540)
+    // {
+    //     // TIM2->CCR2 = CH2_DC;
+    //   CH2_ESC -= 1;
+    // 	printf("current CH2_DC %d\r\n", CH2_ESC);
+    //   __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, CH2_ESC); //this is the same as above
+    //   HAL_Delay(50);
+    // }
+
+    // LEGACY CODE
+    //  if(encoderData_3 > encoder_max && encoderData_3 != 65535) encoder_max = encoderData_3;
+    //  if(encoderData_3 < encoder_min && encoderData_3 != 65535) encoder_min = encoderData_3;
+    //  printf("encoder_max is %d\r\n", encoder_max);
+    //  printf("encoder_min is %d\r\n", encoder_min);
+
+    // PWM test
+    //  while(CH2_DC < 65535)
+    //  {
+    //      // TIM2->CCR2 = CH2_DC;
+    //  	printf("current CH2_DC %d\r\n", CH2_DC);
+    //      __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, CH2_DC); //this is the same as above
+    //      CH2_DC += 70;
+    //      HAL_Delay(10);
+    //  }
+    //  while(CH2_DC > 0)
+    //  {
+    //      // TIM2->CCR2 = CH2_DC;
+    //  	printf("current CH2_DC %d\r\n", CH2_DC);
+    //      __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, CH2_DC); //this is the same as above
+    //      CH2_DC -= 70;
+    //      HAL_Delay(10);
+    //  }
+
+    // TIMER TEST
+    //  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_SET);
+    //  HAL_Delay(1000);
+    //  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_RESET);
+    //  HAL_Delay(1000);
+
+    // TIMER US TEST
+    //	   HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_15);
+    //	   delay_us(3);
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -277,19 +470,20 @@ void SystemClock_Config(void)
 // External Interrupt ISR Handler CallBackFun
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-  // if(!limit_set) {
+  // if(!brakeSet) {
   if (GPIO_Pin == B1_Pin) // INT Source is pin A9
   {
     is_turning = !is_turning;
 
-    Wrist_Roll.stop();
     Wrist_Roll.set_zero_angle_sw();
+    Waist.set_zero_angle_sw();
+    HAL_Delay(10);
     Wrist_Roll.newSetpoint(0.0); // TODO check this?
-
-    limit_set = 1;
+    Waist.newSetpoint(0.0);      // TODO check this?
+    brakeSet = 1;
+    button_counter++;
+    return;
   }
-  button_counter++;
-  return;
   // }
 }
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
@@ -328,11 +522,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
       //---------------------FLOAT---------------------//
       sscanf(rx_buffer, "%lf", &param1);
-      bool is_sp_valid = Wrist_Roll.newSetpoint(param1);
-      if (is_sp_valid)
-        printf("new Setpoint at %lf\r\n", param1);
-      else
-        printf("invalid Setpoint %lf\r\n", param1);
+      Waist.newSetpoint(param1);
+      printf("new Setpoint at %lf\r\n", param1);
       // __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, (int)param1); // set servo output
     }
   }
@@ -353,8 +544,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   // Check which version of the timer triggered this callback and toggle LED
   if (htim == &htim6)
   {
-    // Wrist_Roll.forward();
-    Wrist_Roll.tick();
+    Waist.tick();
   }
 }
 /* USER CODE END 4 */
