@@ -127,12 +127,10 @@ void RoverArmMotor::tick()
             if (setpoint > input)
             {
                 output = internalPIDInstance->calculate(setpoint, input + 360); // buff it 360 to go backwards
-                printf("case 1\r\n");
             }
             else
             {
                 output = internalPIDInstance->calculate(setpoint, input); // wrapped around so bigger so no need buff 360
-                printf("case 2\r\n");
             }
         }
         else
@@ -140,12 +138,10 @@ void RoverArmMotor::tick()
             if (setpoint > input)
             {
                 output = internalPIDInstance->calculate(setpoint, input); //  wrapped around so bigger so no need nerf 360
-                printf("case 3\r\n");
             }
             else
             {
                 output = internalPIDInstance->calculate(setpoint, input - 360); // nerf it 360 to go forwards
-                printf("case 4\r\n");
             }
         }
     }
@@ -286,6 +282,14 @@ double RoverArmMotor::getSetpoint()
 bool RoverArmMotor::newSetpoint(double angle)
 {
     double setpoint_test = angle * gearRatio;
+    if (wrist_waist)
+    {
+        setpoint_test = std::fmod(setpoint_test, 360 * gearRatio);
+        if (setpoint_test < 0)
+        {
+            setpoint_test += (360 * gearRatio);
+        }
+    }
     if (setpoint_test >= lowestAngle && setpoint_test <= highestAngle)
     {
         setpoint = setpoint_test;
