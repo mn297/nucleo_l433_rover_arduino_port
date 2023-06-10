@@ -50,8 +50,10 @@ void RoverArmMotor::begin(double regP, double regI, double regD)
 {
     /*------------------Initialize timers------------------*/
     HAL_TIM_PWM_Start(pwm.p_tim, pwm.tim_channel);
-    HAL_Delay(500); // wait for the motor to start up
-    this->stop();   // stop the motor
+    HAL_Delay(1000); // wait for the motor to start up
+    this->stop();    // stop the motor
+    HAL_Delay(100);  // wait for the motor to start up
+    this->stop();    // stop the motor
 
     /*------------------Initialize PID------------------*/
     if (escType == CYTRON)
@@ -81,8 +83,11 @@ void RoverArmMotor::begin(double regP, double regI, double regD)
     if (limit_switch.valid != 0)
         engageBrake(); // use brake if there is one
 
-    /*------------------Set zero angle------------------*/
-    this->forward();
+    /*------------------Reverse to hit zero angle------------------*/
+    HAL_Delay(1000); // wait for the motor to start up
+    this->reverse();
+    HAL_Delay(500); // wait for the motor to start up
+    this->reverse();
 }
 
 int positive_rezeros = 0;
@@ -92,13 +97,14 @@ double real_angle = 0;
 void RoverArmMotor::tick()
 { // worry about currentAngle and setpoint
 
-    this->stop(); // stop the motor
+    // this->stop(); // stop the motor
 
     /*------------------Get current angle------------------*/
     int error = get_current_angle_sw(&currentAngle);
     if (error == -1)
     {
         output = 0;
+        this->stop(); // stop the motor
         printf("ERROR: get_current_angle_sw() returned -1 from tick()\r\n");
         return;
     }
@@ -108,6 +114,7 @@ void RoverArmMotor::tick()
     if (abs(currentAngle - setpoint) < 0.5)
     {
         output = 0;
+        this->stop(); // stop the motor
         return;
     }
 

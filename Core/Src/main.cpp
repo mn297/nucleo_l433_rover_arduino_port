@@ -44,6 +44,8 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define MIN_FLOAT -std::numeric_limits<float>::infinity()
+#define MAX_FLOAT std::numeric_limits<float>::infinity()
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -65,7 +67,9 @@
 double regKp_wrist = 0.6, regKi_wrist = 0.2, regKd_wrist = 0.1;
 
 // WAIST (SERVO)
-double regKp_waist = 1.2, regKi_waist = 0.4, regKd_waist = 0.4;
+// double regKp_waist = 1.2, regKi_waist = 0.4, regKd_waist = 0.4; // Sam's configuration
+double regKp_waist = 0.6, regKi_waist = 0.2, regKd_waist = 0.1; // Vincent's configuration
+// double regKp_waist = 2, regKi_waist = 0.4, regKd_waist = 0.4;  // Speed configuration
 
 /* USER CODE END PV */
 
@@ -103,10 +107,12 @@ void delay_us(uint16_t us)
     ; // wait for the counter to reach the us input in the parameter
 }
 
-/*---------------------CYTRON DECLARATIONS---------------------*/
+Pin dummy_pin;
 double setpoint = 0;
 int turn = 0;
 int limit_set = 0;
+
+/*---------------------CYTRON DECLARATIONS---------------------*/
 Pin CYTRON_DIR_1(CYTRON_DIR_1_GPIO_Port, CYTRON_DIR_1_Pin);
 Pin CYTRON_PWM_1(CYTRON_PWM_1_GPIO_Port, CYTRON_PWM_1_Pin, &htim2, TIM_CHANNEL_2);
 Pin AMT22_1(GPIOC, GPIO_PIN_7);
@@ -114,7 +120,6 @@ RoverArmMotor Wrist_Roll(&hspi1, CYTRON_PWM_1, CYTRON_DIR_1, AMT22_1, CYTRON, 0,
 int button_counter = 0;
 
 /*---------------------SERVO DECLARATIONS---------------------*/
-Pin dummy_pin;
 // Pin SERVO_PWM_1(SERVO_PWM_1_GPIO_Port, SERVO_PWM_1_Pin, &htim1, TIM_CHANNEL_2);
 Pin SERVO_PWM_1(CYTRON_PWM_1_GPIO_Port, CYTRON_PWM_1_Pin, &htim2, TIM_CHANNEL_2);
 RoverArmMotor Waist(&hspi1, SERVO_PWM_1, dummy_pin, AMT22_1, BLUE_ROBOTICS, 0, 359.99f);
@@ -187,22 +192,22 @@ int main(void)
   HAL_TIM_Base_Start(&htim1);
 
   /*---WAIST_SERVO setup---*/
-  // Waist.wrist_waist = 1;
-  // Waist.begin(regKp_waist, regKi_waist, regKd_waist);
-  // Waist.setAngleLimits(-999999.99f, 999999.99f); // TODO check good angle limits
-  // Waist.reset_encoder();
-  // HAL_TIM_Base_Start_IT(&htim6);
+  Waist.wrist_waist = 1;
+  Waist.setAngleLimits(MIN_FLOAT, MAX_FLOAT);
+  Waist.reset_encoder();
+  Waist.begin(regKp_waist, regKi_waist, regKd_waist);
 
   /*---WRIST_CYTRON setup---*/
-  int32_t CH2_DC = 0;
-  Wrist_Roll.wrist_waist = 1;
-  Wrist_Roll.setGearRatio(2.672222f);
-  Wrist_Roll.setGearRatio(1);
-  // Wrist_Roll.setAngleLimits(-359.99f, 359.99f);
-  Wrist_Roll.setAngleLimits(-std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity());
-  Wrist_Roll.begin(regKp_wrist, regKi_wrist, regKd_wrist);
+  // int32_t CH2_DC = 0;
+  // Wrist_Roll.wrist_waist = 1;
+  // Wrist_Roll.setGearRatio(2.672222f);
+  // Wrist_Roll.setGearRatio(1);
+  // // Wrist_Roll.setAngleLimits(-359.99f, 359.99f);
+  // Wrist_Roll.setAngleLimits(MIN_FLOAT, MAX_FLOAT);
+  // Wrist_Roll.begin(regKp_wrist, regKi_wrist, regKd_wrist);
   while (!limit_set)
     ;
+
   HAL_TIM_Base_Start_IT(&htim6);
 
   /*---UART setup---*/
@@ -214,8 +219,11 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    print_MOTOR("SP Wrist_Roll", &Wrist_Roll);
-    printf("forwardDistance: %f, backwardDistance: %f\r\n", Wrist_Roll.forwardDistance, Wrist_Roll.backwardDistance);
+    print_MOTOR("SP Waist", &Waist);
+    printf("forwardDistance: %f, backwardDistance: %f\r\n", Waist.forwardDistance, Waist.backwardDistance);
+
+    // print_MOTOR("SP Wrist", &Wrist_Roll);
+    // printf("forwardDistance: %f, backwardDistance: %f\r\n", Wrist_Roll.forwardDistance, Wrist_Roll.backwardDistance);
 
     HAL_Delay(100);
     /* USER CODE END WHILE */
@@ -278,13 +286,17 @@ void SystemClock_Config(void)
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
   // if(!limit_set) {
-  if (GPIO_Pin == B1_Pin) // INT Source is pin A9
+  if (GPIO_Pin == B1_Pin && HAL_GPIO_ReadPin(B1_GPIO_Port, B1_Pin) == GPIO_PIN_RESET) // INT Source is pin A9
   {
     is_turning = !is_turning;
 
     Wrist_Roll.stop();
     Wrist_Roll.set_zero_angle_sw();
-    Wrist_Roll.newSetpoint(0.0); // TODO check this?
+    Wrist_Roll.newSetpoint(0.0);
+
+    Waist.stop();
+    Waist.set_zero_angle_sw();
+    Waist.newSetpoint(0.0);
 
     limit_set = 1;
   }
@@ -328,7 +340,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
       //---------------------FLOAT---------------------//
       sscanf(rx_buffer, "%lf", &param1);
-      bool is_sp_valid = Wrist_Roll.newSetpoint(param1);
+      bool is_sp_valid = Waist.newSetpoint(param1);
       if (is_sp_valid)
         printf("new Setpoint at %lf\r\n", param1);
       else
@@ -353,8 +365,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   // Check which version of the timer triggered this callback and toggle LED
   if (htim == &htim6)
   {
-    // Wrist_Roll.forward();
-    Wrist_Roll.tick();
+    //    Wrist_Roll.tick();
+    Waist.tick();
   }
 }
 /* USER CODE END 4 */
