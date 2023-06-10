@@ -44,8 +44,10 @@ public:
     void setRegularCoefficients(double P, double I, double D);
     void setRetuningGapLimit(int gap);
     void setAngleLimits(double lowest_angle, double highest_angle);
-    void set_zero_angle();        // mn297
-    void set_zero_angle_sw();     // mn297 software zero angle
+    void set_zero_angle();    // unused
+    void set_zero_angle_sw(); // mn297 software zero angle
+    void set_max_angle_sw();
+
     uint32_t get_turns_encoder(); // mn297
     void reset_encoder();         // mn297
     bool setMultiplierBool(bool mult, double ratio);

@@ -74,6 +74,9 @@ void Error_Handler(void);
 #define SMPS_PG_GPIO_Port GPIOA
 #define SMPS_SW_Pin GPIO_PIN_7
 #define SMPS_SW_GPIO_Port GPIOA
+#define LIMIT_WRIST_PITCH_MIN_Pin GPIO_PIN_10
+#define LIMIT_WRIST_PITCH_MIN_GPIO_Port GPIOB
+#define LIMIT_WRIST_PITCH_MIN_EXTI_IRQn EXTI15_10_IRQn
 #define SPI1_CS_Pin GPIO_PIN_7
 #define SPI1_CS_GPIO_Port GPIOC
 #define SPI3_CS_D9_Pin GPIO_PIN_8
@@ -84,6 +87,9 @@ void Error_Handler(void);
 #define TMS_GPIO_Port GPIOA
 #define TCK_Pin GPIO_PIN_14
 #define TCK_GPIO_Port GPIOA
+#define LIMIT_WRIST_PITCH_MAX_Pin GPIO_PIN_15
+#define LIMIT_WRIST_PITCH_MAX_GPIO_Port GPIOA
+#define LIMIT_WRIST_PITCH_MAX_EXTI_IRQn EXTI15_10_IRQn
 #define CYTRON_PWM_1_Pin GPIO_PIN_3
 #define CYTRON_PWM_1_GPIO_Port GPIOB
 #define CYTRON_DIR_1_Pin GPIO_PIN_5

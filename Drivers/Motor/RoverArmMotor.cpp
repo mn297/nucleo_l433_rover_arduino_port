@@ -340,6 +340,13 @@ void RoverArmMotor::set_zero_angle_sw()
     this->get_current_angle_multi(&zero_angle_sw);
 }
 
+void RoverArmMotor::set_max_angle_sw()
+{
+    double temp = 0;
+    this->get_current_angle_multi(&temp);
+    zero_angle_sw = temp - highestAngle;
+}
+
 uint32_t RoverArmMotor::get_turns_encoder()
 { // mn297
     uint32_t turns = get_turns_AMT22(spi, encoder.port, encoder.pin, 12, nullptr);
