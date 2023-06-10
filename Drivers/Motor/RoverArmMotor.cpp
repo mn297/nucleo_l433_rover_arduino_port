@@ -58,11 +58,11 @@ void RoverArmMotor::begin(double regP, double regI, double regD)
     /*------------------Initialize PID------------------*/
     if (escType == CYTRON)
     {
-        internalPIDInstance = new PID(0.01, 99.0, -99.0, regP, regD, regI);
+        internalPIDInstance = new PID(0.005, 99.0, -99.0, regP, regD, regI);
     }
     else if (escType == BLUE_ROBOTICS)
     {
-        internalPIDInstance = new PID(0.01, 350.0, -350.0, regP, regD, regI);
+        internalPIDInstance = new PID(0.005, 350.0, -350.0, regP, regD, regI);
     }
 
     /*------------------Get setpoint------------------*/
@@ -158,8 +158,8 @@ void RoverArmMotor::tick()
     }
 
     //------------------SAFETY------------------//
-    if (currentAngle >= (highestAngle - 2) || currentAngle <= (lowestAngle + 2))
-        output = 0.0;
+//    if (currentAngle >= (highestAngle - 2) || currentAngle <= (lowestAngle + 2))
+//        output = 0.0;
 
     //------------------Write to motor------------------//
     if (escType == CYTRON)
@@ -185,7 +185,7 @@ void RoverArmMotor::tick()
 
         //------------------DEADBAND------------------//
         volatile double temp_output = output;
-        int deadband = 30;
+        int deadband = 10;
         if (abs(output) <= deadband)
         {
             temp_output = 0;
@@ -203,10 +203,10 @@ void RoverArmMotor::tick()
         }
         volatile double output_actual = 1500 - 1 + temp_output;
         __HAL_TIM_SET_COMPARE(pwm.p_tim, pwm.tim_channel, (int)output_actual);
-        uint32_t compare_actual = __HAL_TIM_GET_COMPARE(pwm.p_tim, pwm.tim_channel);
-        printf("setpoint: %f, currentAngle: %f, lastAngle: %f ", setpoint, currentAngle, lastAngle);
-        printf("output_actual: %f, compare: ", output_actual);
-        printf("%" PRIu32 "\r\n", compare_actual);
+        // uint32_t compare_actual = __HAL_TIM_GET_COMPARE(pwm.p_tim, pwm.tim_channel);
+        // printf("setpoint: %f, currentAngle: %f, lastAngle: %f ", setpoint, currentAngle, lastAngle);
+        // printf("output_actual: %f, compare: ", output_actual);
+        // printf("%" PRIu32 "\r\n", compare_actual);
     }
 }
 

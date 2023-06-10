@@ -23,6 +23,8 @@
 #ifndef _PID_SOURCE_
 #define _PID_SOURCE_
 
+#define PID_DEBUG 0
+
 #include <iostream>
 #include <cmath>
 #include "pid.h"
@@ -31,55 +33,52 @@ using namespace std;
 
 class PIDImpl
 {
-    public:
-        PIDImpl( double dt, double max, double min, double Kp, double Kd, double Ki );
-        ~PIDImpl();
-        double calculate( double setpoint, double pv );
+public:
+    PIDImpl(double dt, double max, double min, double Kp, double Kd, double Ki);
+    ~PIDImpl();
+    double calculate(double setpoint, double pv);
 
-    private:
-        double _dt;
-        double _max;
-        double _min;
-        double _Kp;
-        double _Kd;
-        double _Ki;
-        double _pre_error;
-        double _integral;
+private:
+    double _dt;
+    double _max;
+    double _min;
+    double _Kp;
+    double _Kd;
+    double _Ki;
+    double _pre_error;
+    double _integral;
 };
 
-
-PID::PID( double dt, double max, double min, double Kp, double Kd, double Ki )
+PID::PID(double dt, double max, double min, double Kp, double Kd, double Ki)
 {
-    pimpl = new PIDImpl(dt,max,min,Kp,Kd,Ki);
+    pimpl = new PIDImpl(dt, max, min, Kp, Kd, Ki);
 }
-double PID::calculate( double setpoint, double pv )
+double PID::calculate(double setpoint, double pv)
 {
-    return pimpl->calculate(setpoint,pv);
+    return pimpl->calculate(setpoint, pv);
 }
-PID::~PID() 
+PID::~PID()
 {
     delete pimpl;
 }
 
-
 /**
  * Implementation
  */
-PIDImpl::PIDImpl( double dt, double max, double min, double Kp, double Kd, double Ki ) :
-    _dt(dt),
-    _max(max),
-    _min(min),
-    _Kp(Kp),
-    _Kd(Kd),
-    _Ki(Ki),
-    _pre_error(0),
-    _integral(0)
+PIDImpl::PIDImpl(double dt, double max, double min, double Kp, double Kd, double Ki) : _dt(dt),
+                                                                                       _max(max),
+                                                                                       _min(min),
+                                                                                       _Kp(Kp),
+                                                                                       _Kd(Kd),
+                                                                                       _Ki(Ki),
+                                                                                       _pre_error(0),
+                                                                                       _integral(0)
 {
 }
 
-double PIDImpl::calculate( double setpoint, double pv )
+double PIDImpl::calculate(double setpoint, double pv)
 {
-    
+
     // Calculate error
     double error = setpoint - pv;
 
@@ -96,11 +95,13 @@ double PIDImpl::calculate( double setpoint, double pv )
 
     // Calculate total output
     double output = Pout + Iout + Dout;
-
+#if PID_DEBUG == 1
+    printf("Pout: %f, Iout: %f, Dout: %f\r\n", Pout, Iout, Dout);
+#endif
     // Restrict to max/min
-    if( output > _max )
+    if (output > _max)
         output = _max;
-    else if( output < _min )
+    else if (output < _min)
         output = _min;
 
     // Save error to previous error
