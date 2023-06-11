@@ -3,3 +3,7 @@
 *.d
 *.bin
 *.hex
+*.map
+*.list
+*.su
+*.cyclo

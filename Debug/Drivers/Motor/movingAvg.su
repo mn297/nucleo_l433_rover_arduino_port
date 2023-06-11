@@ -1,5 +1,0 @@
-../Drivers/Motor/movingAvg.cpp:9:6:void movingAvg::begin()	16	static
-../Drivers/Motor/movingAvg.cpp:15:5:int movingAvg::reading(int)	16	static
-../Drivers/Motor/movingAvg.cpp:33:5:int movingAvg::getAvg()	16	static
-../Drivers/Motor/movingAvg.cpp:40:5:int movingAvg::getAvg(int)	32	static
-../Drivers/Motor/movingAvg.cpp:62:6:void movingAvg::reset()	16	static

@@ -45,9 +45,10 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 #define TEST_WRIST_ROLL_CYTRON 0
-#define TEST_WRIST_PITCH_CYTRON 1
+#define TEST_WRIST_PITCH_CYTRON 0
 #define TEST_WAIST_SERVO 0
 #define TEST_ELBOW_SERVO 0
+#define TEST_END_EFFECTOR_CYTRON 1
 
 #define MIN_FLOAT -std::numeric_limits<float>::infinity()
 #define MAX_FLOAT std::numeric_limits<float>::infinity()
@@ -77,10 +78,13 @@ double regKp_wrist_pitch = 0.5, regKi_wrist_pitch = 0.2, regKd_wrist_pitch = 0.2
 // WAIST_SERVO
 double regKp_waist = 1.8, regKi_waist = 1.0, regKd_waist = 0.5; // Vincent's configuration
 
-// ELBOW (SERVO)
+// ELBOW_SERVO
 double regKp_elbow = 0.6, regKi_elbow = 0.2, regKd_elbow = 0.1; // Vincent's configuration
 // double regKp_waist = 1.2, regKi_waist = 0.4, regKd_waist = 0.4; // Sam's configuration
 // double regKp_waist = 2, regKi_waist = 0.4, regKd_waist = 0.4;  // Speed configuration
+
+// END_EFFECTOR_CYTRON
+double regKp_end_effector = 0.4, regKi_end_effector = 0.0, regKd_end_effector = 0.0;
 
 Pin dummy_pin;
 double setpoint = 0;
@@ -145,9 +149,10 @@ static void print_MOTOR(char *msg, RoverArmMotor *pMotor)
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+Pin AMT22_1(GPIOC, GPIO_PIN_7);
 Pin CYTRON_DIR_1(CYTRON_DIR_1_GPIO_Port, CYTRON_DIR_1_Pin);
 Pin CYTRON_PWM_1(CYTRON_PWM_1_GPIO_Port, CYTRON_PWM_1_Pin, &htim2, TIM_CHANNEL_2);
-Pin AMT22_1(GPIOC, GPIO_PIN_7);
+Pin SERVO_PWM_1(CYTRON_PWM_1_GPIO_Port, CYTRON_PWM_1_Pin, &htim2, TIM_CHANNEL_2);
 
 /*---------------------WRIST_ROLL_CYTRON---------------------*/
 #if TEST_WRIST_ROLL_CYTRON == 1
@@ -161,15 +166,19 @@ RoverArmMotor Wrist_Pitch(&hspi1, CYTRON_PWM_1, CYTRON_DIR_1, AMT22_1, CYTRON, 0
 
 /*---------------------WAIST_SERVO DECLARATIONS---------------------*/
 #if TEST_WAIST_SERVO == 1
-Pin SERVO_PWM_1(CYTRON_PWM_1_GPIO_Port, CYTRON_PWM_1_Pin, &htim2, TIM_CHANNEL_2);
 RoverArmMotor Waist(&hspi1, SERVO_PWM_1, dummy_pin, AMT22_1, BLUE_ROBOTICS, 0, 359.99f);
 #endif
 
 /*---------------------ELBOW_SERVO DECLARATIONS---------------------*/
 #if TEST_ELBOW_SERVO == 1
-Pin SERVO_PWM_2(CYTRON_PWM_1_GPIO_Port, CYTRON_PWM_1_Pin, &htim2, TIM_CHANNEL_2);
-RoverArmMotor Elbow(&hspi1, SERVO_PWM_2, dummy_pin, AMT22_1, BLUE_ROBOTICS, 0, 359.99f);
+RoverArmMotor Elbow(&hspi1, SERVO_PWM_1, dummy_pin, AMT22_1, BLUE_ROBOTICS, 0, 359.99f);
 #endif
+
+/*---------------------END_EFFECTOR_CYTRON---------------------*/
+#if TEST_END_EFFECTOR_CYTRON == 1
+RoverArmMotor End_Effector(&hspi1, CYTRON_PWM_1, CYTRON_DIR_1, AMT22_1, CYTRON, 0, 359.99f);
+#endif
+
 /* USER CODE END 0 */
 
 /**
@@ -250,6 +259,17 @@ int main(void)
   Wrist_Pitch.begin(regKp_wrist_pitch, regKi_wrist_pitch, regKd_wrist_pitch);
 #endif
 
+  /*---END_EFFECTOR_CYTRON setup---*/
+
+#if TEST_END_EFFECTOR_CYTRON == 1
+  End_Effector.wrist_waist = 0;
+  End_Effector.setAngleLimits(MIN_FLOAT, MAX_FLOAT);
+  End_Effector.reset_encoder();
+  End_Effector.begin(regKp_end_effector, regKi_end_effector, regKd_end_effector);
+  End_Effector.reverse(100);
+  HAL_TIM_Base_Start_IT(&htim6);
+#endif
+
   while (!limit_set)
     ;
 
@@ -265,23 +285,23 @@ int main(void)
   while (1)
   {
 #if TEST_WAIST_SERVO == 1
-     print_MOTOR("SP Waist", &Waist);
-     printf("forwardDistance: %f, backwardDistance: %f\r\n", Waist.forwardDistance, Waist.backwardDistance);
+    print_MOTOR("SP Waist", &Waist);
 #endif
 
 #if TEST_ELBOW_SERVO == 1
     print_MOTOR("SP Elbow", &Elbow);
-    printf("forwardDistance: %f, backwardDistance: %f\r\n", Elbow.forwardDistance, Elbow.backwardDistance);
 #endif
 
 #if TEST_WRIST_ROLL_CYTRON == 1
     print_MOTOR("SP WRIST_ROLL_CYTRON", &Wrist_Roll);
-    printf("forwardDistance: %f, backwardDistance: %f\r\n", Wrist_Roll.forwardDistance, Wrist_Roll.backwardDistance);
 #endif
 
 #if TEST_WRIST_PITCH_CYTRON == 1
     print_MOTOR("SP WRIST_PITCH_CYTRON", &Wrist_Pitch);
-    printf("forwardDistance: %f, backwardDistance: %f\r\n", Wrist_Pitch.forwardDistance, Wrist_Pitch.backwardDistance);
+#endif
+
+#if TEST_END_EFFECTOR_CYTRON == 1
+    print_MOTOR("SP END_EFFECTOR_CYTRON", &End_Effector);
 #endif
 
     HAL_Delay(100);
@@ -372,21 +392,27 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
     Elbow.newSetpoint(0.0);
 #endif
 
+#if TEST_END_EFFECTOR_CYTRON == 1
+    End_Effector.stop();
+    End_Effector.set_zero_angle_sw();
+    End_Effector.newSetpoint(0.0);
+#endif
+
     limit_set = 1;
   }
 
 #if TEST_WRIST_PITCH_CYTRON == 1
-   if (GPIO_Pin == LIMIT_WRIST_PITCH_MIN_Pin && HAL_GPIO_ReadPin(LIMIT_WRIST_PITCH_MIN_GPIO_Port, LIMIT_WRIST_PITCH_MIN_Pin) == GPIO_PIN_RESET)
-   {
-     Wrist_Pitch.stop();
-     Wrist_Pitch.set_zero_angle_sw();
-   }
-  
-   if (GPIO_Pin == LIMIT_WRIST_PITCH_MAX_Pin && HAL_GPIO_ReadPin(LIMIT_WRIST_PITCH_MAX_GPIO_Port, LIMIT_WRIST_PITCH_MAX_Pin) == GPIO_PIN_RESET)
-   {
-     Wrist_Pitch.stop();
-     Wrist_Pitch.set_max_angle_sw();
-   }
+  if (GPIO_Pin == LIMIT_WRIST_PITCH_MIN_Pin && HAL_GPIO_ReadPin(LIMIT_WRIST_PITCH_MIN_GPIO_Port, LIMIT_WRIST_PITCH_MIN_Pin) == GPIO_PIN_RESET)
+  {
+    Wrist_Pitch.stop();
+    Wrist_Pitch.set_zero_angle_sw();
+  }
+
+  if (GPIO_Pin == LIMIT_WRIST_PITCH_MAX_Pin && HAL_GPIO_ReadPin(LIMIT_WRIST_PITCH_MAX_GPIO_Port, LIMIT_WRIST_PITCH_MAX_Pin) == GPIO_PIN_RESET)
+  {
+    Wrist_Pitch.stop();
+    Wrist_Pitch.set_max_angle_sw();
+  }
 #endif
 
   button_counter++;
@@ -443,6 +469,9 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 #if TEST_ELBOW_SERVO == 1
       bool is_sp_valid = Elbow.newSetpoint(param1);
 #endif
+#if TEST_END_EFFECTOR_CYTRON == 1
+      bool is_sp_valid = End_Effector.newSetpoint(param1);
+#endif
 
       if (is_sp_valid)
         printf("new Setpoint at %lf\r\n", param1);
@@ -479,6 +508,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 #endif
 #if TEST_ELBOW_SERVO == 1
     Elbow.tick();
+#endif
+#if TEST_END_EFFECTOR_CYTRON == 1
+    // End_Effector.tick();
+    print_MOTOR("SP END_EFFECTOR_CYTRON", &End_Effector);
 #endif
   }
 }
