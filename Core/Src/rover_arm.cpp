@@ -190,6 +190,7 @@ void rover_arm_setup(void)
   HAL_UART_Receive_IT(&huart2, rx_data, 1);
 }
 
+
 void rover_arm_loop()
 {
 #if TEST_ENCODER == 1
