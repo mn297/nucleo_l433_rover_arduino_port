@@ -103,12 +103,12 @@ static void print_MOTOR(char *msg, RoverArmMotor *pMotor)
 
 Pin AMT22_1(GPIOC, GPIO_PIN_7);
 Pin CYTRON_DIR_1(CYTRON_DIR_1_GPIO_Port, CYTRON_DIR_1_Pin);
-Pin CYTRON_PWM_1(CYTRON_PWM_1_GPIO_Port, CYTRON_PWM_1_Pin, &htim2, TIM_CHANNEL_2);
-Pin SERVO_PWM_1(CYTRON_PWM_1_GPIO_Port, CYTRON_PWM_1_Pin, &htim2, TIM_CHANNEL_2);
+Pin PWM1(PWM1_GPIO_Port, PWM1_Pin, &htim2, TIM_CHANNEL_2);
+Pin SERVO_PWM_1(PWM1_GPIO_Port, PWM1_Pin, &htim2, TIM_CHANNEL_2);
 
 /*---------------------WRIST_ROLL_CYTRON---------------------*/
 #if TEST_WRIST_ROLL_CYTRON == 1
-RoverArmMotor Wrist_Roll(&hspi1, CYTRON_PWM_1, CYTRON_DIR_1, AMT22_1, CYTRON, 0, 359.99f);
+RoverArmMotor Wrist_Roll(&hspi2, PWM1, CYTRON_DIR_1, AMT22_1, CYTRON, 0, 359.99f);
 #endif
 
 /*---------------------WRIST_PITCH_CYTRON---------------------*/
@@ -195,7 +195,7 @@ void rover_arm_loop()
 {
 #if TEST_ENCODER == 1
   uint16_t encoderData_1 = 0;
-  encoderData_1 = getPositionSPI(&hspi1, GPIOC, GPIO_PIN_7, 12, &htim1);
+  encoderData_1 = getPositionSPI(&hspi2, GPIOC, GPIO_PIN_7, 12, &htim1);
   printf("encoder 1 gives %d\r\n", encoderData_1);
 #endif
 
