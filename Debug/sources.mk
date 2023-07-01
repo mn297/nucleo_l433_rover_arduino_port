@@ -36,5 +36,4 @@ Core/Src \
 Core/Startup \
 Drivers/Motor \
 Drivers/STM32L4xx_HAL_Driver/Src \
-Drivers/STM32_AMT22_lib \
 

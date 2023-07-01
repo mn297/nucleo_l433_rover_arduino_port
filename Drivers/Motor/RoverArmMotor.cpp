@@ -198,7 +198,7 @@ void RoverArmMotor::tick()
             // }
             // else
             // {
-            //     temp_output = (output - deadband / 2);
+            //     temp_output = (output - deadband / 2);   
             // }
         }
         volatile double output_actual = 1500 - 1 + temp_output;
