@@ -77,8 +77,10 @@ void Error_Handler(void);
 #define LIMIT_WRIST_PITCH_MIN_Pin GPIO_PIN_10
 #define LIMIT_WRIST_PITCH_MIN_GPIO_Port GPIOB
 #define LIMIT_WRIST_PITCH_MIN_EXTI_IRQn EXTI15_10_IRQn
-#define SPI1_CS_Pin GPIO_PIN_7
-#define SPI1_CS_GPIO_Port GPIOC
+#define CYTRON_PWM_2_Pin GPIO_PIN_11
+#define CYTRON_PWM_2_GPIO_Port GPIOB
+#define CS1_Pin GPIO_PIN_7
+#define CS1_GPIO_Port GPIOC
 #define SPI3_CS_D9_Pin GPIO_PIN_8
 #define SPI3_CS_D9_GPIO_Port GPIOA
 #define SERVO_PWM_1_Pin GPIO_PIN_9

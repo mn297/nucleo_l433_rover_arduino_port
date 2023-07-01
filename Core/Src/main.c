@@ -26,7 +26,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "rover_arm.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -68,6 +68,7 @@ void SystemClock_Config(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
+
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -95,7 +96,7 @@ int main(void)
   MX_TIM2_Init();
   MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
-  rover_arm_setup();
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -103,7 +104,7 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-    rover_arm_loop();
+
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
