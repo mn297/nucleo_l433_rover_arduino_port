@@ -202,9 +202,7 @@ int main(void)
   MX_TIM2_Init();
   MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
-  uint16_t encoderData_1 = 99;
-  uint16_t encoderData_2 = 99;
-  uint16_t encoderData_3 = 99;
+
   uint16_t encoder_max = 0;
   uint16_t encoder_min = 4100;
   HAL_TIM_Base_Start(&htim1);
@@ -250,6 +248,9 @@ int main(void)
     // HAL_Delay(100);
 
     /*--------------------------------------AMT22 test--------------------------------------*/
+      uint16_t encoderData_1 = 99;
+      uint16_t encoderData_2 = 99;
+      uint16_t encoderData_3 = 99;
     // encoderData_1 = getPositionSPI(&hspi1, GPIOC, GPIO_PIN_7, 12, &htim1);
     // encoderData_2 = getPositionSPI(&hspi2, GPIOB, GPIO_PIN_6, 12, &htim1);
     // encoderData_3 = getPositionSPI(&hspi3, GPIOA, GPIO_PIN_8, 12, &htim1);

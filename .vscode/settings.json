@@ -43,6 +43,7 @@
         "xfacet": "cpp",
         "xiosbase": "cpp",
         "xlocale": "cpp",
-        "xlocinfo": "cpp"
+        "xlocinfo": "cpp",
+        "dma.h": "c"
     }
 }
