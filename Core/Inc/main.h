@@ -82,6 +82,10 @@ void Error_Handler(void);
 #define PWM3_GPIO_Port GPIOB
 #define CS1_Pin GPIO_PIN_7
 #define CS1_GPIO_Port GPIOC
+#define CS2_Pin GPIO_PIN_8
+#define CS2_GPIO_Port GPIOC
+#define CS3_Pin GPIO_PIN_9
+#define CS3_GPIO_Port GPIOC
 #define PWM1_Pin GPIO_PIN_9
 #define PWM1_GPIO_Port GPIOA
 #define PWM2_Pin GPIO_PIN_10
@@ -99,6 +103,8 @@ void Error_Handler(void);
 #define CYTRON_DIR_1_GPIO_Port GPIOB
 #define SPI2_CS_D8_Pin GPIO_PIN_6
 #define SPI2_CS_D8_GPIO_Port GPIOB
+#define DIR2_Pin GPIO_PIN_7
+#define DIR2_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 
