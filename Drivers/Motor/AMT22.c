@@ -5,6 +5,11 @@
 
 #include "AMT22.h"
 #include "tim.h"
+
+#ifndef AMT22_TIM
+#define AMT22_TIM htim15
+#endif
+
 /* SPI commands */
 #define AMT22_NOP 0x00
 #define AMT22_RESET 0x60
@@ -253,7 +258,7 @@ void delay(TIM_HandleTypeDef *timer, uint32_t delayTime)
 }
 void delay_us_AMT22(uint16_t us)
 {
-  __HAL_TIM_SET_COUNTER(&htim1, 0); // set the counter value a 0
-  while (__HAL_TIM_GET_COUNTER(&htim1) < us)
+  __HAL_TIM_SET_COUNTER(&AMT22_TIM, 0); // set the counter value a 0
+  while (__HAL_TIM_GET_COUNTER(&AMT22_TIM) < us)
     ; // wait for the counter to reach the us input in the parameter
 }

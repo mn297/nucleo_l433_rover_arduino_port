@@ -103,8 +103,9 @@ static void print_MOTOR(char *msg, RoverArmMotor *pMotor)
 
 Pin AMT22_1(GPIOC, GPIO_PIN_7);
 Pin CYTRON_DIR_1(CYTRON_DIR_1_GPIO_Port, CYTRON_DIR_1_Pin);
-Pin PWM1(PWM1_GPIO_Port, PWM1_Pin, &htim2, TIM_CHANNEL_2);
-Pin SERVO_PWM_1(PWM1_GPIO_Port, PWM1_Pin, &htim2, TIM_CHANNEL_2);
+Pin PWM1(PWM1_GPIO_Port, PWM1_Pin, &htim1, TIM_CHANNEL_2);  // D1
+Pin PWM2(PWM2_GPIO_Port, PWM2_Pin, &htim1, TIM_CHANNEL_3);  // D0
+Pin PWM3(PWM3_GPIO_Port, PWM3_Pin, &htim2, TIM_CHANNEL_2);  // D3
 
 /*---------------------WRIST_ROLL_CYTRON---------------------*/
 #if TEST_WRIST_ROLL_CYTRON == 1
@@ -113,7 +114,7 @@ RoverArmMotor Wrist_Roll(&hspi2, PWM1, CYTRON_DIR_1, AMT22_1, CYTRON, 0, 359.99f
 
 /*---------------------WRIST_PITCH_CYTRON---------------------*/
 #if TEST_WRIST_PITCH_CYTRON == 1
-RoverArmMotor Wrist_Pitch(&hspi1, CYTRON_PWM_1, CYTRON_DIR_1, AMT22_1, CYTRON, 0, 359.99f);
+RoverArmMotor Wrist_Pitch(&hspi2, PWM2, CYTRON_DIR_1, AMT22_1, CYTRON, 0, 359.99f);
 #endif
 
 /*---------------------WAIST_SERVO DECLARATIONS---------------------*/
@@ -134,6 +135,8 @@ RoverArmMotor End_Effector(&hspi1, CYTRON_PWM_1, CYTRON_DIR_1, AMT22_1, CYTRON, 
 void rover_arm_setup(void)
 {
   HAL_TIM_Base_Start(&htim1);
+  HAL_TIM_Base_Start(&htim2);
+  HAL_TIM_Base_Start(&htim15);
 
   /*---WAIST_SERVO setup---*/
 #if TEST_WAIST_SERVO == 1
